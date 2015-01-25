@@ -1,0 +1,292 @@
+#!/usr/bin/env perl
+
+my $MIN_PROT_LENGTH = 100;
+
+=pod
+
+=head1 NAME
+
+L<Transdecoder.LongOrfs|http://transdecoder.github.io> - Transcriptome Protein Prediction
+
+=head1 USAGE
+
+Required:
+
+ -t <string>                            transcripts.fasta
+
+Optional:
+
+ -m <int>                               minimum protein length (default: $MIN_PROT_LENGTH)
+ 
+ -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia)
+
+ -S                                     strand-specific (only analyzes top strand)
+
+=head1 Genetic Codes
+
+See L<http://golgi.harvard.edu/biolinks/gencode.html>. These are currently supported:
+
+ universal (default)
+ Euplotes
+ Tetrahymena
+ Candida
+ Acetabularia
+ Mitochondrial-Canonical
+ Mitochondrial-Vertebrates
+ Mitochondrial-Arthropods
+ Mitochondrial-Echinoderms
+ Mitochondrial-Molluscs
+ Mitochondrial-Ascidians
+ Mitochondrial-Nematodes
+ Mitochondrial-Platyhelminths
+ Mitochondrial-Yeasts
+ Mitochondrial-Euascomycetes
+ Mitochondrial-Protozoans
+
+
+=cut
+
+
+use strict;
+use warnings;
+use FindBin;
+use Pod::Usage;
+use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
+use Data::Dumper;
+use List::Util qw (min max);
+use File::Basename;
+
+use lib ("$FindBin::RealBin/PerlLib");
+
+use POSIX qw(ceil);
+use Gene_obj;
+use Nuc_translator;
+use Fasta_reader;
+use Longest_orf;
+
+my $UTIL_DIR = "$FindBin::RealBin/util";
+$ENV{PATH} = "$UTIL_DIR/bin:$ENV{PATH}";
+
+
+my ($transcripts_file);
+
+my $genetic_code='universal';
+
+my $TOP_STRAND_ONLY = 0;
+
+my $help;
+my $workdir;
+my $verbose;
+my $search_pfam = "";
+my ($reuse,$pfam_out);
+
+
+my $MPI_DEBUG = 1;
+
+&GetOptions( 't=s' => \$transcripts_file,
+             'm=i' => \$MIN_PROT_LENGTH,
+             'G=s' => \$genetic_code,
+             'h' => \$help,
+             'v' => \$verbose,
+             'S' => \$TOP_STRAND_ONLY, 
+             );
+
+
+
+pod2usage if ($help);
+
+if (@ARGV) {
+    die "Error, don't understand options: @ARGV";
+}
+
+our $SEE = $verbose;
+
+pod2usage "No transcript file (-t)\n" unless ($transcripts_file && -s $transcripts_file);
+
+if ($genetic_code ne 'universal') {
+    &Nuc_translator::use_specified_genetic_code($genetic_code);
+}
+
+
+
+main: {
+    my $workdir = basename($transcripts_file) . ".transdecoder_dir"; 
+    mkdir($workdir) or die "Error, cannot mkdir $workdir.  If dir exists from previous run, please relocate or remove it before proceeding.\n";
+    
+    
+
+    
+    my $base_freqs_file = "$workdir/base_freqs.dat";
+    my $base_freqs_checkpoint = "$base_freqs_file.ok";
+    if (! -e $base_freqs_checkpoint) {
+        print STDERR "-first extracting base frequencies, we'll need them later.\n";
+        my $cmd = "$UTIL_DIR/compute_base_probs.pl $transcripts_file $TOP_STRAND_ONLY > $base_freqs_file";
+        &process_cmd($cmd);
+        
+        &process_cmd("touch $base_freqs_checkpoint");
+    }
+    
+
+
+    my $prefix = "$workdir/longest_orfs";
+    my $cds_file = "$prefix.cds";
+    my $gff3_file = "$prefix.gff3";
+    my $pep_file = "$prefix.pep";
+    
+	open (PEP, ">$pep_file") or die $!;
+	open (CDS, ">$cds_file") or die $!; 
+	open (GFF, ">$gff3_file") or die $!;
+	
+	
+	my $counter = 0;
+	
+	my $fasta_reader = new Fasta_reader($transcripts_file);
+	while (my $seq_obj = $fasta_reader->next()) {
+		
+		my $acc = $seq_obj->get_accession();
+		my $sequence = $seq_obj->get_sequence();
+		
+		my $longest_orf_finder = new Longest_orf();
+		$longest_orf_finder->allow_5prime_partials();
+		$longest_orf_finder->allow_3prime_partials();
+		
+	    if ($TOP_STRAND_ONLY) {
+			$longest_orf_finder->forward_strand_only();
+		}
+		
+		my @orf_structs = $longest_orf_finder->capture_all_ORFs($sequence);
+		
+		@orf_structs = reverse sort {$a->{length}<=>$b->{length}} @orf_structs;
+		
+        while (@orf_structs) {
+            my $orf = shift @orf_structs;
+            
+            my $start = $orf->{start};
+            my $stop = $orf->{stop};
+            
+            my $length = int((abs($start-$stop)+1)/3); 
+            my $orient = $orf->{orient};
+            my $protein = $orf->{protein};            
+            
+            ##################################
+            # adjust for boundary conditions, since starts and stops run off the ends of the sequences at partial codons
+            #################################
+            
+            # adjust at 3' end
+            if ($stop > length($sequence)) {
+                $stop -= 3;
+            }
+            if ($start > length($sequence)) {
+                $start -= 3;
+            }
+            
+            # adjust at 5' end
+            if ($stop < 1) {
+                $stop += 3;
+            }
+            if ($start < 1) {
+                $start += 3;
+            }
+            
+                        
+            if ($length < $MIN_PROT_LENGTH) { next; }
+            
+            my $cds_coords_href = { $start => $stop };
+            my $exon_coords_href = ($start < $stop) ? { 1 => length($sequence) } : { length($sequence) => 1 };
+            
+            my $gene_obj = new Gene_obj();
+            
+            $counter++;
+            $gene_obj->populate_gene_object($cds_coords_href, $exon_coords_href);
+            $gene_obj->{asmbl_id} = $acc;
+            
+            my $model_id = "$acc|m.$counter";
+            my $gene_id = "$acc|g.$counter";
+            
+            $gene_obj->{TU_feat_name} = $gene_id;
+            $gene_obj->{Model_feat_name} = $model_id;
+
+            
+            my $cds = $gene_obj->create_CDS_sequence(\$sequence);
+
+            unless ($cds) {
+                die "Error, no CDS for gene: " . Dumper($cds_coords_href) . Dumper($exon_coords_href);
+            }
+
+            my $got_start = 0;
+            my $got_stop = 0;
+            if ($protein =~ /^M/) {
+                $got_start = 1;
+            } 
+            if ($protein =~ /\*$/) {
+                $got_stop = 1;
+            }
+            
+            my $prot_type = "";
+            if ($got_start && $got_stop) {
+                $prot_type = "complete";
+            } elsif ($got_start) {
+                $prot_type = "3prime_partial";
+            } elsif ($got_stop) {
+                $prot_type = "5prime_partial";
+            } else {
+                $prot_type = "internal";
+            }
+            
+            $gene_obj->{com_name} = "ORF $gene_id $model_id type:$prot_type len:$length ($orient)";            
+            
+            # this header is identical between CDS and PEP (since PEP is just a direct translation of CDS for a specific translation table)
+            # we are currently not printing this out at the final data but it would be nice to.
+            my $pep_header = ">$model_id $gene_id type:$prot_type len:$length gc:$genetic_code $acc:$start-$stop($orient)\n";
+            my $cds_header = ">$model_id $gene_id type:$prot_type len:$length $acc:$start-$stop($orient)\n";
+            
+            print PEP $pep_header."$protein\n";
+            $number_of_peps++;
+            
+            print CDS $cds_header."$cds\n";
+            
+            print GFF $gene_obj->to_GFF3_format(source => "transdecoder") . "\n";
+            
+
+            $orf_lengths{$model_id} = length($cds);
+            
+
+
+        }
+	}
+
+    close PEP;
+    close CDS;
+    close GFF;
+    
+
+    print STDERR "\n\n#################################\n"
+                  . "### Done preparing long ORFs.  ###\n"
+                  . "##################################\n\n";
+
+    print STDERR "\tUse file: $pep_file  for Pfam and/or BlastP searches to enable homology-based coding region identification.\n\n";
+    
+    print STDERR "\t\tThen, run TransDecoder.Predict for your final coding region predictions.\n\n\n";
+    
+
+    exit(0);
+
+    
+}
+
+
+####
+sub process_cmd {
+	my ($cmd) = @_;
+
+	print "CMD: $cmd\n";
+	my $ret = system($cmd);
+
+	if ($ret) {
+		die "Error, cmd: $cmd died with ret $ret";
+	}
+	
+	return;
+
+}
+

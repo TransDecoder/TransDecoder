@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# These are example SCRIPTs to run PFAM with MPI ON PBS. Minor changes would be needed for LSF etc
+# executable for mpirun, e.g. from OpenMPI
+MPIRUN_EXEC=`which mpirun`
+# these arguments are valid for OpenMPI, change them for Intel's
+MPIRUN_ARGS="-gmca mpi_warn_on_fork 0 -cpus-per-proc 1 -np $2 -machinefile workers.$PBS_JOBID.mpi"
+
+#executable of hhmscan
+HMMSCAN_EXEC=`which hmmscan`
+
+#your PFAM database
+PFAMDB=/home/pap056/30day/databases/pfam/Pfam-AB.hmm.bin
+
+# no need to change the following
+
+export OMP_NUM_THREADS=1
+# the PBS_O_WORKDIR is where you launched the script from. Feel free to change this if you need
+# to launch it from a difference directory
+cd $PBS_O_WORKDIR
+cat ${PBS_NODEFILE} > workers.$PBS_JOBID.mpi
+$MPIRUN_EXEC $MPIRUN_ARGS ffindex_apply_mpi \
+ -d "$1"_out2.db \
+ -i "$1"_out2.db.idx \
+ $1 \
+ $1.idx \
+ -- $HMMSCAN_EXEC -o /dev/null --cpu 1 --noali --cut_nc --acc --notextw --domtblout /dev/stdout $PFAMDB -

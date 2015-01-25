@@ -1,0 +1,5 @@
+## 2014-07-04
+
+-added 'make simple' to build just the essential components involving parafly and cdhit
+-removed the 'cds.' prefix from the pep and cds sequence accessions.
+
