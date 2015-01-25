@@ -150,6 +150,11 @@ main: {
 	my $fasta_reader = new Fasta_reader($transcripts_file);
 	while (my $seq_obj = $fasta_reader->next()) {
 		
+        $counter++;
+        my $percent_done = sprintf("%.2f", $counter/$num_total_trans*100);
+        print STDERR "\r[$counter/$num_total_trans] = $percent_done\% done    " if $counter % 100 == 0;
+                
+
 		my $acc = $seq_obj->get_accession();
 		my $sequence = $seq_obj->get_sequence();
 		
@@ -202,10 +207,6 @@ main: {
             my $exon_coords_href = ($start < $stop) ? { 1 => length($sequence) } : { length($sequence) => 1 };
             
             my $gene_obj = new Gene_obj();
-            
-            $counter++;
-            my $percent_done = sprintf("%.2f", $counter/$num_total_trans*100);
-            print STDERR "\r[$counter/$num_total_trans] = $percent_done\% done    " if $counter % 100 == 0;
             
 
             $gene_obj->populate_gene_object($cds_coords_href, $exon_coords_href);
