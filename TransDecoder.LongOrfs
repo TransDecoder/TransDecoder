@@ -16,7 +16,7 @@ Required:
 
 Optional:
 
- -m <int>                               minimum protein length (default: $MIN_PROT_LENGTH)
+ -m <int>                               minimum protein length (default: 100)
  
  -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia)
 
@@ -93,7 +93,7 @@ my $MPI_DEBUG = 1;
 
 
 
-pod2usage if ($help);
+pod2usage(-verbose => 2, -output => \*STDERR) if ($help);
 
 if (@ARGV) {
     die "Error, don't understand options: @ARGV";
@@ -101,7 +101,8 @@ if (@ARGV) {
 
 our $SEE = $verbose;
 
-pod2usage "No transcript file (-t)\n" unless ($transcripts_file && -s $transcripts_file);
+pod2usage(-verbose => 2,
+          -output => \*STDERR) unless ($transcripts_file && -s $transcripts_file);
 
 if ($genetic_code ne 'universal') {
     &Nuc_translator::use_specified_genetic_code($genetic_code);
@@ -119,7 +120,7 @@ main: {
     my $base_freqs_file = "$workdir/base_freqs.dat";
     my $base_freqs_checkpoint = "$base_freqs_file.ok";
     if (! -e $base_freqs_checkpoint) {
-        print STDERR "-first extracting base frequencies, we'll need them later.\n";
+        print STDERR "\n\n-first extracting base frequencies, we'll need them later.\n";
         my $cmd = "$UTIL_DIR/compute_base_probs.pl $transcripts_file $TOP_STRAND_ONLY > $base_freqs_file";
         &process_cmd($cmd);
         
@@ -241,17 +242,11 @@ main: {
             my $cds_header = ">$model_id $gene_id type:$prot_type len:$length $acc:$start-$stop($orient)\n";
             
             print PEP $pep_header."$protein\n";
-            $number_of_peps++;
-            
+                        
             print CDS $cds_header."$cds\n";
             
             print GFF $gene_obj->to_GFF3_format(source => "transdecoder") . "\n";
             
-
-            $orf_lengths{$model_id} = length($cds);
-            
-
-
         }
 	}
 
