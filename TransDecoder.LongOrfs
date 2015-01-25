@@ -112,10 +112,10 @@ if ($genetic_code ne 'universal') {
 
 main: {
     my $workdir = basename($transcripts_file) . ".transdecoder_dir"; 
-    mkdir($workdir) or die "Error, cannot mkdir $workdir.  If dir exists from previous run, please relocate or remove it before proceeding.\n";
+    unless (-d $workdir) {
+        mkdir($workdir) or die "Error, cannot mkdir $workdir.";
+    }
     
-    
-
     
     my $base_freqs_file = "$workdir/base_freqs.dat";
     my $base_freqs_checkpoint = "$base_freqs_file.ok";
@@ -138,9 +138,15 @@ main: {
 	open (CDS, ">$cds_file") or die $!; 
 	open (GFF, ">$gff3_file") or die $!;
 	
+
+    print STDERR "\n\n- extracting ORFs from transcripts.\n";
 	
 	my $counter = 0;
 	
+    my $num_total_trans = `grep '>' $transcripts_file | wc -l`;
+    chomp $num_total_trans;
+    print STDERR "-total transcripts to examine: $num_total_trans\n";
+
 	my $fasta_reader = new Fasta_reader($transcripts_file);
 	while (my $seq_obj = $fasta_reader->next()) {
 		
@@ -198,6 +204,10 @@ main: {
             my $gene_obj = new Gene_obj();
             
             $counter++;
+            my $percent_done = sprintf("%.2f", $counter/$num_total_trans*100);
+            print STDERR "\r[$counter/$num_total_trans] = $percent_done\% done    " if $counter % 100 == 0;
+            
+
             $gene_obj->populate_gene_object($cds_coords_href, $exon_coords_href);
             $gene_obj->{asmbl_id} = $acc;
             
@@ -254,7 +264,7 @@ main: {
     close CDS;
     close GFF;
     
-
+    
     print STDERR "\n\n#################################\n"
                   . "### Done preparing long ORFs.  ###\n"
                   . "##################################\n\n";
