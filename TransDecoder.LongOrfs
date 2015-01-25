@@ -271,7 +271,7 @@ main: {
 
     print STDERR "\tUse file: $pep_file  for Pfam and/or BlastP searches to enable homology-based coding region identification.\n\n";
     
-    print STDERR "\t\tThen, run TransDecoder.Predict for your final coding region predictions.\n\n\n";
+    print STDERR "\tThen, run TransDecoder.Predict for your final coding region predictions.\n\n\n";
     
 
     exit(0);
