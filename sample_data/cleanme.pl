@@ -16,8 +16,11 @@ my @files_to_keep = qw (cleanme.pl
                         test.genome.fasta.gz
                         test.tophat.sam.gz
                         transcripts.gtf.gz
-                        __runMe_use_pfam.sh
-                        __runMe_use_pfam_MPI_ffindex.sh
+                 
+                 
+
+pfam.domtblout.gz
+blastp.results.outfmt6.gz
                         );
 
 
