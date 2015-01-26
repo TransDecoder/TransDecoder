@@ -141,8 +141,9 @@ main: {
 
     print STDERR "\n\n- extracting ORFs from transcripts.\n";
 	
-	my $counter = 0;
-	
+	my $model_counter = 0;
+	my $trans_counter = 0;
+    
     my $num_total_trans = `grep '>' $transcripts_file | wc -l`;
     chomp $num_total_trans;
     print STDERR "-total transcripts to examine: $num_total_trans\n";
@@ -150,9 +151,9 @@ main: {
 	my $fasta_reader = new Fasta_reader($transcripts_file);
 	while (my $seq_obj = $fasta_reader->next()) {
 		
-        $counter++;
-        my $percent_done = sprintf("%.2f", $counter/$num_total_trans*100);
-        print STDERR "\r[$counter/$num_total_trans] = $percent_done\% done    " if $counter % 100 == 0;
+        $trans_counter++;
+        my $percent_done = sprintf("%.2f", $trans_counter/$num_total_trans*100);
+        print STDERR "\r[$trans_counter/$num_total_trans] = $percent_done\% done    " if $trans_counter % 100 == 0;
                 
 
 		my $acc = $seq_obj->get_accession();
@@ -212,8 +213,10 @@ main: {
             $gene_obj->populate_gene_object($cds_coords_href, $exon_coords_href);
             $gene_obj->{asmbl_id} = $acc;
             
-            my $model_id = "$acc|m.$counter";
-            my $gene_id = "$acc|g.$counter";
+            $model_counter++;
+
+            my $model_id = "$acc|m.$model_counter";
+            my $gene_id = "$acc|g.$model_counter";
             
             $gene_obj->{TU_feat_name} = $gene_id;
             $gene_obj->{Model_feat_name} = $model_id;
