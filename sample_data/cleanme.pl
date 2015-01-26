@@ -35,7 +35,8 @@ foreach my $file (<*>) {
 	}
 }
 
-`rm -rf transdecoder.tmp.*`;
+
+`rm -rf ./transcripts.fasta.transdecoder_dir/`;
 
 
 exit(0);

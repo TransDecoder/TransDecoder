@@ -12,6 +12,15 @@ if [ -e transcripts.gtf.gz ] && [ ! -e transcripts.gtf ]; then
     gunzip -c transcripts.gtf.gz > transcripts.gtf
 fi
 
+if [ -e blastp.results.outfmt6.gz ] && [ ! -e blastp.results.outfmt6 ]; then
+    gunzip -c blastp.results.outfmt6.gz > blastp.results.outfmt6
+fi
+
+if [ -e pfam.domtblout.gz ] && [ ! -e pfam.domtblout ]; then
+    gunzip -c pfam.domtblout.gz > pfam.domtblout
+fi
+
+
 
 ## generate alignment gff3 formatted output
 ../util/cufflinks_gtf_to_alignment_gff3.pl transcripts.gtf > transcripts.gff3
@@ -19,13 +28,17 @@ fi
 ## generate transcripts fasta file
 ../util/cufflinks_gtf_genome_to_cdna_fasta.pl transcripts.gtf test.genome.fasta > transcripts.fasta 
 
-## find likely ORFs
+## Extract the long ORFs
+../TransDecoder.LongOrfs -t transcripts.fasta
+
+
+## Predict likely ORFs
 if [ $1 ]; then
- ## checking for PFAM
- ../TransDecoder -t transcripts.fasta --workdir transdecoder.tmp.pfam --search_pfam $1
+    ## use pfam and blast results:
+    ../TransDecoder.Predict  -t transcripts.fasta --retain_pfam_hits pfam.domtblout --retain_blastp_hits blastp.results.outfmt6 -v
 else
- ## no PFAM
- ../TransDecoder -t transcripts.fasta --workdir transdecoder.tmp.nopfam
+    # just coding metrics
+    ../TransDecoder.Predict -t transcripts.fasta 
 fi
 
 ## convert to genome coordinates

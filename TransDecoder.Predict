@@ -99,7 +99,7 @@ my $MPI_DEBUG = 1;
 
 
 
-pod2usage if ($help);
+pod2usage(-verbose => 2, -output => \*STDERR) if ($help);
 
 if (@ARGV) {
     die "Error, don't understand options: @ARGV";
@@ -108,7 +108,7 @@ if (@ARGV) {
 
 our $SEE = $verbose;
 
-pod2usage "No transcript file (-t)\n" unless ($transcripts_file && -s $transcripts_file);
+pod2usage(-verbose => 2, -output => \*STDERR, -message => "No transcript file (-t)\n") unless ($transcripts_file && -s $transcripts_file);
 
 main: {
     my $workdir = basename($transcripts_file) . ".transdecoder_dir"; 
