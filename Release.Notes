@@ -1,3 +1,18 @@
+
+## 2015-01-26   v2.0 release
+
+-overhauled the build
+    -removed the active searching of Pfam and all MPI-related funcitonality
+    -runs in 2 phase:
+        -TransDecoder.LongOrfs : extracs the long ORFs
+        -TransDecoder.Predict : predicts the likely coding regions among the ORFs
+            -step can use Pfam and blastp search results (blast support is a new addition)
+    -run Pfam and/or BlastP searches directly or try using "HPC GridRunner" (http://HpcGridRunner.github.io)
+
+-moved to github 
+
+
+
 ## 2014-07-04
 
 -added 'make simple' to build just the essential components involving parafly and cdhit

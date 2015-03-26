@@ -12,29 +12,16 @@ It uses the following criteria:
 
 The software is primarily maintained by Brian Haas at the Broad Institute and Alexie Papanicolaou at the Commonwealth Scientific and Industrial Research Organisation (CSIRO). It is integrated into other related software such as Trinity, PASA, EVidenceModeler, and Trinotate.
 
-Full documentation is provided at: http://transdecoder.sf.net
+Full documentation is provided at: http://transdecoder.github.io
 
 ===========================
 To build just TransDecoder:
 
-Please make sure you read http://transdecoder.sf.net before proceeding.
+Please make sure you read http://transdecoder.github.io before proceeding.
 
    %  make
-
-To leverage the included PFAM data:
-
-   Be sure to have hmmer installed: http://hmmer.janelia.org/
-
-   % make prep_pfam
-
-To leverage MPI using ffindex:
-
-   % make all
 
 
 See sample_data/ directory for example usage.
 
 
-Notes:
-
-Binary PFAM database was prepared using PfamA and PfamB and then compressed using HMMER Version Easel h3.0 (March 2010)

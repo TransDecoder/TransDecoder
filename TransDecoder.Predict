@@ -22,6 +22,7 @@ Common options:
  
  --retain_blastp_hits <string>
 
+ --cpu <int>                            Use multipe cores for cd-hit-est. (default=1)
 
 
 Advanced options
@@ -75,7 +76,7 @@ my $RETAIN_LONG_ORFS = 900;
 
 my $retain_pfam_hits_file;
 my $retain_blastp_hits_file;
-
+my $cpu = 1;
 my $MPI_DEBUG = 1;
 
 &GetOptions( 't=s' => \$transcripts_file,
@@ -95,6 +96,7 @@ my $MPI_DEBUG = 1;
              
              'retain_pfam_hits=s' => \$retain_pfam_hits_file,
              'retain_blastp_hits=s' => \$retain_blastp_hits_file,
+             'cpu=i' => \$cpu,
              
              );
 
@@ -142,7 +144,7 @@ main: {
             my $red_num = $top_ORFs_train * 10;
             my $red_num_cds_longest_file = "$cds_file.top_longest_${red_num}";
             &process_cmd("$UTIL_DIR/get_top_longest_fasta_entries.pl $cds_file $red_num > $red_num_cds_longest_file");
-            &process_cmd("$cd_hit_est_exec -r 1 -i $red_num_cds_longest_file -c 0.80 -o $red_num_cds_longest_file.nr80 -M 0 ");
+            &process_cmd("$cd_hit_est_exec -r 1 -i $red_num_cds_longest_file -T $cpu -c 0.80 -o $red_num_cds_longest_file.nr80 -M 0 ");
             &process_cmd("$UTIL_DIR/get_top_longest_fasta_entries.pl $red_num_cds_longest_file.nr80 $top_ORFs_train > $top_cds_file");
         
             &process_cmd("touch $checkpoint");
