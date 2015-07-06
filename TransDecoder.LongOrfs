@@ -22,6 +22,8 @@ Optional:
 
  -S                                     strand-specific (only analyzes top strand)
 
+ -p <int>                               shorten potential 5' partials if they are this percentage of the original protein or longer.
+
 =head1 Genetic Codes
 
 See L<http://golgi.harvard.edu/biolinks/gencode.html>. These are currently supported:
@@ -72,6 +74,8 @@ my ($transcripts_file);
 
 my $genetic_code='universal';
 
+my $preserve_full_lengths = undef;
+
 my $TOP_STRAND_ONLY = 0;
 
 my $help;
@@ -89,6 +93,7 @@ my $MPI_DEBUG = 1;
              'h' => \$help,
              'v' => \$verbose,
              'S' => \$TOP_STRAND_ONLY, 
+             'p=i' => \$preserve_full_lengths
              );
 
 
@@ -170,6 +175,9 @@ main: {
 		my @orf_structs = $longest_orf_finder->capture_all_ORFs($sequence);
 		
 		@orf_structs = reverse sort {$a->{length}<=>$b->{length}} @orf_structs;
+    print "checking for fp in $acc \n" if ($SEE);
+    $longest_orf_finder->check_for_fp_5prime_partials($MIN_PROT_LENGTH,\@orf_structs,$preserve_full_lengths) 
+       if(defined($preserve_full_lengths));
 		
         while (@orf_structs) {
             my $orf = shift @orf_structs;
@@ -200,6 +208,8 @@ main: {
             if ($start < 1) {
                 $start += 3;
             }
+
+            print "Candidate (len $length): ".Dumper($orf) if($SEE);
             
                         
             if ($length < $MIN_PROT_LENGTH) { next; }
@@ -210,6 +220,10 @@ main: {
             my $gene_obj = new Gene_obj();
             
 
+            print "dumping coords for $acc $start $stop\n" if($SEE);
+            print Dumper(%$cds_coords_href) if($SEE);
+            print Dumper(%$exon_coords_href) if($SEE);
+            
             $gene_obj->populate_gene_object($cds_coords_href, $exon_coords_href);
             $gene_obj->{asmbl_id} = $acc;
             
