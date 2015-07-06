@@ -22,7 +22,7 @@ Optional:
 
  -S                                     strand-specific (only analyzes top strand)
 
- -p                                     preserve full length orfs, removing potential FP partials
+ -p <int>                               shorten potential 5' partials if they are this percentage of the original protein or longer.
 
 =head1 Genetic Codes
 
@@ -74,7 +74,7 @@ my ($transcripts_file);
 
 my $genetic_code='universal';
 
-my $preserve_full_lengths = 0;
+my $preserve_full_lengths = undef;
 
 my $TOP_STRAND_ONLY = 0;
 
@@ -93,7 +93,7 @@ my $MPI_DEBUG = 1;
              'h' => \$help,
              'v' => \$verbose,
              'S' => \$TOP_STRAND_ONLY, 
-             'p' => \$preserve_full_lengths
+             'p=i' => \$preserve_full_lengths
              );
 
 
@@ -176,7 +176,8 @@ main: {
 		
 		@orf_structs = reverse sort {$a->{length}<=>$b->{length}} @orf_structs;
     print "checking for fp in $acc \n" if ($SEE);
-    $longest_orf_finder->check_for_fp_5prime_partials($MIN_PROT_LENGTH,\@orf_structs) if($preserve_full_lengths);
+    $longest_orf_finder->check_for_fp_5prime_partials($MIN_PROT_LENGTH,\@orf_structs,$preserve_full_lengths) 
+       if(defined($preserve_full_lengths));
 		
         while (@orf_structs) {
             my $orf = shift @orf_structs;

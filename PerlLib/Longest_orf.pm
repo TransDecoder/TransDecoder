@@ -188,9 +188,10 @@ sub capture_all_ORFs {
 }
 
 sub check_for_fp_5prime_partials {
-  my($self,$min_len,$orfs_ref) = @_;
+  my($self,$min_len,$orfs_ref,$pct_cutoff) = @_;
   my @orfs = @$orfs_ref;
   print "IN fp $#orfs\n" if($SEE);
+  $pct_cutoff /= 100;
   for(my $i = 0; $i <= $#orfs; $i++) {
     use Data::Dumper;
 
@@ -203,8 +204,9 @@ sub check_for_fp_5prime_partials {
     print "partial with M\nnew prot: $fl_protein\n" if($SEE);
     print Dumper($orfs[$i]) if($SEE);
 
-    next if($i < $#orfs && length($orfs[$i+1]->{protein}) > length($fl_protein));
     next if(length($fl_protein) < $min_len);
+    next if(length($fl_protein) < $pct_cutoff*length($orfs[$i]->{protein}));
+    next if($i < $#orfs && length($orfs[$i+1]->{protein}) > length($fl_protein));
  
     print "seq start: $orfs[$i]->{start} new start: ".($orfs[$i]->{start} + $fl_start*3)." length: $orfs[$i]->{length}\n" if($SEE);
     $orfs[$i]->{sequence} = substr($orfs[$i]->{sequence},$fl_start*3);
@@ -218,9 +220,7 @@ sub check_for_fp_5prime_partials {
     $orfs[$i]->{protein} = $fl_protein;
     $orfs[$i]->{type} = 'complete';
     
-    print "passt\n" if ($SEE);
     print Dumper($orfs[$i]) if($SEE);
-
   }
 
 }
