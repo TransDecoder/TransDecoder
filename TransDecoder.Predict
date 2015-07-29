@@ -31,7 +31,8 @@ Advanced options
                                         longest non-redundant ORFs used
 
  -T <int>                               If no --train, top longest ORFs to train Markov Model (hexamer stats) (default: 500)
-
+                                        Note, 10x this value are first selected for use with cd-hit to remove redundancies,
+                                        and then this -T value of longest ORFs are selected from the non-redundant set.
 
 =cut
 
