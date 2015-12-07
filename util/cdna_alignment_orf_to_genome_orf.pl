@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use Carp;
 
 use FindBin;
 use lib ("$FindBin::Bin/../PerlLib");
@@ -141,7 +142,7 @@ sub parse_transcript_alignment_info {
 sub place_orf_in_cdna_alignment_context {
     my ($transcript_struct, $orf_gene_obj, $cdna_seq_lengths_href) = @_;
 
-    my $trans_seq_length = $cdna_seq_lengths_href->{ $transcript_struct->{asmbl} } or die "Error, no length for " . Dumper($transcript_struct);
+    my $trans_seq_length = $cdna_seq_lengths_href->{ $transcript_struct->{asmbl} } or confess "Error, no length for " . Dumper($transcript_struct) . " Please be sure to use a cDNA fasta file and not a genome fasta file for your commandline parameter.";
     
 
 
