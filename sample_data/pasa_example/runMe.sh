@@ -18,4 +18,4 @@ fi
 
 ../../util/cdna_alignment_orf_to_genome_orf.pl  pasa_assemblies.fasta.transdecoder.gff3 pasa_assemblies.gff3 pasa_assemblies.fasta | tee pasa_assemblies.fasta.transdecoder.genome.gff3
 
-exit(0)
+exit 0
