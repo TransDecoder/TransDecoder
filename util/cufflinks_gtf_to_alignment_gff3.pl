@@ -77,20 +77,22 @@ main: {
 				my $gene_obj = new Gene_obj();
 
 				$gene_obj->{TU_feat_name} = $gene_id;
-				$gene_obj->{Model_feat_name} = $trans_id;
+				$gene_obj->{Model_feat_name} = "$trans_id";
 				$gene_obj->{com_name} = "cufflinks $gene_id $trans_id";
 				
 				$gene_obj->{asmbl_id} = $scaff;
 				
 				$gene_obj->populate_gene_object($coords_href, $coords_href);
-                
-				print $gene_obj->to_alignment_GFF3_format($trans_id, "$trans_id", "Cufflinks");
+
+
+                ## encode gene and trans id in the ID and target fields for later extraction.  (probably a better way to do this!!)
+				print $gene_obj->to_alignment_GFF3_format("GENE^$gene_id,TRANS^$trans_id", "GENE^$gene_id,TRANS^$trans_id", "Cufflinks");
 				
 				print "\n";
 			}
 		}
 	}
-
+    
 
 	exit(0);
 }
