@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use Carp;
 
 use FindBin;
 use lib ("$FindBin::Bin/../PerlLib");
@@ -44,7 +45,7 @@ main: {
     
         my @gene_ids = @{$contig_to_gene_list_href->{$asmbl_id}};
     
-        foreach my $gene_id (@gene_ids) {
+        foreach my $gene_id (@gene_ids) { # gene identifiers as given by transdecoder on the transcript sequences
             my $gene_obj_ref = $gene_obj_indexer_href->{$gene_id};
             
             my $asmbl_id = $gene_obj_ref->{asmbl_id};
@@ -72,11 +73,14 @@ main: {
                     #$new_orf_gene->{TU_feat_name} = "t.$asmbl_id.$orf_count";
                     #$new_orf_gene->{Model_feat_name} = "m.$asmbl_id.$orf_count";
                     $new_orf_gene->{com_name} = "ORF";
-                    
-                    $new_orf_gene->{TU_feat_name} = $gene_id;
-                    $new_orf_gene->{Model_feat_name} = $gene_obj_ref->{Model_feat_name};
-                                        
 
+                    my $use_gene_id = $transcript_struct->{gene_id} || $gene_id;
+                    
+                    
+                    $new_orf_gene->{TU_feat_name} = $use_gene_id;
+                    $new_orf_gene->{Model_feat_name} = $gene_obj_ref->{Model_feat_name};
+                    
+                    
                     print $new_orf_gene->to_GFF3_format(source => "transdecoder") . "\n";
                     
                 }
@@ -118,6 +122,18 @@ sub parse_transcript_alignment_info {
 
         $info =~ /Target=(\S+)/ or die "Error, cannot parse ID from $info";
         my $asmbl = $1;
+
+        my $trans_id = "";
+        my $gene_id = "";
+           
+        
+        if ($asmbl =~ /^GENE\^(\S+),TRANS\^(\S+)/) {
+            $gene_id = $1;
+            $trans_id = $2;
+
+            $asmbl = $2;
+        }
+        
         
         if (my $struct = $cdna_alignments{$asmbl}) {
             push (@{$struct->{coords}}, [$lend, $rend]);
@@ -128,10 +144,14 @@ sub parse_transcript_alignment_info {
                            contig => $contig,
                            
                            coords => [ 
-                                       [$lend, $rend]
-                                     ],
+                               [$lend, $rend]
+                               ],
+                               
                            orient => $orient,
-                                   };
+                               trans_id => $trans_id,
+                               gene_id => $gene_id,
+                               
+            };
 
             $cdna_alignments{$asmbl} = $struct;
         }
@@ -148,7 +168,7 @@ sub parse_transcript_alignment_info {
 sub place_orf_in_cdna_alignment_context {
     my ($transcript_struct, $orf_gene_obj, $cdna_seq_lengths_href) = @_;
 
-    my $trans_seq_length = $cdna_seq_lengths_href->{ $transcript_struct->{asmbl} } or die "Error, no length for " . Dumper($transcript_struct);
+    my $trans_seq_length = $cdna_seq_lengths_href->{ $transcript_struct->{asmbl} } or confess "Error, no length for " . Dumper($transcript_struct) . " Please be sure to use a cDNA fasta file and not a genome fasta file for your commandline parameter.";
     
 
 

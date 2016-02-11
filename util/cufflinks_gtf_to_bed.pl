@@ -68,11 +68,11 @@ main: {
 
 		my $genes_href = $genome_trans_to_coords{$scaff};
 
-		foreach my $gene_id (keys %$genes_href) {
+		foreach my $gene_id (sort keys %$genes_href) {
 
 			my $trans_href = $genes_href->{$gene_id};
 
-			foreach my $trans_id (keys %$trans_href) {
+			foreach my $trans_id (sort keys %$trans_href) {
 
 				my $coords_href = $trans_href->{$trans_id};
 
