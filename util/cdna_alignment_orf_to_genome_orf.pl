@@ -16,6 +16,13 @@ my $cdna_orfs_gff3 = $ARGV[0] or die $usage;
 my $cdna_genome_gff3 = $ARGV[1] or die $usage;
 my $cdna_fasta = $ARGV[2] or die $usage;
 
+# ensure can find the inputs
+foreach my $file ($cdna_orfs_gff3, $cdna_genome_gff3, $cdna_fasta) {
+    unless (-s $file) {
+        die "Error, cannot locate file: $file";
+    }
+}
+
 
 my $WARNING_COUNT = 0; # count those orfs that appear to be on strand opposite from the transcribed strand.
 
