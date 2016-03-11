@@ -1,3 +1,11 @@
+## 2016-03-11 v2.1 release
+-added cpu parameter to TransDecoder.predict
+-retaining gene identifier information from cufflinks output
+-added sample data and examples for the various use-cases.
+
+
+
+
 
 ## 2015-01-26   v2.0 release
 
