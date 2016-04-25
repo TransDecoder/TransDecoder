@@ -25,7 +25,7 @@ fi
 ../../util/cufflinks_gtf_to_alignment_gff3.pl transcripts.gtf > transcripts.gff3
 
 ## generate transcripts fasta file
-../../util/cufflinks_gtf_genome_to_cdna_fasta.pl transcripts.gtf test.genome.fasta > transcripts.fasta 
+PERL_HASH_SEED=0 ../../util/cufflinks_gtf_genome_to_cdna_fasta.pl transcripts.gtf test.genome.fasta > transcripts.fasta 
 
 ## Extract the long ORFs
 ../../TransDecoder.LongOrfs -t transcripts.fasta
