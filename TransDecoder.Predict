@@ -268,7 +268,8 @@ main: {
         $cmd = "$UTIL_DIR/gff3_file_to_proteins.pl $gff3_file $transcripts_file CDS > $best_cds_file";
         &process_cmd($cmd);
         
-        # make a CDS file:
+        # make a cDNA file:
+        # useful because it indicates the ORF info within the header.
         my $best_cdna_file = $best_pep_file;
         $best_cdna_file =~ s/\.pep$/\.mRNA/;
         $cmd = "$UTIL_DIR/gff3_file_to_proteins.pl $gff3_file $transcripts_file cDNA > $best_cdna_file";

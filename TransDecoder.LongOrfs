@@ -175,9 +175,11 @@ main: {
 		my @orf_structs = $longest_orf_finder->capture_all_ORFs($sequence);
 		
 		@orf_structs = reverse sort {$a->{length}<=>$b->{length}} @orf_structs;
-    print "checking for fp in $acc \n" if ($SEE);
-    $longest_orf_finder->check_for_fp_5prime_partials($MIN_PROT_LENGTH,\@orf_structs,$preserve_full_lengths) 
-       if(defined($preserve_full_lengths));
+        print "checking for fp in $acc \n" if ($SEE);
+        
+        if (defined($preserve_full_lengths)) {
+            $longest_orf_finder->check_for_fp_5prime_partials($MIN_PROT_LENGTH,\@orf_structs,$preserve_full_lengths) 
+        }
 		
         while (@orf_structs) {
             my $orf = shift @orf_structs;
