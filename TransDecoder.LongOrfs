@@ -239,11 +239,12 @@ main: {
 
             
             my $cds = $gene_obj->create_CDS_sequence(\$sequence);
-
+            $gene_obj->set_CDS_phases(\$sequence);
+            
             unless ($cds) {
                 die "Error, no CDS for gene: " . Dumper($cds_coords_href) . Dumper($exon_coords_href);
             }
-
+            
             my $got_start = 0;
             my $got_stop = 0;
             if ($protein =~ /^M/) {
@@ -274,6 +275,8 @@ main: {
             print PEP $pep_header."$protein\n";
                         
             print CDS $cds_header."$cds\n";
+
+            
             
             print GFF $gene_obj->to_GFF3_format(source => "transdecoder") . "\n";
             
