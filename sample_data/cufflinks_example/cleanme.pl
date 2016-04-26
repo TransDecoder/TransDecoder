@@ -20,6 +20,8 @@ my @files_to_keep = qw (cleanme.pl
 
 blastp.outfmt6.gz
 pfam.domtblout.gz
+Makefile
+
                                          );
 
 

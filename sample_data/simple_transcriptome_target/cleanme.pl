@@ -15,6 +15,7 @@ my @files_to_keep = qw (
 cleanme.pl
 runMe.sh
 Trinity.fasta.gz
+Makefile
                         );
 
 
