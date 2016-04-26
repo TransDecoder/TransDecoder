@@ -45,7 +45,7 @@ if [ 1 ]; then   # always doing this now.
     
     
     ## use pfam and blast results:
-    ../../TransDecoder.Predict  -t transcripts.fasta --retain_pfam_hits pfam.domtblout --retain_blastp_hits blastp.outfmt6 -v
+    ../../TransDecoder.Predict  -t transcripts.fasta --retain_pfam_hits pfam.domtblout --retain_blastp_hits blastp.outfmt6 --single_best_orf  -v
 else
     # just coding metrics
     ../../TransDecoder.Predict -t transcripts.fasta 

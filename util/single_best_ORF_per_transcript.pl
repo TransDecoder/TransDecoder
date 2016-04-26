@@ -112,7 +112,7 @@ main: {
                                          "homology_count: " . $entry->{homology_count},
                                          "len: " . $entry->{length}) . "\n";
             }
-                    
+            
         }
         
         my $best_gene_entry = shift @gene_entries;
@@ -136,7 +136,7 @@ main: {
 
 ## note borrowed code below from TransDecoder.predict and should consolidate.   ## //FIXME
 
-sub parse_pfam_hits {
+sub parse_pfam_hits_file {
     my ($pfam_hits_file) = @_;
 
     my %has_pfam_hit;
