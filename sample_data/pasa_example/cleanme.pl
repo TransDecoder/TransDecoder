@@ -17,6 +17,8 @@ genome.fasta.gz
 pasa_assemblies.fasta.gz
 pasa_assemblies.gff3.gz
 runMe.sh
+pasa_assemblies_described.txt.gz
+
                         );
 
 
