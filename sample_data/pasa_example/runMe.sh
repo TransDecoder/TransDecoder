@@ -12,7 +12,15 @@ if [ ! -e pasa_assemblies.gff3 ]; then
     gunzip -c pasa_assemblies.gff3.gz > pasa_assemblies.gff3
 fi
 
-../../TransDecoder.LongOrfs -t pasa_assemblies.fasta
+if [ ! -e pasa_assemblies_described.txt ]; then
+    gunzip -c pasa_assemblies_described.txt.gz > pasa_assemblies_described.txt
+fi
+
+
+# get the gene-to-transcript relationships
+cut -f2,3 pasa_assemblies_described.txt > pasa.gene_trans_map.txt
+
+../../TransDecoder.LongOrfs -t pasa_assemblies.fasta --gene_trans_map pasa.gene_trans_map.txt
 
 ../../TransDecoder.Predict -t pasa_assemblies.fasta
 
