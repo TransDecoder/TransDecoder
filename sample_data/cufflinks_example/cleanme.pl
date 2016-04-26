@@ -17,11 +17,10 @@ my @files_to_keep = qw (cleanme.pl
                         test.tophat.sam.gz
                         transcripts.gtf.gz
                  
-                 
 
+blastp.outfmt6.gz
 pfam.domtblout.gz
-blastp.results.outfmt6.gz
-                        );
+                                         );
 
 
 my %keep = map { + $_ => 1 } @files_to_keep;

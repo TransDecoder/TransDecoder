@@ -1,22 +1,21 @@
-#!/bin/bash -e
+#!/bin/bash -ve
 
-if [ -e test.genome.fasta.gz ] && [ ! -e test.genome.fasta ]; then
+export PERL_HASH_SEED=0
+
+if [ ! -e test.genome.fasta ]; then
     gunzip -c test.genome.fasta.gz > test.genome.fasta
 fi
 
-if [ -e test.tophat.sam.gz ] && [ ! -e test.tophat.sam ]; then
-    gunzip -c test.tophat.sam.gz > test.tophat.sam
-fi
 
-if [ -e transcripts.gtf.gz ] && [ ! -e transcripts.gtf ]; then
+if [ ! -e transcripts.gtf ]; then
     gunzip -c transcripts.gtf.gz > transcripts.gtf
 fi
 
-if [ -e blastp.results.outfmt6.gz ] && [ ! -e blastp.results.outfmt6 ]; then
-    gunzip -c blastp.results.outfmt6.gz > blastp.results.outfmt6
+if [ ! -e blastp.outfmt6 ]; then
+    gunzip -c blastp.outfmt6.gz > blastp.outfmt6
 fi
 
-if [ -e pfam.domtblout.gz ] && [ ! -e pfam.domtblout ]; then
+if [ ! -e pfam.domtblout ]; then
     gunzip -c pfam.domtblout.gz > pfam.domtblout
 fi
 
@@ -25,16 +24,28 @@ fi
 ../../util/cufflinks_gtf_to_alignment_gff3.pl transcripts.gtf > transcripts.gff3
 
 ## generate transcripts fasta file
-PERL_HASH_SEED=0 ../../util/cufflinks_gtf_genome_to_cdna_fasta.pl transcripts.gtf test.genome.fasta > transcripts.fasta 
+../../util/cufflinks_gtf_genome_to_cdna_fasta.pl transcripts.gtf test.genome.fasta > transcripts.fasta 
 
 ## Extract the long ORFs
 ../../TransDecoder.LongOrfs -t transcripts.fasta
 
 
 ## Predict likely ORFs
-if [ $1 ]; then
+if [ 1 ]; then   # always doing this now.
+
+    # this is how I would have run blast and pfam but I'm using precomputed results for ease of demonstration.
+    #BLASTDB=/seq/RNASEQ/DBs/TRINOTATE_RESOURCES/TRINOTATE_V3/uniprot_sprot.pep
+    #PFAMDB=/seq/RNASEQ/DBs/TRINOTATE_RESOURCES/TRINOTATE_V3/Pfam-A.hmm
+    #
+    ## run blast
+    #blastp -query transcripts.fasta.transdecoder_dir/longest_orfs.pep -db $BLASTDB -max_target_seqs 1 -outfmt 6 -evalue 1e-5 > blastp.outfmt6
+    #
+    ## run pfam
+    #hmmscan --domtblout pfam.domtblout $PFAMDB transcripts.fasta.transdecoder_dir/longest_orfs.pep > pfam.log
+    
+    
     ## use pfam and blast results:
-    ../../TransDecoder.Predict  -t transcripts.fasta --retain_pfam_hits pfam.domtblout --retain_blastp_hits blastp.results.outfmt6 -v
+    ../../TransDecoder.Predict  -t transcripts.fasta --retain_pfam_hits pfam.domtblout --retain_blastp_hits blastp.outfmt6 -v
 else
     # just coding metrics
     ../../TransDecoder.Predict -t transcripts.fasta 
@@ -52,10 +63,8 @@ fi
 # convert the genome-based gene-gff3 file to bed
 ../../util/gff3_file_to_bed.pl transcripts.fasta.transdecoder.genome.gff3 > transcripts.fasta.transdecoder.genome.bed
 
-echo
-echo
-echo Done!  Coding region genome annotations provided as: transcripts.fasta.transdecoder.genome.\*
-echo
-echo 
+
+# Done!  Coding region genome annotations provided as: transcripts.fasta.transdecoder.genome.\*
+
 
 exit 0

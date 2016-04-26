@@ -244,7 +244,7 @@ sub place_orf_in_cdna_alignment_context {
         if (scalar(@exon_coords) > 1) {
             # any correct ORF should be in the '+' orientation here.... must be a false positive orf or transcript structure is wrong
             $WARNING_COUNT++;
-            print STDERR "Warning [$WARNING_COUNT], shouldn't have a minus-strand ORF on a spliced transcript structure. Skipping entry.\n";
+            print STDERR "Warning [$WARNING_COUNT], shouldn't have a minus-strand ORF on a spliced transcript structure. Skipping entry $orf_gene_obj->{Model_feat_name}.\n";
             
             return undef;
         }
