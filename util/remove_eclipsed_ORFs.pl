@@ -64,6 +64,8 @@ main: {
                 
                 if ($next_lend > $lend && $next_rend < $rend) {
                     ## eclipsed
+                    my $model_feat_name = $gene->{gene_obj}->{Model_feat_name};
+                    print STDERR "$model_feat_name is eclipsed by longer ORF, removing it.\n";
                     $found_eclipsed = 1;
                     last;
                 }
