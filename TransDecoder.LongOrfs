@@ -294,12 +294,12 @@ main: {
                 $prot_type = "internal";
             }
             
-            $gene_obj->{com_name} = "ORF $gene_id $model_id type:$prot_type len:$length ($orient)";            
+            $gene_obj->{com_name} = "ORF type:$prot_type len:$length ($orient)";            
             
             # this header is identical between CDS and PEP (since PEP is just a direct translation of CDS for a specific translation table)
             # we are currently not printing this out at the final data but it would be nice to.
-            my $pep_header = ">$model_id $gene_id type:$prot_type len:$length gc:$genetic_code $acc:$start-$stop($orient)\n";
-            my $cds_header = ">$model_id $gene_id type:$prot_type len:$length $acc:$start-$stop($orient)\n";
+            my $pep_header = ">$model_id type:$prot_type len:$length gc:$genetic_code $acc:$start-$stop($orient)\n";
+            my $cds_header = ">$model_id type:$prot_type len:$length $acc:$start-$stop($orient)\n";
             
             print PEP $pep_header."$protein\n";
                         

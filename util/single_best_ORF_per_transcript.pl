@@ -8,6 +8,7 @@ use Gene_obj;
 use Gene_obj_indexer;
 use GFF3_utils;
 use Carp;
+use Data::Dumper;
 use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
 
 
@@ -85,12 +86,9 @@ main: {
                 $homology_count++;
             }
             
-            my ($lend, $rend) = sort {$a<=>$b} $gene_obj_ref->get_coords();
             
             my $struct = { gene_obj => $gene_obj_ref,
-                           lend => $lend,
-                           rend => $rend,
-                           length => $rend - $lend + 1,
+                           length => $gene_obj_ref->get_CDS_length(),
                            homology_count => $homology_count,
             };
             
@@ -107,12 +105,25 @@ main: {
             
         } @gene_entries;
         
+        if (scalar @gene_entries > 1) {
+            print STDERR "ORFs prioritized as:\n";
+            foreach my $entry (@gene_entries) {
+                print STDERR "\t" . join("\t", $entry->{gene_obj}->{Model_feat_name}, 
+                                         "homology_count: " . $entry->{homology_count},
+                                         "len: " . $entry->{length}) . "\n";
+            }
+                    
+        }
+        
         my $best_gene_entry = shift @gene_entries;
 
         my $gene_obj = $best_gene_entry->{gene_obj};
             
         print $gene_obj->to_GFF3_format(source => "transdecoder") . "\n";
         
+        foreach my $remaining_gene (@gene_entries) {
+            print STDERR "-discarding " . $remaining_gene->{gene_obj}->{Model_feat_name} . " as not single best orf on trans\n";
+        }
         
     }
     

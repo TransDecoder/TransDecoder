@@ -288,6 +288,8 @@ main: {
                 $cmd .= " --pfam_hits $retain_pfam_hits_file ";
             }
             $cmd .= " --gff3_file $cds_file.eclipsed_removed.gff3 > $cds_file.single_best_orf.gff3";
+            
+            &process_cmd($cmd);
 
             $target_final_file = "$cds_file.single_best_orf.gff3";
         }

@@ -33,7 +33,7 @@ main: {
             
             my $gene_obj_ref = $gene_obj_indexer_href->{$gene_id};
             
-            my ($lend, $rend) = sort {$a<=>$b} $gene_obj_ref->get_coords();
+            my ($lend, $rend) = sort {$a<=>$b} $gene_obj_ref->get_model_span();
             
             my $struct = { gene_obj => $gene_obj_ref,
                            lend => $lend,
