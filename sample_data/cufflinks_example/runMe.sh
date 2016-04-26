@@ -11,10 +11,8 @@ if [ ! -e transcripts.gtf ]; then
     gunzip -c transcripts.gtf.gz > transcripts.gtf
 fi
 
-blastp.outfmt6.gz  pfam.domtblout.gz
-
-if [ ! -e blast.outfmt6 ]; then
-    gunzip -c blast.outfmt6.gz > blast.outfmt6
+if [ ! -e blastp.outfmt6 ]; then
+    gunzip -c blastp.outfmt6.gz > blastp.outfmt6
 fi
 
 if [ ! -e pfam.domtblout ]; then
@@ -33,7 +31,7 @@ fi
 
 
 ## Predict likely ORFs
-if [ $1 ]; then
+if [ 1 ]; then   # always doing this now.
 
     # this is how I would have run blast and pfam but I'm using precomputed results for ease of demonstration.
     #BLASTDB=/seq/RNASEQ/DBs/TRINOTATE_RESOURCES/TRINOTATE_V3/uniprot_sprot.pep
@@ -65,10 +63,8 @@ fi
 # convert the genome-based gene-gff3 file to bed
 ../../util/gff3_file_to_bed.pl transcripts.fasta.transdecoder.genome.gff3 > transcripts.fasta.transdecoder.genome.bed
 
-echo
-echo
-echo Done!  Coding region genome annotations provided as: transcripts.fasta.transdecoder.genome.\*
-echo
-echo 
+
+# Done!  Coding region genome annotations provided as: transcripts.fasta.transdecoder.genome.\*
+
 
 exit 0
