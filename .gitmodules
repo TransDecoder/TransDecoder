@@ -1,0 +1,3 @@
+[submodule "TransDecoder.lrgTests"]
+	path = TransDecoder.lrgTests
+	url = https://github.com/TransDecoder/TransDecoder.lrgTests.git
