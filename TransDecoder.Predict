@@ -17,11 +17,11 @@ Common options:
  --retain_long_orfs <int>               retain all ORFs found that are equal or longer than these many nucleotides even if no other evidence 
                                          marks it as coding (default: 900 bp => 300aa)
 
- --retain_pfam_hits <string>                 /path/to/pfam_db.hmm to search 
-                                        using hmmscan (which should be accessible via your PATH setting)
+ --retain_pfam_hits <string>            domain table output file from running hmmscan to search Pfam (see transdecoder.github.io for info)     
+                                        Any ORF with a pfam domain hit will be retained in the final output.
  
- --retain_blastp_hits <string>
-
+ --retain_blastp_hits <string>          blastp output in '-outfmt 6' format.
+                                        Any ORF with a blast match will be retained in the final output.
 
  --single_best_orf                      Retain only the single best ORF per transcript.
                                         (Best is defined as having (optionally pfam and/or blast support) and longest orf)
