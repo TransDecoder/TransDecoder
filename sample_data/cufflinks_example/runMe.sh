@@ -54,7 +54,7 @@ fi
 
 echo
 echo
-echo Done!  Coding region genome annotations provided as: best_candidates.eclipsed_orfs_removed.genome.gff3
+echo Done!  Coding region genome annotations provided as: transcripts.fasta.transdecoder.genome.\*
 echo
 echo 
 

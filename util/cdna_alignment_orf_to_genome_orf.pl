@@ -41,28 +41,20 @@ main: {
     ## associate gene identifiers with contig id's.
     my $contig_to_gene_list_href = &GFF3_utils::index_GFF3_gene_objs($cdna_orfs_gff3, $gene_obj_indexer_href);
 
-    foreach my $asmbl_id (sort keys %$contig_to_gene_list_href) {
+
+    my %isolated_gene_id_to_new_genes;
     
+    foreach my $asmbl_id (sort keys %$contig_to_gene_list_href) {
+        ## $asmbl_id is the actual Transcript identifier from which ORFs were predicted.
+        
         my @gene_ids = @{$contig_to_gene_list_href->{$asmbl_id}};
     
         foreach my $gene_id (@gene_ids) { # gene identifiers as given by transdecoder on the transcript sequences
             my $gene_obj_ref = $gene_obj_indexer_href->{$gene_id};
             
-            my $asmbl_id = $gene_obj_ref->{asmbl_id};
-            
-            
-            ## pasa stuff
-            
-            if ($asmbl_id =~ /(S\d+)_(asmbl_\d+)/) { 
-                
-                my $subcluster = $1;
-                $asmbl_id = $2;
-            }
-            
             my $transcript_struct = $cdna_acc_to_transcript_structure{$asmbl_id} or die "Error, no cdna struct for $asmbl_id";
             
-            #print Dumper($transcript_struct) . $gene_obj_ref->toString();
-
+            
             eval {
                 my $new_orf_gene = &place_orf_in_cdna_alignment_context($transcript_struct, $gene_obj_ref, \%cdna_seq_lengths);
                 
@@ -74,14 +66,17 @@ main: {
                     #$new_orf_gene->{Model_feat_name} = "m.$asmbl_id.$orf_count";
                     $new_orf_gene->{com_name} = "ORF";
 
-                    my $use_gene_id = $transcript_struct->{gene_id} || $gene_id;
-                    
-                    
+                    my $use_gene_id = $transcript_struct->{gene_id};
+                    unless ($use_gene_id) {
+                        ## extract the orig gene id from the incoming gene obj
+                        my ($isolated_gene_id, @rest) = split(/::/, $gene_id);
+                        $use_gene_id = $isolated_gene_id;
+                    }
+                                        
                     $new_orf_gene->{TU_feat_name} = $use_gene_id;
                     $new_orf_gene->{Model_feat_name} = $gene_obj_ref->{Model_feat_name};
-                    
-                    
-                    print $new_orf_gene->to_GFF3_format(source => "transdecoder") . "\n";
+
+                    push (@{$isolated_gene_id_to_new_genes{$use_gene_id}}, $new_orf_gene);
                     
                 }
             };
@@ -99,6 +94,25 @@ main: {
         }
     }
 
+    ## output results:
+    foreach my $gene_id (sort keys %isolated_gene_id_to_new_genes) {
+
+        my @gene_objs = @{$isolated_gene_id_to_new_genes{$gene_id}};
+
+        foreach my $gene_obj (@gene_objs) {
+            $gene_obj->set_CDS_phases_from_init_phase(0);
+        }
+
+        my $parent_gene_obj = shift @gene_objs;
+        foreach my $gene_obj (@gene_objs) {
+            $parent_gene_obj->add_isoform($gene_obj);
+        }
+
+        $parent_gene_obj->refine_gene_object();
+        
+        print $parent_gene_obj->to_GFF3_format(source => "transdecoder") . "\n";
+    }
+        
     exit(0);
 
 }
@@ -126,7 +140,7 @@ sub parse_transcript_alignment_info {
         my $trans_id = "";
         my $gene_id = "";
            
-        
+        ## trick for retaining gene and trans identifier information from cufflinks data 
         if ($asmbl =~ /^GENE\^(\S+),TRANS\^(\S+)/) {
             $gene_id = $1;
             $trans_id = $2;
@@ -147,12 +161,12 @@ sub parse_transcript_alignment_info {
                                [$lend, $rend]
                                ],
                                
-                           orient => $orient,
+                               orient => $orient,
                                trans_id => $trans_id,
                                gene_id => $gene_id,
                                
             };
-
+            
             $cdna_alignments{$asmbl} = $struct;
         }
 

@@ -4450,6 +4450,26 @@ sub has_CDS {
 }
 
 
+####
+sub set_CDS_phases_from_init_phase {
+    my ($self, $init_phase) = @_;
+
+    my @exons = $self->get_exons();
+
+    my $curr_cds_len = $init_phase;
+    
+    foreach my $exon (@exons) {
+        if (my $cds = $exon->get_CDS_obj()) {
+            $cds->set_phase($curr_cds_len % 3);
+            my $cds_len = $cds->length();
+            $curr_cds_len += $cds_len;
+        }
+    }
+
+    return;
+}
+
+
 
 sub set_CDS_phases {
     my ($self, $genomic_seq_ref) = @_;

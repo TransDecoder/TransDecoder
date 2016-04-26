@@ -22,6 +22,10 @@ Common options:
  
  --retain_blastp_hits <string>
 
+
+ --single_best_orf                      Retain only the single best ORF per transcript.
+                                        (Best is defined as having (optionally pfam and/or blast support) and longest orf)
+
  --cpu <int>                            Use multipe cores for cd-hit-est. (default=1)
 
 
@@ -78,6 +82,7 @@ my $retain_pfam_hits_file;
 my $retain_blastp_hits_file;
 my $cpu = 1;
 my $MPI_DEBUG = 1;
+my $single_best_orf_flag = 0;
 
 &GetOptions( 't=s' => \$transcripts_file,
              'train:s' => \$train_file,
@@ -97,6 +102,8 @@ my $MPI_DEBUG = 1;
              'retain_pfam_hits=s' => \$retain_pfam_hits_file,
              'retain_blastp_hits=s' => \$retain_blastp_hits_file,
              'cpu=i' => \$cpu,
+
+             'single_best_orf' => \$single_best_orf_flag,
              
              );
 
@@ -241,8 +248,28 @@ main: {
     {
                         
         # exclude shadow orfs (smaller orfs in different reading frame that are eclipsed by longer orfs)
-        $cmd = "$UTIL_DIR/remove_eclipsed_ORFs.pl $cds_file.best_candidates.gff3 > $final_output_prefix.gff3";
+        $cmd = "$UTIL_DIR/remove_eclipsed_ORFs.pl $cds_file.best_candidates.gff3 > $cds_file.eclipsed_removed.gff3";
+
+        my $target_final_file = "$cds_file.eclipsed_removed.gff3";
+        
         &process_cmd($cmd);
+
+        
+        if ($single_best_orf_flag) {
+            $cmd = "$UTIL_DIR/single_best_ORF_per_transcript.pl ";
+            if ($retain_blastp_hits_file) {
+                $cmd .= " --blast_hits $retain_blastp_hits_file ";
+            }
+            if ($retain_pfam_hits_file) {
+                $cmd .= " --pfam_hits $retain_pfam_hits_file ";
+            }
+            $cmd .= " --gff3_file $cds_file.eclipsed_removed.gff3 > $cds_file.single_best_orf.gff3";
+
+            $target_final_file = "$cds_file.single_best_orf.gff3";
+        }
+
+        
+        &process_cmd("cp $target_final_file $final_output_prefix.gff3");
                 
         ## write final outputs:
         

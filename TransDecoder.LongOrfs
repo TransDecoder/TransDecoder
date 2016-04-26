@@ -16,6 +16,8 @@ Required:
 
 Optional:
 
+ --gene_trans_map <string>              gene-to-transcript identifier mapping file (tab-delimited, gene_id<tab>trans_id<return> ) 
+
  -m <int>                               minimum protein length (default: 100)
  
  -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia)
@@ -83,7 +85,7 @@ my $workdir;
 my $verbose;
 my $search_pfam = "";
 my ($reuse,$pfam_out);
-
+my $gene_trans_map_file;
 
 my $MPI_DEBUG = 1;
 
@@ -93,8 +95,9 @@ my $MPI_DEBUG = 1;
              'h' => \$help,
              'v' => \$verbose,
              'S' => \$TOP_STRAND_ONLY, 
-             'p=i' => \$preserve_full_lengths
-             );
+             'p=i' => \$preserve_full_lengths,
+             'gene_trans_map=s' => \$gene_trans_map_file,
+    );
 
 
 
@@ -116,6 +119,20 @@ if ($genetic_code ne 'universal') {
 
 
 main: {
+
+    my %gene_trans_map;
+    if ($gene_trans_map_file) {
+        open(my $fh, $gene_trans_map_file) or die "Error, cannot open file $gene_trans_map_file";
+        while (<$fh>) {
+            chomp;
+            my ($gene_id, $trans_id) = split(/\t/);
+            $gene_trans_map{$trans_id} = $gene_id;
+        }
+        close $fh;
+    }
+        
+           
+
     my $workdir = basename($transcripts_file) . ".transdecoder_dir"; 
     unless (-d $workdir) {
         mkdir($workdir) or die "Error, cannot mkdir $workdir.";
@@ -231,13 +248,25 @@ main: {
             
             $model_counter++;
 
-            my $model_id = "$acc|m.$model_counter";
-            my $gene_id = "$acc|g.$model_counter";
+
+            my $gene_id;
+            if (%gene_trans_map) {
+                $gene_id = $gene_trans_map{$acc} or die "Error, cannot locate gene identifier for transcript acc: [$acc]";
+            }
+            elsif (my $parsed_gene_id = &try_parse_gene_id_from_acc($acc)) {
+                $gene_id = $parsed_gene_id;
+            }
+            else {
+                $gene_id = "Gene.$model_counter";
+            }
             
+            ## gene ID and model ID must be unique for each entry, but also decipherable for later on.
+            $gene_id = "${gene_id}::${acc}::g.$model_counter";
+            my $model_id = "${gene_id}::m.$model_counter";
+                        
             $gene_obj->{TU_feat_name} = $gene_id;
             $gene_obj->{Model_feat_name} = $model_id;
-
-            
+                        
             my $cds = $gene_obj->create_CDS_sequence(\$sequence);
             $gene_obj->set_CDS_phases(\$sequence);
             
@@ -282,7 +311,7 @@ main: {
             
         }
 	}
-
+    
     close PEP;
     close CDS;
     close GFF;
@@ -318,3 +347,18 @@ sub process_cmd {
 
 }
 
+####
+sub try_parse_gene_id_from_acc {
+    my ($acc) = @_;
+
+    my $gene_id;
+    
+    if ($acc =~ /^(\S+_c\d+_g\d+)_i\d+$/) {
+        $gene_id = $1;
+    }
+    elsif ($acc =~ /^(\S+_c\d+)_seq\d+$/) {
+        $gene_id = $1;
+    }
+
+    return($gene_id);
+}
