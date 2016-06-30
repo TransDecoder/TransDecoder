@@ -9,35 +9,63 @@ use Fasta_reader;
 use GFF3_utils;
 use Carp;
 use Nuc_translator;
+use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
 
-my $usage = "\n\nusage: $0 gff3_file genome_db [prot|CDS|cDNA|gene,default=prot] [flank=0]\n\n";
 
-my $gff3_file = $ARGV[0] or die $usage;
-my $fasta_db = $ARGV[1] or die $usage;
-my $seq_type = $ARGV[2] || "prot";
-my $flank = $ARGV[3] || 0;
+my $usage = <<__EOUSAGE__;
 
-my ($upstream_flank, $downstream_flank) = (0,0);
+####################################################
+#
+# Required:
+#
+#  --gff3 <string>          gff3 file
+#
+#  --fasta <string>         fasta file corresponding to gff3 file
+#
+##
+#  Optional:
+#
+#  --seqType <string>        prot|CDS|cDNA|gene,  default=prot
+#
+#  --genetic_code  <string>   universal (default)
+#                             Euplotes, Tetrahymena, Candida
+#                             Acetabularia, Mitochondrial-Canonical
+#                             Mitochondrial-Vertebrates, Mitochondrial-Arthropods
+#                             Mitochondrial-Echinoderms, Mitochondrial-Molluscs
+#                             Mitochondrial-Ascidians, Mitochondrial-Nematodes
+#                             Mitochondrial-Platyhelminths,Mitochondrial-Yeasts
+#                             Mitochondrial-Euascomycetes, Mitochondrial-Protozoans
+#
+###################################################
 
-if ($flank) {
-	if ($flank =~ /:/) {
-		($upstream_flank, $downstream_flank) = split (/:/, $flank);
-	}
-	else {
-		($upstream_flank, $downstream_flank) = ($flank, $flank);
-	}
+
+__EOUSAGE__
+
+    ;
+
+
+my $gff3_file;
+my $fasta_db;
+my $seq_type = 'prot';
+my $genetic_code = '';
+
+&GetOptions ( 'gff3=s' => \$gff3_file,
+              'fasta=s' => \$fasta_db,
+              'seqType=s' => \$seq_type,
+              'genetic_code=s' => \$genetic_code,
+    );
+
+unless ($gff3_file && $fasta_db) {
+    die $usage;
 }
-
-if ($upstream_flank < 0 || $downstream_flank < 0) {
-	die $usage;
-}
-
-
 
 unless ($seq_type =~ /^(prot|CDS|cDNA|gene)$/) {
     die "Error, don't understand sequence type [$seq_type]\n\n$usage";
 }
 
+if ($genetic_code) {
+    &Nuc_translator::use_specified_genetic_code($genetic_code);
+}
 
 ## read genome
 my $fasta_reader = new Fasta_reader($fasta_db);
@@ -83,22 +111,13 @@ foreach my $asmbl_id (sort keys %$contig_to_gene_list_href) {
             }
             elsif ($seq_type eq "CDS") {
                 $seq = $isoform->get_CDS_sequence();
-				if ($upstream_flank || $downstream_flank) {
-					$seq = &add_flank($seq, $upstream_flank, $downstream_flank, $model_lend, $model_rend, $orientation, \$genome_seq);
-				}
-			}
+            }
             elsif ($seq_type eq "cDNA") {
                 $seq = $isoform->get_cDNA_sequence();
-				if ($upstream_flank || $downstream_flank) {
-					$seq = &add_flank($seq, $upstream_flank, $downstream_flank, $gene_lend, $gene_rend, $orientation, \$genome_seq);
-				}
-			}
+            }
             elsif ($seq_type eq "gene" && $counter == 1) {
                 $seq = $isoform->get_gene_sequence();
-				if ($upstream_flank || $downstream_flank) {
-					$seq = &add_flank($seq, $upstream_flank, $downstream_flank, $gene_lend, $gene_rend, $orientation, \$genome_seq);
-				}
-			}
+            }
             
             unless ($seq) {
                 print STDERR "-warning, no $seq_type sequence for $isoform_id\n";
@@ -137,28 +156,5 @@ foreach my $asmbl_id (sort keys %$contig_to_gene_list_href) {
 
 
 exit(0);
-
-
-####
-sub add_flank {
-	my ($seq, $upstream_flank, $downstream_flank, $lend, $rend, $orientation, $genome_seq_ref) = @_;
-	
-	my $far_left = ($orientation eq '+') ? $lend - $upstream_flank : $lend - $downstream_flank;
-	
-	if ($far_left < 1) { $far_left = 1; }
-	
-	my $flank_right = ($orientation eq '+') ? $downstream_flank : $upstream_flank;
-
-	my $left_seq = substr($$genome_seq_ref, $far_left - 1, $lend - $far_left);
-
-	my $right_seq = substr($$genome_seq_ref, $rend, $flank_right);
-	
-	if ($orientation eq '+') {
-		return (lc($left_seq) . uc($seq) . lc($right_seq));
-	}
-	else {
-		return (lc(&reverse_complement($right_seq)) . uc($seq) . lc(&reverse_complement($left_seq)));
-	}
-}
 
 

@@ -28,6 +28,8 @@ Common options:
 
  --cpu <int>                            Use multipe cores for cd-hit-est. (default=1)
 
+ -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia, ...)
+
 
 Advanced options
 
@@ -39,6 +41,32 @@ Advanced options
                                         and then this -T value of longest ORFs are selected from the non-redundant set.
 
 =cut
+
+=head1 Genetic Codes
+
+See L<http://golgi.harvard.edu/biolinks/gencode.html>. These are currently supported:
+
+ universal (default)
+ Euplotes
+ Tetrahymena
+ Candida
+ Acetabularia
+ Mitochondrial-Canonical
+ Mitochondrial-Vertebrates
+ Mitochondrial-Arthropods
+ Mitochondrial-Echinoderms
+ Mitochondrial-Molluscs
+ Mitochondrial-Ascidians
+ Mitochondrial-Nematodes
+ Mitochondrial-Platyhelminths
+ Mitochondrial-Yeasts
+ Mitochondrial-Euascomycetes
+ Mitochondrial-Protozoans
+
+
+=cut
+    
+
 
 
 use strict;
@@ -83,6 +111,7 @@ my $retain_blastp_hits_file;
 my $cpu = 1;
 my $MPI_DEBUG = 1;
 my $single_best_orf_flag = 0;
+my $genetic_code = "";
 
 &GetOptions( 't=s' => \$transcripts_file,
              'train:s' => \$train_file,
@@ -104,6 +133,9 @@ my $single_best_orf_flag = 0;
              'cpu=i' => \$cpu,
 
              'single_best_orf' => \$single_best_orf_flag,
+
+             'G=s' => \$genetic_code,
+
              
              );
 
@@ -119,6 +151,11 @@ if (@ARGV) {
 our $SEE = $verbose;
 
 pod2usage(-verbose => 2, -output => \*STDERR, -message => "No transcript file (-t)\n") unless ($transcripts_file && -s $transcripts_file);
+
+
+if ($genetic_code) {
+    $genetic_code = " --genetic_code $genetic_code";
+}
 
 main: {
     my $workdir = basename($transcripts_file) . ".transdecoder_dir"; 
@@ -310,7 +347,7 @@ main: {
         # make a peptide file:
         my $best_pep_file = $gff3_file;
         $best_pep_file =~ s/\.gff3$/\.pep/;
-        $cmd = "$UTIL_DIR/gff3_file_to_proteins.pl $gff3_file $transcripts_file > $best_pep_file";
+        $cmd = "$UTIL_DIR/gff3_file_to_proteins.pl --gff3 $gff3_file --fasta $transcripts_file $genetic_code > $best_pep_file";
         &process_cmd($cmd);
         
         
@@ -318,7 +355,7 @@ main: {
         # make a CDS file:
         my $best_cds_file = $best_pep_file;
         $best_cds_file =~ s/\.pep$/\.cds/;
-        $cmd = "$UTIL_DIR/gff3_file_to_proteins.pl $gff3_file $transcripts_file CDS > $best_cds_file";
+        $cmd = "$UTIL_DIR/gff3_file_to_proteins.pl --gff3 $gff3_file --fasta $transcripts_file --seqType CDS $genetic_code > $best_cds_file";
         &process_cmd($cmd);
         
     }
