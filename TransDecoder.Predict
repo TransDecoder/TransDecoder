@@ -438,14 +438,15 @@ sub parse_blastp_hits_file {
 
 
 sub check_program() {
- my @paths;
- foreach my $prog (@_) {
-  my $path = `which $prog`;
-  die "Error, path to a required program ($prog) cannot be found\n\n"
-    unless $path =~ /^\//;
-  chomp($path);
-  $path = readlink($path) if -l $path;
-  push( @paths, $path );
- }
- return @paths;
+    my @paths;
+    foreach my $prog (@_) {
+        my $path = `which $prog`;
+        unless ($path =~ /\w/) {
+            die "Error, path to a required program ($prog) cannot be found\n\n"
+        }
+        chomp($path);
+        $path = readlink($path) if -l $path;
+        push( @paths, $path );
+    }
+    return @paths;
 }
