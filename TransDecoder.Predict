@@ -26,7 +26,7 @@ Common options:
  --single_best_orf                      Retain only the single best ORF per transcript.
                                         (Best is defined as having (optionally pfam and/or blast support) and longest orf)
 
- --cpu <int>                            Use multipe cores for cd-hit-est. (default=1)
+ --cpu <int>                            Use multiple cores for cd-hit-est. (default=1)
 
  -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia, ...)
 
