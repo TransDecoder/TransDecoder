@@ -90,7 +90,7 @@ main: {
         # make a peptide file:
         my $best_pep_file = $gff3_file;
         $best_pep_file =~ s/\.gff3$/\.pep/;
-        $cmd = "$UTIL_DIR/gff3_file_to_proteins.pl $gff3_file $transcripts_file > $best_pep_file";
+        $cmd = "$UTIL_DIR/gff3_file_to_proteins.pl --gff3 $gff3_file --fasta $transcripts_file --seqType prot > $best_pep_file";
         &process_cmd($cmd);
         
         
@@ -98,13 +98,13 @@ main: {
         # make a CDS file:
         my $best_cds_file = $best_pep_file;
         $best_cds_file =~ s/\.pep$/\.cds/;
-        $cmd = "$UTIL_DIR/gff3_file_to_proteins.pl $gff3_file $transcripts_file CDS > $best_cds_file";
+        $cmd = "$UTIL_DIR/gff3_file_to_proteins.pl --gff3 $gff3_file --fasta $transcripts_file --seqType CDS > $best_cds_file";
         &process_cmd($cmd);
         
         # make a CDS file:
         my $best_cdna_file = $best_pep_file;
         $best_cdna_file =~ s/\.pep$/\.mRNA/;
-        $cmd = "$UTIL_DIR/gff3_file_to_proteins.pl $gff3_file $transcripts_file cDNA > $best_cdna_file";
+        $cmd = "$UTIL_DIR/gff3_file_to_proteins.pl --gff3 $gff3_file --fasta $transcripts_file --seqType cDNA > $best_cdna_file";
         &process_cmd($cmd);
     
     }
