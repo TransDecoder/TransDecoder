@@ -9,6 +9,7 @@ use Gene_obj_indexer;
 use GFF3_utils;
 use Carp;
 use Data::Dumper;
+use List::Util qw (max);
 use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
 
 
@@ -27,6 +28,8 @@ my $usage = <<__EOUSAGE__;
 #
 #  --pfam_hits <string>          pfam hits file
 #
+#  --cds_scores <string>         cds scores file
+#
 ################################################################################
 
 
@@ -37,11 +40,13 @@ __EOUSAGE__
 my $gff3_file;
 my $blast_hits_file;
 my $pfam_hits_file;
+my $cds_scores_file;
 
 
 &GetOptions('gff3_file=s' => \$gff3_file,
             'blast_hits=s' => \$blast_hits_file,
             'pfam_hits=s' => \$pfam_hits_file,
+            'cds_scores=s' => \$cds_scores_file,
     );
 
 unless ($gff3_file) {
@@ -59,6 +64,11 @@ main: {
     my %pfam_hits;
     if ($pfam_hits_file) {
         %pfam_hits = &parse_pfam_hits_file($pfam_hits_file);
+    }
+
+    my %cds_scores;
+    if ($cds_scores_file) {
+      %cds_scores = &parse_CDS_scores_file ($cds_scores_file);
     }
         
     my $gene_obj_indexer_href = {};
@@ -85,11 +95,17 @@ main: {
             if ($pfam_hits{$model_id}) {
                 $homology_count++;
             }
+
+            my $cds_score = 0;
+            if ($cds_scores{$model_id}) {
+                $cds_score = $cds_scores{$model_id};
+            }
             
             
             my $struct = { gene_obj => $gene_obj_ref,
                            length => $gene_obj_ref->get_CDS_length(),
                            homology_count => $homology_count,
+                           cds_score => $cds_score,
             };
             
             push (@gene_entries, $struct);
@@ -98,8 +114,9 @@ main: {
         }
         
         @gene_entries = sort {
-        
             $b->{homology_count} <=> $a->{homology_count}
+            ||
+            $b->{cds_score} <=> $a->{cds_score}
             ||
             $b->{length} <=> $a->{length}
             
@@ -110,6 +127,7 @@ main: {
             foreach my $entry (@gene_entries) {
                 print STDERR "\t" . join("\t", $entry->{gene_obj}->{Model_feat_name}, 
                                          "homology_count: " . $entry->{homology_count},
+                                         "cds_score: " . $entry->{cds_score},
                                          "len: " . $entry->{length}) . "\n";
             }
             
@@ -184,4 +202,28 @@ sub parse_blastp_hits_file {
     return(%blastp_hits);
 }
 
+sub parse_CDS_scores_file {
+  my ($cds_scores_file) = @_;
 
+  unless (-e $cds_scores_file) {
+    die "Error, cannot find file $cds_scores_file";
+  }
+
+  my %cds_scores;
+
+  open (my $fh, $cds_scores_file) or die "Error, cannot open file $cds_scores_file";
+  while (<$fh>) {
+    chomp;
+    my @x = split(/\t/);
+    my ($acc, $orf_length, @scores) = split(/\t/);
+    my $score = shift @scores;
+    if(max(@scores) > $score) {
+      $score -= max(@scores);
+    }
+
+    $cds_scores{$acc} = $score;
+  }
+  close $fh;
+
+  return(%cds_scores);
+}
