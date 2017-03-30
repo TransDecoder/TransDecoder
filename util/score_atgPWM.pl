@@ -8,6 +8,7 @@ use FindBin;
 use lib ("$FindBin::Bin/../PerlLib");
 use Fasta_reader;
 use Nuc_translator;
+use PWM;
 
 my $usage = <<__EOUSAGE__;
 
@@ -18,6 +19,8 @@ my $usage = <<__EOUSAGE__;
 #  --atg_pwm <string>         start codon PWM file
 #
 #  --base_freqs <string>      base freqs dat file
+#
+#  --atg_position <int>       position of ATG in the PWM (default: 10)
 #
 #####################################################################
 
@@ -31,12 +34,13 @@ my $help_flag;
 my $transcripts_file;
 my $atg_pwm_file;
 my $base_freqs_file;
-
+my $atg_position = 10;
 
 &GetOptions ( 'h' => \$help_flag,
               'transcripts=s' => \$transcripts_file,
               'atg_pwm=s' => \$atg_pwm_file,
-              'base_freqs=s' => \$base_freqs_file
+              'base_freqs=s' => \$base_freqs_file,
+              'atg_position=i' => \$atg_position,
     );
 
 if ($help_flag) {
@@ -51,8 +55,8 @@ unless ($transcripts_file && $atg_pwm_file && $base_freqs_file) {
 
 main: {
 
-    my %pwm = &get_pwm($atg_pwm_file);
-
+    my $pwm = new PWM();
+    $pwm->load_pwm_from_file($atg_pwm_file);
     
     my %base_freqs = &parse_base_freqs($base_freqs_file);
 
@@ -60,8 +64,8 @@ main: {
     while (my $seq_obj = $fasta_reader->next()) {
         my $seq_acc = $seq_obj->get_accession();
         my $sequence = uc $seq_obj->get_sequence();
-
-        &score_seq_using_pwm($seq_acc, $sequence, \%pwm, \%base_freqs);
+        
+        &score_seq_using_pwm($seq_acc, $sequence, $pwm, \%base_freqs);
         
     }
 
@@ -69,7 +73,7 @@ main: {
 }
 
 sub score_seq_using_pwm {
-    my ($seq_acc, $sequence, $pwm_href, $base_freqs_href) = @_;
+    my ($seq_acc, $sequence, $pwm_obj, $base_freqs_href) = @_;
 
         
     my @candidates;
@@ -81,94 +85,25 @@ sub score_seq_using_pwm {
     }
     
     my $seq_len = length($sequence);
-    
-    my @seq_chars = split(//, $sequence);
-    
-    my $pwm_lend = $pwm_href->{'pwm_left'};
-    my $pwm_rend = $pwm_href->{'pwm_right'};
-    my $pwm_len = $pwm_lend + 3 + $pwm_rend;
+    my $pwm_length = $pwm_obj->get_pwm_length();
+
+    my @mask = ($atg_position, $atg_position+1, $atg_position+2);
+    my $target_prefix_length = $atg_position + 1 - 1;
+
     
     foreach my $start_pos (@candidates) {
+
+        my $target_seq = substr($sequence, $start_pos - $target_prefix_length, $pwm_length);
+
+        unless (length($target_seq) == $pwm_length) { next; } # need to skip it
         
-        my $motif_score = &score_pwm($pwm_href, $base_freqs_href,
-                                     \@seq_chars, $start_pos,
-                                     0, $pwm_len);
-                
+        my $motif_score = $pwm_obj->score_pwm($target_seq, $base_freqs_href, 'mask' => \@mask);
+        
         print "$seq_acc\t$start_pos\t$motif_score\n";
     }
     print "\n";
-}
 
-
-sub score_pwm {
-    my ($pwm_href, $base_freqs_href, 
-        $seq_input_aref, $seq_input_start_idx, 
-        $pwm_start_idx, $pwm_extent) = @_; 
-
-    my $pwm_lend = $pwm_href->{'pwm_left'};
-    my $pwm_rend = $pwm_href->{'pwm_right'};
-    my $pwm_len = $pwm_lend + 3 + $pwm_rend;
-        
-    my $pwm_pos = $pwm_start_idx;
-    my $pwm_stop_pos = $pwm_start_idx + $pwm_extent - 1;
-    
-    my $begin = $seq_input_start_idx - $pwm_lend;
-    my $seq_len = scalar(@$seq_input_aref);
-    
-    if ($begin < 0 || $begin + $pwm_len >= $seq_len) { return("NA"); }
-    
-    
-    my $motif_score = 0;
-    
-    for (my $i = $begin; $i < $begin + $pwm_len; $i++) {
-        
-        if ($pwm_pos > $pwm_lend && $pwm_pos <= $pwm_lend + 3) { next; } # skip the ATG itself
-        
-        my $char = $seq_input_aref->[$i];
-        my $prob = $pwm_href->{pwm}->{$pwm_pos}->{$char};
-        my $prob_rand = $base_freqs_href->{$char};
-        
-        my $loglikelihood = log($prob/$prob_rand);
-        $motif_score += $loglikelihood;
-        
-        $pwm_pos++;
-
-        if ($pwm_pos > $pwm_stop_pos) { last; }
-    }
-
-    return($motif_score);
-
-}
-    
-
-####
-sub get_pwm {
-    my ($pwm_file) = @_;
-
-    open(my $fh, $pwm_file) or die "Error, cannot open file: $pwm_file";
-    my $header = <$fh>;
-    chomp $header;
-    my @x = split(/\s+/, $header);
-    my $pwm_left = $x[1];
-    my $pwm_right = $x[3];
-
-    my %pwm;
-    $pwm{'pwm_left'} = $pwm_left;
-    $pwm{'pwm_right'} = $pwm_right;
-
-    my $seq_header = <$fh>;
-    my $i = 0;
-    while(<$fh>) {
-        chomp;
-        my ($relpos, $G, $A, $T, $C) = split(/\t/);
-        $pwm{'pwm'}->{$i} = { G => $G,
-                              A => $A,
-                              T => $T,
-                              C => $C };
-        $i++;
-    }
-
-    return(%pwm);
+    return;
 }
 
 ####
