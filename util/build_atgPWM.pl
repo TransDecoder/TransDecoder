@@ -8,6 +8,7 @@ use FindBin;
 use lib ("$FindBin::Bin/../PerlLib");
 use Fasta_reader;
 use Nuc_translator;
+use PWM;
 
 my $usage = <<__EOUSAGE__;
 
@@ -17,11 +18,14 @@ my $usage = <<__EOUSAGE__;
 #
 #  --train_gff3 <string>      longest_orfs.cds.best_candidates.gff3
 #
+#  --out_prefix <string>      output prefix for pwm and feature sequences
+#
 ## Optional
 #
 #  --pwm_left <int>           default: 10
 #
 #  --pwm_right <int>          default: 10         
+#
 #
 #####################################################################
 
@@ -36,19 +40,23 @@ my $transcripts_file;
 my $train_gff3_file;
 my $pwm_left = 10;
 my $pwm_right = 10;
+my $out_prefix = undef;
+
 
 &GetOptions ( 'h' => \$help_flag, 
               'transcripts=s' => \$transcripts_file,
               'train_gff3=s' => \$train_gff3_file,
               'pwm_left=i' => \$pwm_left,
               'pwm_right=i' => \$pwm_right,
+              'out_prefix=s' => \$out_prefix,
+    
     );
 
 if ($help_flag) {
     die $usage;
 }
 
-unless ($transcripts_file && $train_gff3_file) {
+unless ($transcripts_file && $train_gff3_file && $out_prefix) {
     die $usage;
 }
 
@@ -62,12 +70,15 @@ main: {
     my @starts = &parse_starts($train_gff3_file);
 
     my $pwm_length = $pwm_left + 3 + $pwm_right;
-    my %pwm;
 
-    
+    my $pwm = new PWM();
+        
+    my $features_file = "$out_prefix.features";
+    open (my $ofh_features, ">$features_file") or die "Error, cannot write to $features_file";
+        
     foreach my $start_info (@starts) {
         my ($transcript_acc, $start_coord, $orient) = @$start_info;
-
+        
         my $transcript_seq = $seqs{$transcript_acc};
 
         if ($orient eq '-') {
@@ -87,36 +98,23 @@ main: {
         }
         my @trans_chars = split(//, uc $transcript_seq);
 
-        my $pwm_pos = 0;
+        my $feature_seq = "";
         for (my $i = $begin_pwm; $i <= $end_pwm; $i++) {
             my $char = $trans_chars[$i-1];
-            $pwm{$pwm_pos}->{$char}++;
-            $pwm_pos++;
+            $feature_seq .= $char;
         }
+        print $ofh_features join("\t", $feature_seq, $transcript_acc) . "\n";
+
+        $pwm->add_feature_seq_to_pwm($feature_seq);
+        
     }
+
+    $pwm->build_pwm();
     
-    print "# $pwm_left ATG $pwm_right\n";
-    my @chars = qw(G A T C);
-    print join("\t", "pos", @chars) . "\n";
-    for (my $i = 0; $i < $pwm_length; $i++) {
+    my $pwm_file = "$out_prefix.pwm";
+    $pwm->write_pwm_file($pwm_file);
 
-        # set row ids as upstream and downstream like so:  -3 -2 -1 1 2 3 4 ...  (no zero), and 1 starts at ATG
-        my $pos_val = $i-$pwm_left;
-        if ($pos_val >= 0) {
-            $pos_val += 1;
-        }
         
-        my @vals = ($pos_val);
-        foreach my $char (@chars) {
-            my $num_char = $pwm{$i}->{$char} || 0;
-            push (@vals, $num_char);
-        }
-
-        my @prob_vals = &convert_counts_to_prob_vals(@vals);
-        
-        print join("\t", @prob_vals) . "\n";
-    }
-
     exit(0);
     
 

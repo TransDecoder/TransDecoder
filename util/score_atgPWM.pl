@@ -62,7 +62,6 @@ main: {
         my $sequence = uc $seq_obj->get_sequence();
 
         &score_seq_using_pwm($seq_acc, $sequence, \%pwm, \%base_freqs);
-                
         
     }
 
@@ -72,11 +71,7 @@ main: {
 sub score_seq_using_pwm {
     my ($seq_acc, $sequence, $pwm_href, $base_freqs_href) = @_;
 
-    my $pwm_lend = $pwm_href->{'pwm_left'};
-    my $pwm_rend = $pwm_href->{'pwm_right'};
-    my $pwm_len = $pwm_lend + 3 + $pwm_rend;
-
-    
+        
     my @candidates;
     
     while ($sequence =~ /(ATG)/g) {
@@ -89,33 +84,60 @@ sub score_seq_using_pwm {
     
     my @seq_chars = split(//, $sequence);
     
+    my $pwm_lend = $pwm_href->{'pwm_left'};
+    my $pwm_rend = $pwm_href->{'pwm_right'};
+    my $pwm_len = $pwm_lend + 3 + $pwm_rend;
     
     foreach my $start_pos (@candidates) {
         
-        my $motif_score = 0;
-        
-        my $begin = $start_pos - $pwm_lend;
-        
-        if ($begin < 0 || $begin + $pwm_len >= $seq_len) { next; }
-        
-        my $pwm_pos = 0;
-        for (my $i = $begin; $i < $begin + $pwm_len; $i++) {
-            
-            if ($pwm_pos > $pwm_lend && $pwm_pos <= $pwm_lend + 3) { next; } # skip the ATG itself
-            
-            my $char = $seq_chars[$i];
-            my $prob = $pwm_href->{pwm}->{$pwm_pos}->{$char};
-            my $prob_rand = $base_freqs_href->{$char};
-            
-            my $loglikelihood = log($prob/$prob_rand);
-            $motif_score += $loglikelihood;
-            
-            $pwm_pos++;
-        }
-        
+        my $motif_score = &score_pwm($pwm_href, $base_freqs_href,
+                                     \@seq_chars, $start_pos,
+                                     0, $pwm_len);
+                
         print "$seq_acc\t$start_pos\t$motif_score\n";
     }
     print "\n";
+}
+
+
+sub score_pwm {
+    my ($pwm_href, $base_freqs_href, 
+        $seq_input_aref, $seq_input_start_idx, 
+        $pwm_start_idx, $pwm_extent) = @_; 
+
+    my $pwm_lend = $pwm_href->{'pwm_left'};
+    my $pwm_rend = $pwm_href->{'pwm_right'};
+    my $pwm_len = $pwm_lend + 3 + $pwm_rend;
+        
+    my $pwm_pos = $pwm_start_idx;
+    my $pwm_stop_pos = $pwm_start_idx + $pwm_extent - 1;
+    
+    my $begin = $seq_input_start_idx - $pwm_lend;
+    my $seq_len = scalar(@$seq_input_aref);
+    
+    if ($begin < 0 || $begin + $pwm_len >= $seq_len) { return("NA"); }
+    
+    
+    my $motif_score = 0;
+    
+    for (my $i = $begin; $i < $begin + $pwm_len; $i++) {
+        
+        if ($pwm_pos > $pwm_lend && $pwm_pos <= $pwm_lend + 3) { next; } # skip the ATG itself
+        
+        my $char = $seq_input_aref->[$i];
+        my $prob = $pwm_href->{pwm}->{$pwm_pos}->{$char};
+        my $prob_rand = $base_freqs_href->{$char};
+        
+        my $loglikelihood = log($prob/$prob_rand);
+        $motif_score += $loglikelihood;
+        
+        $pwm_pos++;
+
+        if ($pwm_pos > $pwm_stop_pos) { last; }
+    }
+
+    return($motif_score);
+
 }
     
 
