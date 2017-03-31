@@ -31,6 +31,16 @@ sub is_pwm_built {
 sub add_feature_seq_to_pwm {
     my ($self, $feature_seq) = @_;
 
+    $feature_seq = uc $feature_seq;
+    
+    my $pwm_len = $self->get_pwm_length();
+    if ($pwm_len && length($feature_seq) != $pwm_len) {
+        croak "Error, pwm_len: $pwm_len and feature_seq len: " . length($feature_seq) . " are unmatched.";
+    }
+    if ($feature_seq =~ /[^GATC]/) {
+        croak "Error, feature_seq: $feature_seq contains non-GATC chars.";
+    }
+    
     my @chars = split(//, $feature_seq);
     for (my $i = 0; $i <= $#chars; $i++) {
         my $char = $chars[$i];
