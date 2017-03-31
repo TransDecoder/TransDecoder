@@ -83,7 +83,6 @@ main: {
         }
     }
         
-    my @mask = ($atg_position, $atg_position+1, $atg_position+2);
 
     my %motif_range_to_vals;
     
@@ -128,7 +127,6 @@ main: {
                 my $range_left = $atg_position - $up;
                 my $range_down = $atg_position + 2 + $down; # the -1's are to convert from 1-based to 0-based coord sys
                 my $score = $pwm_plus->score_plus_minus_pwm($feature_seq, $pwm_minus, 
-                                                            mask => \@mask,
                                                             pwm_range => [$range_left, $range_down]);
                 
                 if ($score ne "NA") {
