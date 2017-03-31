@@ -57,6 +57,59 @@ sub get_pwm_length {
 }
 
 
+sub simulate_feature {
+    my ($self) = @_;
+
+    if (! $self->is_pwm_built()) {
+        confess "Error, pwm not built yet";
+    }
+
+    my $probs_aref = $self->{pos_probs};
+
+    my @chars = qw(G A T C);
+    my $feature_seq = "";
+
+    my $pwm_length = $self->get_pwm_length();
+    for (my $i = 0; $i < $pwm_length; $i++) {
+        my $sum_prob = 0;
+        my $selected_flag = 0;
+        #print "rand val: $rand_val\n";
+        my $tot_prob = 0;
+        for (my $j = 0; $j <= $#chars; $j++) {
+            my $char = $chars[$j];
+            my $p = $probs_aref->[$i]->{$char};
+            $tot_prob += $p;
+        }
+        my $rand_val = rand($tot_prob); # tot_prob should be 1 or very close...
+        
+        
+        for (my $j = 0; $j <= $#chars; $j++) {
+            my $char = $chars[$j];
+            my $p = $probs_aref->[$i]->{$char};
+            #print "char: $char, p: $p\n";
+            $sum_prob += $p;
+            if ($j == $#chars) {
+                $sum_prob = 1;
+            }
+            
+            if ($rand_val <= $sum_prob) {
+                # choose char
+                $feature_seq .= $char;
+                $selected_flag = 1;
+                last;
+            }
+        }
+        if (! $selected_flag) {
+            croak "Error, didn't select a random char for feature seq";
+        }
+    }
+
+    return($feature_seq);
+
+}
+
+
+
 ####
 sub write_pwm_file {
     my ($self, $filename) = @_;
@@ -108,7 +161,7 @@ sub build_pwm {
         # now convert to relative freqs
         foreach my $char (@chars) {
             my $val = $pos_freqs_aref->[$i]->{$char};
-            my $prob = sprintf("%.3f", $val / $sum);
+            my $prob = sprintf("%.6f", $val / $sum);
             $self->{pos_probs}->[$i]->{$char} = $prob;
         }
         
@@ -245,6 +298,7 @@ sub score_plus_minus_pwm {
     for (my $i = $pwm_start; $i <= $pwm_end; $i++) {
         
         if ($mask{$i}) {
+            #print STDERR "masking $i\n";
             next;
         }
         
@@ -262,7 +316,7 @@ sub score_plus_minus_pwm {
         
         my $loglikelihood = log($prob/$prob_rand);
         $motif_score += $loglikelihood;
-
+        
     }
     
     return($motif_score);

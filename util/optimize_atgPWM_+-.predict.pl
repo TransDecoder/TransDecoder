@@ -73,8 +73,8 @@ main: {
     $pwm_minus->load_pwm_from_file($atg_pwm_minus_file);
     
     my $pwm_length = $pwm_minus->get_pwm_length();
-    my $pwm_upstream_max = $atg_position + 1 - 1;
-    my $pwm_downstream_max = $pwm_length - ($atg_position +1 + 2);
+    my $pwm_upstream_max = $atg_position; # positions 0..$atg_position-1
+    my $pwm_downstream_max = $pwm_length - ($atg_position +1 + 2); # positions available after the ATG
 
     my @up_down_combos;
     for (my $i = 1; $i <= $pwm_upstream_max; $i++) {
@@ -115,7 +115,7 @@ main: {
 
         my $num_features_train = int($fraction_train * $num_features);
         my @train_features = @feature_seqs[0..$num_features_train-1];
-        my @test_features = @feature_seqs[$num_features_train..$#feature_seqs];
+        my @test_features = @feature_seqs[$num_features_train..$#feature_seqs]; # rest of them
 
         my $pwm_plus = &build_pwm(@train_features);
         
@@ -150,9 +150,10 @@ main: {
         print $ofh "data = read.table(\"$features_file.+-.pwm_range_scores\")\n"
                  . "pdf(\"$features_file.+-.pwm_range_scores.boxplot.pdf\")\n"
                  . "boxplot(data, outline=F, las=2, cex.axis=0.5, main='log odds, order by comparison')\n"
-                 . "cm = colMeans(data)\n"
+                 . "abline(h=0, col='blue')\n"
                  . "cd = apply(data, 2, median)\n"
                  . "boxplot(data[,rev(order(cd))], outline=F, las=2, cex.axis=0.5, main='log odds, order by mean desc')\n"
+                 . "abline(h=0, col='blue')\n"
                  . "dev.off()\n";
 
         close $ofh;
