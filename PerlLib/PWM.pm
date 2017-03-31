@@ -120,7 +120,7 @@ sub build_pwm {
 }
 
 
-sub score_pwm {
+sub score_pwm_using_base_freqs {
     my ($self, $target_sequence, $base_freqs_href, %options ) = @_;
 
     ###  Options can include:
@@ -181,6 +181,81 @@ sub score_pwm {
         }
         
         my $prob_rand = $base_freqs_href->{$char};
+        unless ($prob_rand) {
+            die "Error, no non-zero probability value specified for char [$char] ";
+        }
+        
+        my $loglikelihood = log($prob/$prob_rand);
+        $motif_score += $loglikelihood;
+
+    }
+    
+    return($motif_score);
+
+}
+
+
+sub score_plus_minus_pwm {
+    my ($self, $target_sequence, $pwm_minus, %options) = @_;
+    
+    ###  Options can include:
+    ###
+    ###   mask => [ coordA, coordB, coordC ],  # ignored pwm positions in scoring
+    ###   pwm_range => [pwm_idx_start, pwm_idx_end], # start and end are inclusive
+    ###
+    
+    for my $key (keys %options) {
+        if (! grep {$_ eq $key} ('mask', 'pwm_range')) {
+            confess "Error, option $key is not recognized";
+        }
+    }
+        
+    #print STDERR "target_seq: [$target_sequence]\n";
+    
+    $target_sequence = uc $target_sequence;
+    unless ($target_sequence =~ /^[GATC]+$/) {
+        # can only score GATC-containing sequences.
+        return("NA");
+    }
+    
+    if (! $self->is_pwm_built()) {
+        croak("pwm not built yet!");
+    }
+    
+    my $pwm_length = $self->get_pwm_length();
+
+    if (length($target_sequence) != $pwm_length) {
+        croak "Error, len(target_sequence)=" . length($target_sequence) . " and pwm length = $pwm_length";
+    }
+
+    my %mask;
+    if (my $mask_positions_aref = $options{'mask'}) {
+        %mask = map { + $_ => 1 } @$mask_positions_aref;
+    }
+    
+    my $motif_score = 0;
+
+    my @seqarray = split(//, $target_sequence);
+
+    my ($pwm_start, $pwm_end) = (0, $pwm_length-1);
+    if (my $pwm_range_aref = $options{'pwm_range'}) {
+        ($pwm_start, $pwm_end) = @$pwm_range_aref;
+    }
+        
+    for (my $i = $pwm_start; $i <= $pwm_end; $i++) {
+        
+        if ($mask{$i}) {
+            next;
+        }
+        
+        my $char = $seqarray[$i];
+        my $prob = $self->{pos_probs}->[$i]->{$char};
+
+        unless ($prob) {
+            return("NA");
+        }
+        
+        my $prob_rand = $pwm_minus->{pos_probs}->[$i]->{$char};
         unless ($prob_rand) {
             die "Error, no non-zero probability value specified for char [$char] ";
         }
