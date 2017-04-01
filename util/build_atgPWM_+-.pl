@@ -16,7 +16,7 @@ my $usage = <<__EOUSAGE__;
 #
 #  --transcripts <string>     target transcripts fasta file
 #
-#  --train_gff3 <string>      longest_orfs.cds.best_candidates.gff3
+#  --selected_orfs <string>   longest_orfs.cds.top_longest_5000.nr80
 #
 #  --out_prefix <string>      output prefix for pwm and feature sequences
 #
@@ -37,7 +37,7 @@ __EOUSAGE__
 
 my $help_flag;
 my $transcripts_file;
-my $train_gff3_file;
+my $selected_orfs_file;
 my $pwm_left = 10;
 my $pwm_right = 10;
 my $out_prefix = undef;
@@ -45,7 +45,7 @@ my $out_prefix = undef;
 
 &GetOptions ( 'h' => \$help_flag, 
               'transcripts=s' => \$transcripts_file,
-              'train_gff3=s' => \$train_gff3_file,
+              'selected_orfs=s' => \$selected_orfs_file,
               'pwm_left=i' => \$pwm_left,
               'pwm_right=i' => \$pwm_right,
               'out_prefix=s' => \$out_prefix,
@@ -56,12 +56,11 @@ if ($help_flag) {
     die $usage;
 }
 
-unless ($transcripts_file && $train_gff3_file && $out_prefix) {
+unless ($transcripts_file && $selected_orfs_file && $out_prefix) {
     die $usage;
 }
 
 my $pwm_length = $pwm_left + 3 + $pwm_right;
-
 
 main: {
 
@@ -69,7 +68,7 @@ main: {
 
     my %seqs = $fasta_reader->retrieve_all_seqs_hash();
 
-    my @starts = &parse_starts($train_gff3_file);
+    my @starts = &parse_starts($selected_orfs_file);
 
 
 
@@ -77,9 +76,13 @@ main: {
     my $pwm_minus = new PWM();
     
     
-    my $features_file = "$out_prefix.features";
-    open (my $ofh_features, ">$features_file") or die "Error, cannot write to $features_file";
+    my $features_plus_file = "$out_prefix.+.features";
+    open (my $ofh_features_plus, ">$features_plus_file") or die "Error, cannot write to $features_plus_file";
+
+    my $features_minus_file = "$out_prefix.-.features";
+    open (my $ofh_features_minus, ">$features_minus_file") or die "Error, cannot write to $features_minus_file";
         
+    
     foreach my $start_info (@starts) {
         my ($transcript_acc, $start_coord, $orient) = @$start_info;
         
@@ -101,7 +104,7 @@ main: {
 
         if ($feature_seq) {
             
-            print $ofh_features join("\t", $feature_seq, $transcript_acc) . "\n";
+            print $ofh_features_plus join("\t", $feature_seq, $transcript_acc) . "\n";
             
             $pwm_plus->add_feature_seq_to_pwm($feature_seq);
         }
@@ -110,10 +113,13 @@ main: {
         ## contribute rest to the negative set.
         $transcript_seq = substr($transcript_seq, $start_coord + 1);
         
-        &add_all_starts_to_pwm($pwm_minus, $transcript_seq);
+        &add_all_starts_to_pwm($pwm_minus, $transcript_seq, $ofh_features_minus);
         
     }
 
+    close $ofh_features_plus;
+    close $ofh_features_minus;
+    
     # build and write plus model
     $pwm_plus->build_pwm();
     
@@ -159,7 +165,7 @@ sub get_feature_seq {
 
 ####
 sub add_all_starts_to_pwm {
-    my ($pwm_obj, $sequence) = @_;
+    my ($pwm_obj, $sequence, $ofh) = @_;
 
     my @seqarray = split(//, $sequence);
     
@@ -176,9 +182,10 @@ sub add_all_starts_to_pwm {
         
         if ($feature_seq) {
             $pwm_obj->add_feature_seq_to_pwm($feature_seq);
+            print $ofh "$feature_seq\n";
         }
     }
-
+    
     return;
 }
     
@@ -186,40 +193,33 @@ sub add_all_starts_to_pwm {
 
 ####
 sub parse_starts {
-    my ($gff3_file) = @_;
+    my ($selected_orfs_file) = @_;
 
     my @starts;
-    
-    open(my $fh, $gff3_file) or die "Error cannot open file $gff3_file";
+
+    open(my $fh, $selected_orfs_file) or die "Error, cannot open file $selected_orfs_file";
     while (<$fh>) {
-        unless (/\w/) { next; }
-        if (/^\#/) { next; }
         chomp;
-        my @x = split(/\t/);
+        if (/^>/) {
+            if (/len:\d+ (\S+):(\d+)-(\d+)\(([+-])\)/) {
+                my $transcript = $1;
+                my $prime5 = $2;
+                my $prime3= $3;
+                my $orient = $4;
 
-        my $transcript = $x[0];
-        
-        my $feat_type = $x[2];
-        
-        my $lend = $x[3];
-        my $rend = $x[4];
-        my $orient = $x[6];
-
-        my $info = $x[8];
-
-        if ($feat_type eq "CDS") {
-
-            if ($orient eq '+') {
-                push (@starts, [$transcript, $lend, $orient]);
+                
+                push (@starts, [$transcript, $prime5, $orient]);
             }
             else {
-                push (@starts, [$transcript, $rend, $orient]);
+                die "Error, couldn't parse transcript coordinate info from $_";
             }
-        }
 
+            
+        }
+        
     }
     close $fh;
-
+    
     return(@starts);
 }
 

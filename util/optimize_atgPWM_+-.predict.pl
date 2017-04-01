@@ -128,9 +128,11 @@ main: {
                 my $range_down = $atg_position + 2 + $down; # the -1's are to convert from 1-based to 0-based coord sys
                 my $score = $pwm_plus->score_plus_minus_pwm($feature_seq, $pwm_minus, 
                                                             pwm_range => [$range_left, $range_down]);
+
+                my $local_pwm_len = $down + $up;
                 
                 if ($score ne "NA") {
-                    $score = sprintf("%.3f", $score);
+                    $score = sprintf("%.3f", $score/$local_pwm_len);  # normalizing for length of pwm
                 } 
                 push (@row, $score); 
             }
@@ -147,10 +149,10 @@ main: {
         open (my $ofh, ">$Rscript") or die "Error, cannot write to $Rscript";
         print $ofh "data = read.table(\"$features_file.+-.pwm_range_scores\")\n"
                  . "pdf(\"$features_file.+-.pwm_range_scores.boxplot.pdf\")\n"
-                 . "boxplot(data, outline=F, las=2, cex.axis=0.5, main='log odds, order by comparison')\n"
+                 . "boxplot(data, outline=F, las=2, cex.axis=0.4, main='log_odds/pwm_length, order by comparison')\n"
                  . "abline(h=0, col='blue')\n"
                  . "cd = apply(data, 2, median)\n"
-                 . "boxplot(data[,rev(order(cd))], outline=F, las=2, cex.axis=0.5, main='log odds, order by mean desc')\n"
+                 . "boxplot(data[,rev(order(cd))], outline=F, las=2, cex.axis=0.4, main='log_odds/pwm_length, order by median desc')\n"
                  . "abline(h=0, col='blue')\n"
                  . "dev.off()\n";
 
