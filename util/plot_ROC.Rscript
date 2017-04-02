@@ -1,0 +1,21 @@
+#!/usr/bin/env Rscript
+
+args<-commandArgs(TRUE)
+
+if (length(args) == 0) {
+    stop("require param: features.scores.roc")
+}
+
+dat_filename = args[1]
+
+data = read.table(dat_filename, header=T)
+
+library(ggplot2)
+
+data = read.table("feature.scores.roc", header=T)
+p = ggplot(data, aes(x=FPR, y=TPR, color=cat)) + geom_point() + geom_smooth(method='loess', se=FALSE)
+pdf("feature.scores.roc.pdf")
+print(p)
+dev.off()
+
+
