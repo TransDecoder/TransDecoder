@@ -115,8 +115,8 @@ main: {
         
         my $worst_score = $scored_features[0]->{score};
 
-        if ($score > $worst_score) {
-
+        if ($score ne 'NA' && $score > $worst_score) {
+            
             # purge the worst feature
             my $purge_feature = shift @scored_features;
                         
@@ -124,7 +124,7 @@ main: {
             push(@scored_features, { score => $score,
                                      seq => $feature,
                  } );
-            @scored_features = sort {$a->{score}<=> $b->{score}} @scored_features;
+
     
             # adjust the pwm
             $pwm_plus->remove_feature_seq_from_pwm($purge_feature->{seq});
@@ -134,10 +134,32 @@ main: {
 
             print STDERR "-feature swap of score: $score instead of $worst_score\n";
             $num_feature_swaps++;
+            
+            ## rescore all currently integrated features:
+            foreach my $scored_feature (@scored_features) {
+                $scored_feature->{score} = $pwm_plus->score_plus_minus_pwm($scored_feature->{seq}, $pwm_minus);
+            }
+            
+            @scored_features = sort {$a->{score}<=> $b->{score}} @scored_features;
+
         }
     }
 
     print STDERR "-num feature swaps: $num_feature_swaps\n";
+
+    ## prune non-pos scoring features from model
+    my $num_features_removed = 0;
+    foreach my $scored_feature (@scored_features) {
+        if ($scored_feature->{score} <= 0) {
+            $pwm_plus->remove_feature_seq_from_pwm($scored_feature->{seq});
+            $num_features_removed++;
+        }
+    }
+
+    if ($num_features_removed > 0) {
+        $pwm_plus->build_pwm();
+        print STDERR "-removed $num_features_removed / " . scalar(@scored_features) . " from PWM based on low scores\n";
+    }
     
     my $out_pwm_file = "$out_prefix.+.pwm";
     $pwm_plus->write_pwm_file($out_pwm_file);
