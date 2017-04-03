@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
+my $PSEUDOCOUNT = 0.1;
 
 ###
 sub new {
@@ -22,10 +23,22 @@ sub new {
 
 sub is_pwm_built {
     my ($self) = @_;
-
+    
     return($self->{_pwm_built_flag});
 
 }
+
+sub has_pos_freqs {
+    my ($self) = @_;
+
+    if (@{$self->{pos_freqs}}) {
+        return(1);
+    }
+    else {
+        return(0);
+    }
+}
+
 
 
 sub add_feature_seq_to_pwm {
@@ -35,10 +48,10 @@ sub add_feature_seq_to_pwm {
     
     my $pwm_len = $self->get_pwm_length();
     if ($pwm_len && length($feature_seq) != $pwm_len) {
-        croak "Error, pwm_len: $pwm_len and feature_seq len: " . length($feature_seq) . " are unmatched.";
+        confess "Error, pwm_len: $pwm_len and feature_seq len: " . length($feature_seq) . " are unmatched.";
     }
     if ($feature_seq =~ /[^GATC]/) {
-        croak "Error, feature_seq: $feature_seq contains non-GATC chars.";
+        confess "Error, feature_seq: $feature_seq contains non-GATC chars.";
     }
     
     my @chars = split(//, $feature_seq);
@@ -51,6 +64,35 @@ sub add_feature_seq_to_pwm {
     return;
 }
 
+
+sub remove_feature_seq_from_pwm {
+    my ($self, $feature_seq) = @_;
+    
+    if (! $self->has_pos_freqs()) {
+        confess "Error, pwm obj doesn't have position frequencies set";
+    }
+    
+    $feature_seq = uc $feature_seq;
+    
+    my $pwm_len = $self->get_pwm_length();
+    if ($pwm_len && length($feature_seq) != $pwm_len) {
+        confess "Error, pwm_len: $pwm_len and feature_seq len: " . length($feature_seq) . " are unmatched.";
+    }
+    if ($feature_seq =~ /[^GATC]/) {
+        confess "Error, feature_seq: $feature_seq contains non-GATC chars.";
+    }
+    
+    my @chars = split(//, $feature_seq);
+    for (my $i = 0; $i <= $#chars; $i++) {
+        my $char = $chars[$i];
+        $self->{pos_freqs}->[$i]->{$char}--;
+    }
+    
+    return;
+}
+
+
+    
 sub get_pwm_length {
     my ($self) = @_;
 
@@ -171,7 +213,7 @@ sub build_pwm {
         # now convert to relative freqs
         foreach my $char (@chars) {
             my $val = $pos_freqs_aref->[$i]->{$char};
-            my $prob = sprintf("%.6f", $val / $sum);
+            my $prob = sprintf("%.6f", ($val + $PSEUDOCOUNT) / ($sum + 4 * $PSEUDOCOUNT) );
             $self->{pos_probs}->[$i]->{$char} = $prob;
         }
         
