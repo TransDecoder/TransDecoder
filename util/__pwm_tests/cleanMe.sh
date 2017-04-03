@@ -2,5 +2,5 @@
 
 set -ev
 
-rm -f ./rand.*
+rm -f ./test.*
 

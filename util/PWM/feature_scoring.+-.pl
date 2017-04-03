@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
 use FindBin;
-use lib ("$FindBin::Bin/../PerlLib");
+use lib ("$FindBin::Bin/../../PerlLib");
 use Fasta_reader;
 use Nuc_translator;
 use PWM;
@@ -14,7 +14,7 @@ use Process_cmd;
 
 my $num_rounds = 5;
 my $fraction_train = 0.75;
-my $atg_position = 10;
+my $atg_position = 20;
 my $max_feature_select = 1000;
 
 my $usage = <<__EOUSAGE__;

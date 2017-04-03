@@ -5,10 +5,14 @@ use warnings;
 use Carp;
 use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
 use FindBin;
-use lib ("$FindBin::Bin/../PerlLib");
+use lib ("$FindBin::Bin/../../PerlLib");
 use Fasta_reader;
 use Nuc_translator;
 use PWM;
+
+my $pwm_left = 20;
+my $pwm_right = 10;
+
 
 my $usage = <<__EOUSAGE__;
 
@@ -22,9 +26,9 @@ my $usage = <<__EOUSAGE__;
 #
 ## Optional
 #
-#  --pwm_left <int>           default: 10
+#  --pwm_left <int>           default: $pwm_left
 #
-#  --pwm_right <int>          default: 10         
+#  --pwm_right <int>          default: $pwm_right  
 #
 #
 #####################################################################
@@ -38,8 +42,6 @@ __EOUSAGE__
 my $help_flag;
 my $transcripts_file;
 my $selected_orfs_file;
-my $pwm_left = 10;
-my $pwm_right = 10;
 my $out_prefix = undef;
 
 

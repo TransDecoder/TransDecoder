@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-my $usage = "usage: $0 feature.scores [num_intervals=10]\n\n";
+my $usage = "usage: $0 feature.scores [num_ROC_threshold_intervals=10]\n\n";
 
 my $feature_score_file = $ARGV[0] or die $usage;
 

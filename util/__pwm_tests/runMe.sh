@@ -2,7 +2,18 @@
 
 set -ev
 
-../PWM/simulate_feature_seq_from_PWM.pl  --pwm atg.-.pwm --num_features 1000 > rand.features
-../PWM/build_pwm.pl  --features rand.features --pwm_out rand.pwm
-../PWM/optimize_atgPWM_+-.predict.pl --features rand.features --atg_pwm_minus rand.pwm 
-xpdf rand.features.+-.pwm_range_scores.boxplot.pdf
+gunzip -c longest_orfs.cds.top_longest_5000.nr80.gz > test.train_orfs.fa
+
+gunzip -c pasa_assemblies.fasta.gz > test.transcripts.fa
+
+../PWM/build_atgPWM_+-.pl --transcripts test.transcripts.fa --selected_orfs test.train_orfs.fa --out_prefix test
+
+../PWM/feature_scoring.+-.pl --features_plus test.+.features --features_minus test.-.features > test.features.scores
+
+../PWM/feature_scores_to_ROC.pl test.features.scores > test.features.scores.ROC
+
+../PWM/plot_ROC.Rscript test.features.scores.ROC
+
+../PWM/compute_AUC.Rscript test.features.scores.ROC
+
+

@@ -12,9 +12,9 @@ data = read.table(dat_filename, header=T)
 
 library(ggplot2)
 
-data = read.table("feature.scores.roc", header=T)
+data = read.table(dat_filename, header=T)
 p = ggplot(data, aes(x=FPR, y=TPR, color=cat)) + geom_point() + geom_smooth(method='loess', se=FALSE)
-pdf("feature.scores.roc.pdf")
+pdf( paste0(dat_filename, ".plot.pdf"))
 print(p)
 dev.off()
 
