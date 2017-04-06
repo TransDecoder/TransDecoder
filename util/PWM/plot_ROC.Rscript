@@ -11,9 +11,10 @@ dat_filename = args[1]
 data = read.table(dat_filename, header=T)
 
 library(ggplot2)
+library(splines)
 
 data = read.table(dat_filename, header=T)
-p = ggplot(data, aes(x=FPR, y=TPR, color=cat)) + geom_point() + geom_smooth(method='loess', se=FALSE)
+p = ggplot(data, aes(x=FPR, y=TPR, color=cat)) + geom_point() + geom_line() + theme(legend.position="none")
 pdf( paste0(dat_filename, ".plot.pdf"))
 print(p)
 dev.off()
