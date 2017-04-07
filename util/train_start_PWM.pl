@@ -93,9 +93,17 @@ main: {
     $cmd = "$utildir/compute_AUC.pl atg.feature.scores.roc";
     $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/aucplot.ok"));
 
-    
-    
+    $cmd = "$utildir/make_seqLogo.Rscript atg.+.pwm";
+    $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/seqlogo.atg.+.ok"));
+
+    $cmd = "$utildir/make_seqLogo.Rscript atg.-.pwm";
+    $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/seqlogo.atg.-.ok"));
+
+        
+    #################
     ## motif enhancer
+
+    
     $cmd = "$utildir/deplete_feature_noise.pl "
         . " --features_plus atg.+.features "
         . " --pwm_minus atg.-.pwm "
@@ -122,7 +130,10 @@ main: {
     $cmd = "$utildir/compute_AUC.pl enhanced.feature.scores.roc";
     $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/enhanced_aucplot.ok"));
     
-
+    $cmd = "$utildir/make_seqLogo.Rscript enhanced.+.pwm";
+    $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/seqlogo.enhanced.atg.+.ok"));
+    
+    
     
     $pipeliner->run();
 

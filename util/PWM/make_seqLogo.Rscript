@@ -1,0 +1,25 @@
+#!/usr/bin/env Rscript
+
+args<-commandArgs(TRUE)
+
+if (length(args) == 0) {
+    stop("require param: motif.+.pwm")
+}
+
+dat_filename = args[1]
+
+library(seqLogo)
+
+data = read.table(dat_filename, header=T, row.names=1)
+
+motif = t(data)
+p = makePWM(motif)
+
+pdf( paste0(dat_filename, ".seqLogo.pdf"))
+
+seqLogo(p)
+
+
+dev.off()
+
+
