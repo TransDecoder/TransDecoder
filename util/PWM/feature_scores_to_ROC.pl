@@ -21,6 +21,8 @@ main: {
         chomp;
         my ($category, $pos_or_neg, $score) = split(/\t/);
 
+        if ($score eq 'NA') { next; }
+        
         push (@{$cat_type_to_scores{$category}}, [$pos_or_neg, $score]);
     
         if (! defined $min_val) {
@@ -77,6 +79,8 @@ sub score_cat_type {
     foreach my $type_n_score (@$type_n_score_aref) {
         my ($type, $score) = @$type_n_score;
 
+        if ($score eq "NA") { next; }
+        
         if ($type eq 'pos') {
             if ($score >= $min_val) {
                 $TP++;
