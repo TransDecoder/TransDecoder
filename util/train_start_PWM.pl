@@ -42,13 +42,17 @@ __EOUSAGE__
 my $transcripts_file;
 my $selected_orfs_file;
 
-&GetOptions ( 'h' => \$help_flag,
+&GetOptions ( 'help|h' => \$help_flag,
               'transcripts=s' => \$transcripts_file,
               'selected_orfs=s' => \$selected_orfs_file,
               'pwm_left=i' => \$pwm_left,
               'pwm_right=i' => \$pwm_right,
     );
 
+
+if ($help_flag) {
+    die $usage;
+}
 
 
 unless ($transcripts_file && $selected_orfs_file) {
