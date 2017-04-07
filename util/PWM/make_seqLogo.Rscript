@@ -12,7 +12,10 @@ library(seqLogo)
 
 data = read.table(dat_filename, header=T, row.names=1)
 
+data = data[,c('A', 'C', 'G', 'T')]
+
 motif = t(data)
+
 p = makePWM(motif)
 
 pdf( paste0(dat_filename, ".seqLogo.pdf"))

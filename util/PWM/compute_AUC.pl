@@ -65,13 +65,20 @@ main: {
     {
         open (my $ofh, ">$Rscript_file");
         print $ofh "data = read.table(\"$auc_outfile\", header=F)\n"
+            . "colnames(data) = c('cat', 'auc')\n"
             . "pdf(\"$auc_outfile.plot.pdf\")\n"
             . "barplot(data[,2], las=2, names=data[,1], cex.names=0.4, ylim=c(0,1))\n"
             . "data = data[rev(order(data[,2])),]\n"
             . "barplot(data[,2], las=2, names=data[,1], cex.names=0.4, ylim=c(0,1))\n"
+            . "library(ggplot2)\n"
+            . "before_after_df = data.frame(t(simplify2array(strsplit(as.character(data\$cat), ','))))\n"
+            . "before_after_df = apply(before_after_df, 1:2, as.numeric)\n"
+            . "colnames(before_after_df) = c('before', 'after')\n"
+            . "data = cbind(before_after_df, data)\n"
+            . "ggplot(data, aes(x=before, y=after)) +  geom_point(aes(size=auc, color=auc))\n"
             . "dev.off()\n";
         close $ofh;
-
+        
         system("Rscript $Rscript_file");
 
     }
