@@ -270,12 +270,19 @@ main: {
                 $keep_flag = 1;
                 push (@ATTS, "FRAMESCORE");
             }
+            if ($keep_flag == 0 && $single_best_orf_flag) {
+              # keep all ORFs if single_best_orf flag is taken and let
+              # single_best_ORF_per_transcript.pl decide which to keep
+              $keep_flag = 1;
+            }
             
             if ($keep_flag) {
                 print $ofh "$acc\n";
 
-                my $att_string = join("|", sort @ATTS);
-                $att_counter{$att_string}++;
+                if(scalar(@ATTS)) {
+                  my $att_string = join("|", sort @ATTS);
+                  $att_counter{$att_string}++;
+                }
             }
         }
         close $ifh;
@@ -324,7 +331,7 @@ main: {
             if ($retain_pfam_hits_file) {
                 $cmd .= " --pfam_hits $retain_pfam_hits_file ";
             }
-            $cmd .= " --gff3_file $cds_file.eclipsed_removed.gff3 > $cds_file.single_best_orf.gff3";
+            $cmd .= " --gff3_file $cds_file.eclipsed_removed.gff3 --cds_scores $cds_file.scores > $cds_file.single_best_orf.gff3";
             
             &process_cmd($cmd);
 
