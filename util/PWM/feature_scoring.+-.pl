@@ -194,7 +194,7 @@ sub score_features {
     my ($features_aref, $pwm_plus, $pwm_minus, $up_down_combos_aref, $feature_set_type) = @_;
     
     foreach my $up_down (@$up_down_combos_aref) {
-        print STDERR "\t$up_down\n";
+        #print STDERR "\t$up_down\n";
         my ($up, $down) = split(/,/, $up_down);
         my $range_left = $atg_position - $up;
         my $range_down = $atg_position + 2 + $down; # the -1's are to convert from 1-based to 0-based coord sys

@@ -16,6 +16,8 @@ data = data[,c('A', 'C', 'G', 'T')]
 
 motif = t(data)
 
+motif = sweep(motif, 2, colSums(motif), '/')
+
 p = makePWM(motif)
 
 pdf( paste0(dat_filename, ".seqLogo.pdf"))

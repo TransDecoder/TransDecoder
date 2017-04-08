@@ -379,7 +379,7 @@ sub score_plus_minus_pwm {
 sub load_pwm_from_file {
     my ($self, $pwm_file) = @_;
 
-    open(my $fh, $pwm_file) or die "Error, cannot open file: $pwm_file";
+    open(my $fh, $pwm_file) or confess "Error, cannot open file: $pwm_file";
 
     my $header = <$fh>;
     chomp $header;

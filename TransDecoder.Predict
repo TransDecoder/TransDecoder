@@ -172,6 +172,7 @@ main: {
     ## Train a Markov model based on user-provided file or longest candidate CDS sequences, score all candidates, and select the final set.
 
     my $top_cds_file;
+    my $nr_top_orfs_file;
     if ($train_file) {
 
         if (! -s $train_file) {
@@ -193,6 +194,8 @@ main: {
         
             &process_cmd("touch $checkpoint");
 
+            $nr_top_orfs_file = "$red_num_cds_longest_file.nr80";
+            
         }
     }
     
@@ -338,6 +341,19 @@ main: {
             $target_final_file = "$cds_file.single_best_orf.gff3";
         }
 
+        ## start codon refinement
+        if ($nr_top_orfs_file) {
+            $cmd = "$UTIL_DIR/train_start_PWM.pl --transcripts $transcripts_file --selected_orfs $nr_top_orfs_file --out_prefix $workdir/start_refinement";
+            &process_cmd($cmd);
+
+            my $revised_orf_gff3_file = "$target_final_file.revised_starts.gff3";
+            $cmd = "$UTIL_DIR/start_codon_refinement.pl --transcripts $transcripts_file --gff3_file $target_final_file > $revised_orf_gff3_file";
+            &process_cmd($cmd);
+
+            $target_final_file = $revised_orf_gff3_file;
+            
+        }
+                
         
         &process_cmd("cp $target_final_file $final_output_prefix.gff3");
                 
