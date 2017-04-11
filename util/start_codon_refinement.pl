@@ -18,6 +18,7 @@ use PWM;
 
 my $atg_pwm_pos = 20;
 my $adj_dist = 30;
+my $adj_pct = 15;
 
 my $usage = <<__EOUSAGE__;
 
@@ -31,6 +32,8 @@ my $usage = <<__EOUSAGE__;
 #
 #  --adj_dist <int>         distance allowed for start adjustment (default: $adj_dist)
 # 
+#  --adj_pct <int>          pecentage of orf length for examining start adjustment (default: $adj_pct)
+#
 #  --atg_pos <int>          atg index position in pwm (default: $atg_pwm_pos)
 #
 #  --debug                  verbose
@@ -52,12 +55,17 @@ my $DEBUG = 0;
             'gff3_file=s' => \$gff3_file,
             'adj_dist=i' => \$adj_dist,
             'atg_pos=i'=> \$atg_pwm_pos,
+            'atg_pct=i' => \$adj_pct,
             'debug' => \$DEBUG,
     );
 
 
 unless ($transcripts_file && $gff3_file) {
     die $usage;
+}
+
+if ($adj_pct > 30 || $adj_pct < 0) {
+    die "Error, --adj_pct is out of range...  must be between 0 and 30 ";
 }
 
 main: {
@@ -113,8 +121,6 @@ main: {
             if ($revised_start_flag) {
                 $num_starts_revised++;
             }
-            
-            
 
         }
     }
@@ -183,11 +189,11 @@ sub refine_start_codon_position {
     my $orient = $gene_obj->get_orientation();
     
     my ($lend, $rend) = sort {$a<=>$b} $gene_obj->get_model_span();
-    my $len = $rend - $lend + 1;
-    if ($len % 3 != 0) {
-        die "Error, $len is not mod 3 " . $gene_obj->toString();
+    my $orf_len = $rend - $lend + 1;
+    if ($orf_len % 3 != 0) {
+        die "Error, $orf_len is not mod 3 " . $gene_obj->toString();
     }
-
+    
     my $orig_start_pos = $lend;
     
     my $start_pos = $lend;
@@ -198,9 +204,12 @@ sub refine_start_codon_position {
 
     my @alt_starts;
     my $start_index = $start_pos - 1; # zero based
+    
+    my $max_search_pos = max($start_index + $adj_dist, $start_index + int($adj_pct * $orf_len / 100));
+    
     while ($transcript_seq =~ /(ATG)/g) {
         my $pos = $-[0];
-        if ($pos > $start_index + $adj_dist) { last; } # too far
+        if ($pos > $max_search_pos) { last; } # too far
         if ($pos > $start_index 
             && 
             ($pos - $start_index) % 3  == 0) { # in frame start
@@ -240,6 +249,8 @@ sub refine_start_codon_position {
             my $alt_start_score = $pwm_plus_obj->score_plus_minus_pwm($feature_seq, $pwm_minus_obj,
                                                                       pwm_range => $pwm_range_aref);
 
+            if ($alt_start_score eq "NA") { next; }
+            
             print STDERR "-existing start score: $existing_start_score\talt start: $alt_start_score\n" if $DEBUG;
             if ($alt_start_score > $existing_start_score
                 &&
