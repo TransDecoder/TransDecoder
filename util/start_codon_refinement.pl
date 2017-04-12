@@ -90,6 +90,8 @@ main: {
     my ($pwm_range_left, $pwm_range_right) = split(",", $pwm_range); # extent around the atg
     my $pwm_range_aref = [$atg_pwm_pos - $pwm_range_left -1, $atg_pwm_pos + 2 + $pwm_range_right -1]; # zero based
     
+    my $start_scores_log_file = "${transdecoder_dir}/start_refinement.alt_start_scores";
+    open(my $ofh_start_scores, ">$start_scores_log_file") or die "Error, cannot write to $start_scores_log_file";
     
     print STDERR "-reading transcripts: $transcripts_file\n" if $DEBUG;
     my $fasta_reader = new Fasta_reader($transcripts_file);
@@ -116,7 +118,10 @@ main: {
 
             my $gene_obj = $gene_obj_indexer_href->{$gene_id};
             
-            my $revised_start_flag = &refine_start_codon_position($gene_obj, $pwm_plus_obj, $pwm_minus_obj, $pwm_range_aref, $min_threshold, $transcript_seq);
+            my $revised_start_flag = &refine_start_codon_position($transcript_acc, $gene_id,
+                                                                  $gene_obj, $pwm_plus_obj, $pwm_minus_obj, 
+                                                                  $pwm_range_aref, $min_threshold, $transcript_seq,
+                                                                  $ofh_start_scores);
 
             if ($revised_start_flag) {
                 $num_starts_revised++;
@@ -125,6 +130,8 @@ main: {
         }
     }
 
+    close $ofh_start_scores;
+    
     print STDERR "-number of revised start positions: $num_starts_revised\n";
 
     exit(0);
@@ -182,8 +189,10 @@ sub parse_range_and_thresholds {
 
 ####
 sub refine_start_codon_position {
-    my ($gene_obj, $pwm_plus_obj, $pwm_minus_obj, $pwm_range_aref, $min_threshold, $transcript_seq) = @_;
-
+    my ($transcript_acc, $gene_id,
+        $gene_obj, $pwm_plus_obj, $pwm_minus_obj, 
+        $pwm_range_aref, $min_threshold, $transcript_seq, $ofh_start_scores) = @_;
+    
     my $revised_start_flag = 0;
     
     my $orient = $gene_obj->get_orientation();
@@ -239,6 +248,8 @@ sub refine_start_codon_position {
     
     my $best_alt_start = undef;
     my $best_alt_start_score = undef;
+
+    my @alt_start_scores;
     
     foreach my $alt_start (@alt_starts) {
         my $feature_seq_start = $alt_start - $atg_pwm_pos;
@@ -250,6 +261,12 @@ sub refine_start_codon_position {
                                                                       pwm_range => $pwm_range_aref);
 
             if ($alt_start_score eq "NA") { next; }
+     
+            $alt_start_score = sprintf("%.3f", $alt_start_score);
+            
+            my $short_feature_seq = &translate_sequence(substr($transcript_seq, $alt_start, 15), 1);
+                        
+            push (@alt_start_scores, "${alt_start}_${short_feature_seq}_${alt_start_score}");
             
             print STDERR "-existing start score: $existing_start_score\talt start: $alt_start_score\n" if $DEBUG;
             if ($alt_start_score > $existing_start_score
@@ -257,7 +274,7 @@ sub refine_start_codon_position {
                 $alt_start_score >= $min_threshold
                 &&
                 (  (! defined $best_alt_start_score) || $alt_start_score > $best_alt_start_score) ) {
-
+                
                 $best_alt_start = $alt_start;
                 $best_alt_start_score = $alt_start_score;
             }
@@ -286,6 +303,11 @@ sub refine_start_codon_position {
     
     print $gene_obj->to_GFF3_format(source => "transdecoder") . "\n";
 
+    if (@alt_start_scores) {
+        unshift(@alt_start_scores, $transcript_acc, $gene_id);
+        print $ofh_start_scores join("\t", @alt_start_scores) . "\n";
+    }
+    
     return($revised_start_flag);
     
 }
