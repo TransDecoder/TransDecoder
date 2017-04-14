@@ -196,8 +196,15 @@ sub refine_start_codon_position {
         $start_pos = length($transcript_seq) - $rend + 1;
     }
 
-    my @alt_starts;
+
+    # only work on 5' partials
     my $start_index = $start_pos - 1; # zero based
+    if (substr($transcript_seq, $start_index, 3) eq "ATG") {
+        return(0);
+    }
+    
+    my @alt_starts;
+
     while ($transcript_seq =~ /(ATG)/g) {
         my $pos = $-[0];
         if ($pos > $start_index + $adj_dist) { last; } # too far
@@ -216,18 +223,7 @@ sub refine_start_codon_position {
     
     my $pwm_len = $pwm_plus_obj->get_pwm_length();
     
-    my $existing_start_score = -1000000; # neg inf
-    if (substr($transcript_seq, $start_index, 3) eq "ATG") {
-        my $feature_seq_start = $start_index - $atg_pwm_pos;
-        if ($feature_seq_start > 0) {
-            my $feature_seq = substr($transcript_seq, $feature_seq_start, $pwm_len);
-            $existing_start_score = $pwm_plus_obj->score_plus_minus_pwm($feature_seq, $pwm_minus_obj, 
-                                                                        pwm_range => $pwm_range_aref);
-            
-            print STDERR "-existing start score: $existing_start_score\n" if $DEBUG;
-        }
-    }
-    
+        
     my $best_alt_start = undef;
     my $best_alt_start_score = undef;
     
@@ -239,11 +235,7 @@ sub refine_start_codon_position {
             
             my $alt_start_score = $pwm_plus_obj->score_plus_minus_pwm($feature_seq, $pwm_minus_obj,
                                                                       pwm_range => $pwm_range_aref);
-
-            print STDERR "-existing start score: $existing_start_score\talt start: $alt_start_score\n" if $DEBUG;
-            if ($alt_start_score > $existing_start_score
-                &&
-                $alt_start_score >= $min_threshold
+            if ($alt_start_score >= $min_threshold
                 &&
                 (  (! defined $best_alt_start_score) || $alt_start_score > $best_alt_start_score) ) {
 
@@ -252,7 +244,7 @@ sub refine_start_codon_position {
             }
         }
     }
-
+    
     
     if ($best_alt_start) {
         $best_alt_start++; # make 1-based coord
