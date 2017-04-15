@@ -6,6 +6,8 @@ use Carp;
 
 my $PSEUDOCOUNT = 0.1;
 
+srand(1); # reproducibility
+
 ###
 sub new {
     my $packagename = shift;
