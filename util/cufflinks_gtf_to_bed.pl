@@ -20,7 +20,7 @@ main: {
 	open (my $fh, $cufflinks_gtf) or die "Error, cannot open file $cufflinks_gtf";
 	while (<$fh>) {
 		chomp;
-		
+		if (/^\#/) { next; }
 		unless (/\w/) { next; }
 		
 		my @x = split(/\t/);
@@ -35,11 +35,12 @@ main: {
 		my $info = $x[8];
 		
 		unless ($type eq 'exon') { next; }
-
+        
+        $info =~ s/^\s+|\s+$//g; 
 		my @parts = split(/;/, $info);
 		my %atts;
 		foreach my $part (@parts) {
-			$part =~ s/^\s+|\s+$//;
+			$part =~ s/^\s+|\s+$//g;
 			$part =~ s/\"//g;
 			my ($att, $val) = split(/\s+/, $part);
 			
