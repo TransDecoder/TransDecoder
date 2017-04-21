@@ -1,5 +1,5 @@
 
-DIRS=cufflinks_example pasa_example simple_transcriptome_target
+DIRS=cufflinks_example pasa_example simple_transcriptome_target stringtie_example
 
 test:
 	@for i in $(DIRS); do \
