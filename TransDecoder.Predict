@@ -30,6 +30,7 @@ Common options:
 
  -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia, ...)
 
+  --refine_starts                       identifies potential start codons for 5' partial ORFs using a PWM.
 
 Advanced options
 
@@ -113,6 +114,8 @@ my $MPI_DEBUG = 1;
 my $single_best_orf_flag = 0;
 my $genetic_code = "";
 
+my $REFINE_START_CODONS_FLAG = 0;
+
 &GetOptions( 't=s' => \$transcripts_file,
              'train:s' => \$train_file,
 
@@ -136,6 +139,8 @@ my $genetic_code = "";
 
              'G=s' => \$genetic_code,
 
+             'refine_starts' => \$REFINE_START_CODONS_FLAG,
+             
              
              );
 
@@ -342,7 +347,7 @@ main: {
         }
 
         ## start codon refinement
-        if ($nr_top_orfs_file) {
+        if ($nr_top_orfs_file && $REFINE_START_CODONS_FLAG) {
             $cmd = "$UTIL_DIR/train_start_PWM.pl --transcripts $transcripts_file --selected_orfs $nr_top_orfs_file --out_prefix $workdir/start_refinement";
             &process_cmd($cmd);
 
