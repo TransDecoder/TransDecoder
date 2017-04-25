@@ -24,7 +24,9 @@ Common options:
                                         Any ORF with a blast match will be retained in the final output.
 
  --single_best_orf                      Retain only the single best ORF per transcript.
-                                        (Best is defined as having (optionally pfam and/or blast support) and longest orf)
+                                        (Best is defined as having (optionally pfam and/or blast support), coding score, and longest orf)
+
+     --single_allow_score_lt0           Under --single_best_orf, include best ORF even if there's no homology and the LL score < 0 
 
  --cpu <int>                            Use multiple cores for cd-hit-est. (default=1)
 
@@ -116,6 +118,9 @@ my $genetic_code = "";
 
 my $REFINE_START_CODONS_FLAG = 0;
 
+
+my $SINGLE_ALLOW_SCORE_LT0_FLAG = 0;
+
 &GetOptions( 't=s' => \$transcripts_file,
              'train:s' => \$train_file,
 
@@ -136,11 +141,14 @@ my $REFINE_START_CODONS_FLAG = 0;
              'cpu=i' => \$cpu,
 
              'single_best_orf' => \$single_best_orf_flag,
+             'single_allow_score_lt0' => \$SINGLE_ALLOW_SCORE_LT0_FLAG,
 
+             
              'G=s' => \$genetic_code,
 
              'refine_starts' => \$REFINE_START_CODONS_FLAG,
              
+
              
              );
 
@@ -278,10 +286,11 @@ main: {
                 $keep_flag = 1;
                 push (@ATTS, "FRAMESCORE");
             }
-            if ($keep_flag == 0 && $single_best_orf_flag) {
+            if ($keep_flag == 0 && $single_best_orf_flag && $SINGLE_ALLOW_SCORE_LT0_FLAG) {
               # keep all ORFs if single_best_orf flag is taken and let
               # single_best_ORF_per_transcript.pl decide which to keep
-              $keep_flag = 1;
+                $keep_flag = 1;
+                push (@ATTS, "SINGLELT0");
             }
             
             if ($keep_flag) {
