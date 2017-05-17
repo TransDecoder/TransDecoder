@@ -124,9 +124,10 @@ main: {
                                                                   $pwm_range_aref, $min_threshold, $transcript_seq,
                                                                   $ofh_start_scores);
 
+            print $gene_obj->to_GFF3_format(source => "transdecoder") . "\n";
             if ($revised_start_flag) {
                 $num_starts_revised++;
-            }
+            } 
 
         }
     }
@@ -239,7 +240,6 @@ sub refine_start_codon_position {
     }
 
     unless (@alt_starts) {
-        print $gene_obj->to_GFF3_format(source => "transdecoder") . "\n";    
         return($revised_start_flag);
     }
     
@@ -299,7 +299,6 @@ sub refine_start_codon_position {
         print "# refined start codon: $orig_start_pos -> $new_start (score: $best_alt_start_score)\n";
     }
     
-    print $gene_obj->to_GFF3_format(source => "transdecoder") . "\n";
 
     if (@alt_start_scores) {
         unshift(@alt_start_scores, $transcript_acc, $gene_id);
