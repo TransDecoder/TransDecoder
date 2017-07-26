@@ -196,8 +196,11 @@ main: {
     else {
         $top_cds_file = "$cds_file.top_${top_ORFs_train}_longest";
         my $checkpoint = "$top_cds_file.ok";
+        # to speed things up only check for redundancy up to x the number of entries we want
+        my $red_num = $top_ORFs_train * 10;
+        my $red_num_cds_longest_file = "$cds_file.top_longest_${red_num}";
+        $nr_top_orfs_file = "$red_num_cds_longest_file.nr80";
         if (! -e $checkpoint) {
-                    
             # to speed things up only check for redundancy up to x the number of entries we want
             my $red_num = $top_ORFs_train * 10;
             my $red_num_cds_longest_file = "$cds_file.top_longest_${red_num}";
@@ -206,9 +209,6 @@ main: {
             &process_cmd("$UTIL_DIR/get_top_longest_fasta_entries.pl $red_num_cds_longest_file.nr80 $top_ORFs_train > $top_cds_file");
         
             &process_cmd("touch $checkpoint");
-
-            $nr_top_orfs_file = "$red_num_cds_longest_file.nr80";
-            
         }
     }
     
