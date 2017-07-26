@@ -205,7 +205,7 @@ main: {
             my $red_num = $top_ORFs_train * 10;
             my $red_num_cds_longest_file = "$cds_file.top_longest_${red_num}";
             &process_cmd("$UTIL_DIR/get_top_longest_fasta_entries.pl $cds_file $red_num $max_prot_length_for_training > $red_num_cds_longest_file");
-            &process_cmd("$cd_hit_est_exec -r 1 -i $red_num_cds_longest_file -T $cpu -c 0.80 -o $red_num_cds_longest_file.nr80 -M 0 ");
+            &process_cmd("$cd_hit_est_exec -r 1 -i $red_num_cds_longest_file -T $cpu -c 0.80 -o $red_num_cds_longest_file.nr80 ");
             &process_cmd("$UTIL_DIR/get_top_longest_fasta_entries.pl $red_num_cds_longest_file.nr80 $top_ORFs_train > $top_cds_file");
         
             &process_cmd("touch $checkpoint");
