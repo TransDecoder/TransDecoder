@@ -7,10 +7,11 @@ use FindBin;
 use lib ("$FindBin::Bin/../PerlLib");
 use Fasta_reader;
 
-my $usage = "usage: $0 file.fasta numTopLongest\n\n";
+my $usage = "usage: $0 file.fasta numTopLongest [max_prot_length]\n\n";
 
 my $file = $ARGV[0] or die $usage;
 my $num_longest = $ARGV[1] or die $usage;
+my $max_protein_length = $ARGV[2] || -1;
 
 main: {
 
@@ -32,7 +33,12 @@ main: {
 	foreach my $entry (@entries) {
 		
 		my ($seq_obj, $num) = @$entry;
-		
+
+        my $seq_len = length($seq_obj->get_sequence());
+        if ($max_protein_length > 0 && $seq_len > $max_protein_length) {
+            next;
+        }
+        
 		print $seq_obj->get_FASTA_format();
 		
 		$counter++;
