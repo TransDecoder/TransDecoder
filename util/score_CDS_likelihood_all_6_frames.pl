@@ -38,7 +38,7 @@ sub score_seq {
     my $accession = $seq_obj->get_accession();
     my $sequence = uc $seq_obj->get_sequence();
     
-    for my $markov_order (2..5) {
+    for my $markov_order (5) {
         
 		my $score1 = &score_CDS_via_Markov($sequence, $markov_order);				
 		my $score2 = &score_CDS_via_Markov(substr($sequence, 1), $markov_order);
