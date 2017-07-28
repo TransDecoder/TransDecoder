@@ -18,6 +18,9 @@ my $kmer_scores_file = $ARGV[1] or die $usage;
 my %scores = &parse_kmer_scores($kmer_scores_file);
 
 main: {
+
+    print join("\t", "#acc", "Markov_order", "seq_length", 
+               "score_1", "score_2", "score_3", "score_4", "score_5") . "\n";
 		
 	my $fasta_reader = new Fasta_reader($cds_file);
 	while (my $seq_obj = $fasta_reader->next()) {
@@ -53,7 +56,7 @@ sub score_seq {
 			   $score4, $score5, $score6);
                 
     }
-
+    
     return;
 }
 
