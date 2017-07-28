@@ -23,10 +23,14 @@ def main():
     
     seq = get_seq(args.orf_id, args.longest_orfs_cds)
 
+    seq = seq[0:-2]
+    
     framed_kmers_to_likelihoods = parse_kmer_likelihoods(args.kmer_scores)
     
 
     score_vec = score_seq(seq, framed_kmers_to_likelihoods)
+
+    print("sum: {}".format(sum(score_vec)))
 
     plt.plot(range(1,len(score_vec)+1), score_vec, marker ='+')
     plt.show()

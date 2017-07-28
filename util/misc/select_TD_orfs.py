@@ -15,15 +15,20 @@ def main():
 
     predicted_orf_coords = retrieve_orf_coords(long_orfs_cds_file)
 
-    select(long_orfs_scored_file, long_orfs_scored_file + ".markov_val_any.gff", predicted_orf_coords)
+    prediction_list = parse_predictions_and_scores(long_orfs_scored_file, predicted_orf_coords)
 
-    select(long_orfs_scored_file, long_orfs_scored_file + ".markov_2.gff", predicted_orf_coords, markov_val="2")
 
-    select(long_orfs_scored_file, long_orfs_scored_file + ".markov_3.gff", predicted_orf_coords, markov_val="3")
+    #select(long_orfs_scored_file, long_orfs_scored_file + ".markov_val_any.gff", predicted_orf_coords)
 
-    select(long_orfs_scored_file, long_orfs_scored_file + ".markov_4.gff", predicted_orf_coords, markov_val="4")
+    #select(long_orfs_scored_file, long_orfs_scored_file + ".markov_2.gff", predicted_orf_coords, markov_val="2")
 
-    select(long_orfs_scored_file, long_orfs_scored_file + ".markov_5.gff", predicted_orf_coords, markov_val="5")
+    #select(long_orfs_scored_file, long_orfs_scored_file + ".markov_3.gff", predicted_orf_coords, markov_val="3")
+
+    #select(long_orfs_scored_file, long_orfs_scored_file + ".markov_4.gff", predicted_orf_coords, markov_val="4")
+
+    select(prediction_list, long_orfs_scored_file + ".markov_5.gff", predicted_orf_coords, markov_val="5")
+    select(prediction_list, long_orfs_scored_file + ".longest_single_only.gff", predicted_orf_coords, markov_val="5", longest_single_orf=True)
+    select(prediction_list, long_orfs_scored_file + ".longest_single_only.max3.gff", predicted_orf_coords, markov_val="5", longest_single_orf=True, require_F1_max_all=False)
 
     
     
@@ -43,7 +48,7 @@ def retrieve_orf_coords(long_orfs_cds_file):
             if not match:
                 raise RuntimeError("Error, cannot extract orf coord info from line: {}".format(line))
             (transcript_id, lend, rend, orient) = (match.group(1), match.group(2), match.group(3), match.group(4))
-            (lend, rend) = sorted((lend, rend))
+            (lend, rend) = sorted((int(lend), int(rend)))
 
             match = re.search("^>(\S+)", line)
             orf_id = match.group(1)
@@ -58,58 +63,117 @@ def retrieve_orf_coords(long_orfs_cds_file):
     return orf_acc_to_coord_info
 
 
-
-def select(input_file, output_file, predicted_orf_coords,
-           markov_val=None,
-           require_pos_F1 = True,
-           require_F1_max = True):
-
-    sys.stderr.write("-writing {}\n".format(output_file))
-
-    fh = open(input_file)
-    ofh = open(output_file, 'w')
-
-    seen_orf_ids = set()
+def parse_predictions_and_scores(long_orfs_scored_file, predicted_orf_coords):
+        
+    prediction_list = []
+    
+    fh = open(long_orfs_scored_file)
 
     for line in fh:
         if re.search("^#", line): continue
         line = line.rstrip()
-        (orf_id, markov_order, seq_length, score_1, score_2, score_3, score_4, score_5, score_6)  = line.split("\t")
+        (orf_id, markov_order, orf_length, score_1, score_2, score_3, score_4, score_5, score_6)  = line.split("\t")
 
-        seq_length = int(seq_length)
+        orf_length = int(orf_length)
         score_1 = float(score_1)
         score_2 = float(score_2)
         score_3 = float(score_3)
         score_4 = float(score_4)
         score_5 = float(score_5)
         score_6 = float(score_6)
-        
 
+
+        orf_struct = predicted_orf_coords[orf_id]
+
+        prediction = { 'orf_id' : orf_id,
+                       'markov_order' : markov_order,
+                       'orf_length' : orf_length,
+                       'frame_scores' : (score_1, score_2, score_3, score_4, score_5, score_6),
+                       'orf_struct' : orf_struct
+                       }
+
+        prediction_list.append(prediction)
+
+
+
+    prediction_list.sort(key=lambda x: x['orf_struct']['lend'])
+
+    prediction_list.reverse()
+
+    return prediction_list
+
+
+def select(prediction_list, output_file, predicted_orf_coords,
+           markov_val=None,
+           require_pos_F1 = True,
+           require_F1_max_all = True,
+           require_F1_max_3 = True,
+           longest_single_orf = False):
+
+    sys.stderr.write("-writing {}\n".format(output_file))
+
+    
+    ofh = open(output_file, 'w')
+
+    seen_orf_ids = set() 
+    seen_transcript_ids = set()
+
+    for prediction in prediction_list:
+
+        orf_id = prediction['orf_id']
+        markov_order = prediction['markov_order']
+        orf_length = prediction['orf_length']
+        frame_scores = prediction['frame_scores']
+        (score_1, score_2, score_3, score_4, score_5, score_6) = frame_scores
+
+        orf_struct = prediction['orf_struct']
+
+        transcript_id = orf_struct['transcript_id']
+        lend = orf_struct['lend']
+        rend = orf_struct['rend']
+        orient = orf_struct['orient']
+
+        
         if orf_id in seen_orf_ids:
+            # in case already selected under a different Markov model
             continue
 
+        if longest_single_orf and transcript_id in seen_transcript_ids:
+            continue
+
+        ###########################
         ## apply filtering criteria
+        pass_orf = True
         
-        if markov_val and markov_val != markov_order:
-            continue
+        if pass_orf and \
+               markov_val is not None and \
+               markov_val != markov_order:
 
-        if require_pos_F1 and score_1 <= 0:
-            continue
+            pass_orf = False
 
-        if require_F1_max:
+        if pass_orf and require_pos_F1 and score_1 <= 0:
+            pass_orf = False
+
+        if pass_orf and require_F1_max_all:
             nonF1_scores = (score_2, score_3, score_4, score_5, score_6)
             max_nonF1_score = max(nonF1_scores)
             if max_nonF1_score > score_1:
-                continue
-
-        ## passed filters, report it
-        orf_struct = predicted_orf_coords[orf_id]
+                pass_orf = False
+        elif pass_orf and require_F1_max_3:
+            nonF1_scores = (score_2, score_3)
+            max_nonF1_score = max(nonF1_scores)
+            if max_nonF1_score > score_1:
+                pass_orf = False
         
-        ofh.write("\t".join([orf_struct['transcript_id'], "selected", "CDS",
-                        orf_struct['lend'], orf_struct['rend'], '.', orf_struct['orient'], '.', '.']) + "\n")
+        if pass_orf:
+            ## passed filters, report it
         
-        seen_orf_ids.add(orf_id)
-        
+            ofh.write("\t".join([transcript_id, "selected", "CDS",
+                                 str(lend), str(rend), '.',
+                                 orient, '.', orf_id]) + "\n")
+            
+            seen_orf_ids.add(orf_id)
+            seen_transcript_ids.add(transcript_id)
 
     return
 

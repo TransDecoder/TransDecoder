@@ -103,6 +103,19 @@ sub parse_targetCDSs {
             
             for (my $i = $markov_order; $i < $seq_len; $i++) {
                 my $frame = $i % 3;
+
+                ## avoid stop codons!
+                if ($i == $seq_len - 2 - 1 # last triplet
+                    &&
+                    $frame == 0 # first position of a codon
+                    ) {
+
+                    my $codon = substr($sequence, $i, 3);
+                    # stops: UAA, UAG, UGA
+                    if ($codon =~ /^(TAA|TAG|TGA)$/) {
+                        last;
+                    }
+                }
                 
                 if ($markov_order == 0) {
                     # include counts of number of framed positions, needed for Markov chain computes later.
