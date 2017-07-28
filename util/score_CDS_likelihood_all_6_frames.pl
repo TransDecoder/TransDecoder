@@ -20,8 +20,8 @@ my %scores = &parse_kmer_scores($kmer_scores_file);
 main: {
 
     print join("\t", "#acc", "Markov_order", "seq_length", 
-               "score_1", "score_2", "score_3", "score_4", "score_5") . "\n";
-		
+               "score_1", "score_2", "score_3", "score_4", "score_5", "score_6") . "\n";
+    
 	my $fasta_reader = new Fasta_reader($cds_file);
 	while (my $seq_obj = $fasta_reader->next()) {
 		&score_seq($seq_obj);

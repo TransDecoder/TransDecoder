@@ -76,6 +76,15 @@ def select(input_file, output_file, predicted_orf_coords,
         line = line.rstrip()
         (orf_id, markov_order, seq_length, score_1, score_2, score_3, score_4, score_5, score_6)  = line.split("\t")
 
+        seq_length = int(seq_length)
+        score_1 = float(score_1)
+        score_2 = float(score_2)
+        score_3 = float(score_3)
+        score_4 = float(score_4)
+        score_5 = float(score_5)
+        score_6 = float(score_6)
+        
+
         if orf_id in seen_orf_ids:
             continue
 
