@@ -75,13 +75,35 @@ sub score_CDS_via_Markov {
     for (my $i = 0; $i < $seq_length; $i++) {
         my $frame = $i % 3;
         my $markov_use = min($i, $markov_order);
-        my $kmer = substr($sequence, $i-$markov_order, $markov_order + 1);
+        my $kmer = substr($sequence, $i-$markov_use, $markov_use + 1);
 
+        ## avoid stop codons!
+        if ($i == $seq_length - 2 - 1 # last triplet
+            &&
+            $frame == 0 # first position of a codon
+            ) {
+            
+            my $codon = substr($sequence, $i, 3);
+            # stops: UAA, UAG, UGA
+            if ($codon =~ /^(TAA|TAG|TGA)$/) {
+                last;
+            }
+        }
+        
+        
         my $framed_kmer = "${kmer}-${frame}";
         my $loglikelihood = $scores{$framed_kmer} || 0;
 
+
+        #print "$i\t$framed_kmer\t$loglikelihood\n";
+
+        
+        
         $score += $loglikelihood;
     }
+    
+    #print "Score: $score\n";
+    
 
     return($score);
 

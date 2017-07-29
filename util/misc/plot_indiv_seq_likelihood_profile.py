@@ -15,6 +15,8 @@ parser.add_argument("--longest_orfs_cds", type=str, required=True, help="long or
 
 parser.add_argument("--kmer_scores", type=str, required=True, help= "kmer likelihood score file")
 
+parser.add_argument("--sort", action='store_true')
+
 args = parser.parse_args()
 
 
@@ -23,14 +25,14 @@ def main():
     
     seq = get_seq(args.orf_id, args.longest_orfs_cds)
 
-    seq = seq[0:-2]
-    
     framed_kmers_to_likelihoods = parse_kmer_likelihoods(args.kmer_scores)
     
-
     score_vec = score_seq(seq, framed_kmers_to_likelihoods)
 
     print("sum: {}".format(sum(score_vec)))
+
+    if args.sort:
+        score_vec.sort()
 
     plt.plot(range(1,len(score_vec)+1), score_vec, marker ='+')
     plt.show()
@@ -40,17 +42,31 @@ def score_seq(seq, framed_kmer_likelihoods):
 
     score_vec = []
 
-    for i in range(1, len(seq)):
+    seq = seq.upper()
+
+
+    for i in range(0, len(seq)):
         frame = i % 3
+
         markov_use = min(i, 5)
         kmer = seq[i-markov_use:i+1]
-        #print("i:{}, markov_use:{}, kmer:{}".format(i, markov_use, kmer))
+        
+        codon = seq[i:i+3]
+        #print "codon: {}, frame: {}".format(codon, frame)
 
+        # don't include stop codon
+        if i == len(seq)-2-1 and frame == 0:
+            
+            if codon in ('TAA', 'TAG', 'TGA'):
+                break
+
+
+        #print("i:{}, markov_use:{}, kmer:{}".format(i, markov_use, kmer))
         framed_kmer = "{}-{}".format(kmer, frame)
 
         loglikelihood = framed_kmer_likelihoods[framed_kmer]
 
-        #print("i:{}, likelihood: {}".format(i, loglikelihood))
+        print("i:{}, {}, likelihood: {}".format(i, framed_kmer, loglikelihood))
         score_vec.append(loglikelihood)
 
     return score_vec
