@@ -47,7 +47,6 @@ See L<http://golgi.harvard.edu/biolinks/gencode.html>. These are currently suppo
  Mitochondrial-Euascomycetes
  Mitochondrial-Protozoans
 
-
 =cut
 
 
@@ -67,6 +66,7 @@ use Gene_obj;
 use Nuc_translator;
 use Fasta_reader;
 use Longest_orf;
+use Pipeliner;
 
 my $UTIL_DIR = "$FindBin::RealBin/util";
 $ENV{PATH} = "$UTIL_DIR/bin:$ENV{PATH}";
@@ -120,6 +120,18 @@ if ($genetic_code ne 'universal') {
 
 main: {
 
+    my $workdir = basename($transcripts_file) . ".transdecoder_dir"; 
+    unless (-d $workdir) {
+        mkdir($workdir) or die "Error, cannot mkdir $workdir.";
+    }
+
+    my $longorf_checkpoint = "$workdir/__longorfs.ok";
+    if (-e $longorf_checkpoint) {
+        print STDERR "-longorfs already completed, checkpoint identified at: $longorf_checkpoint\n";
+        exit(0);
+    }
+    
+    
     my %gene_trans_map;
     if ($gene_trans_map_file) {
         open(my $fh, $gene_trans_map_file) or die "Error, cannot open file $gene_trans_map_file";
@@ -129,13 +141,6 @@ main: {
             $gene_trans_map{$trans_id} = $gene_id;
         }
         close $fh;
-    }
-        
-           
-
-    my $workdir = basename($transcripts_file) . ".transdecoder_dir"; 
-    unless (-d $workdir) {
-        mkdir($workdir) or die "Error, cannot mkdir $workdir.";
     }
     
     
@@ -150,7 +155,7 @@ main: {
     }
     
 
-
+    
     my $prefix = "$workdir/longest_orfs";
     my $cds_file = "$prefix.cds";
     my $gff3_file = "$prefix.gff3";
@@ -315,8 +320,10 @@ main: {
     close PEP;
     close CDS;
     close GFF;
+
     
-    
+    &process_cmd("touch $longorf_checkpoint");
+        
     print STDERR "\n\n#################################\n"
                   . "### Done preparing long ORFs.  ###\n"
                   . "##################################\n\n";

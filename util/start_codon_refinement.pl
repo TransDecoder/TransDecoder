@@ -124,10 +124,19 @@ main: {
                                                                   $pwm_range_aref, $min_threshold, $transcript_seq,
                                                                   $ofh_start_scores);
 
-            print $gene_obj->to_GFF3_format(source => "transdecoder") . "\n";
             if ($revised_start_flag) {
                 $num_starts_revised++;
+
+                ## update naming convention based on now having an updated start codon.
+                if ($gene_obj->{com_name} =~ /internal/) {
+                    $gene_obj->{com_name} =~ s/internal/3prime_partial/;
+                }
+                elsif ($gene_obj->{com_name} =~ /5prime_partial/) {
+                    $gene_obj->{com_name} =~ s/5prime_partial/complete/;
+                }
             } 
+            print $gene_obj->to_GFF3_format(source => "transdecoder") . "\n";
+            
 
         }
     }

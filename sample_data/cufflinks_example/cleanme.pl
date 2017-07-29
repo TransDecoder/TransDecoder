@@ -38,6 +38,6 @@ foreach my $file (<*>) {
 
 
 `rm -rf ./transcripts.fasta.transdecoder_dir/`;
-
+`rm -rf ./transcripts.fasta.transdecoder_dir.__checkpoints`;
 
 exit(0);

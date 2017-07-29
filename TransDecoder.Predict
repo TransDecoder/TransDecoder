@@ -1,5 +1,25 @@
 #!/usr/bin/env perl
 
+use strict;
+use warnings;
+use FindBin;
+use Pod::Usage;
+use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
+use Data::Dumper;
+use List::Util qw (min max);
+use File::Basename;
+use Carp;
+
+use lib ("$FindBin::RealBin/PerlLib");
+
+use POSIX qw(ceil);
+use Gene_obj;
+use Nuc_translator;
+use Fasta_reader;
+use Longest_orf;
+use Pipeliner;
+
+
 =pod
 
 =head1 NAME
@@ -14,7 +34,11 @@ Required:
 
 Common options:
  
- --retain_long_orfs <int>               retain all ORFs found that are equal or longer than these many nucleotides even if no other evidence 
+ --retain_long_orfs_mode <string>        'dynamic' or 'strict' (default: dynamic)
+                                        In dynamic mode, sets range according to 1%FDR in random sequence of same GC content.
+                                        In strict, uses --retain_long_orfs_length parameter
+
+ --retain_long_orfs_length <int>         under 'strict' mode, retain all ORFs found that are equal or longer than these many nucleotides even if no other evidence 
                                          marks it as coding (default: 900 bp => 300aa)
 
  --retain_pfam_hits <string>            domain table output file from running hmmscan to search Pfam (see transdecoder.github.io for info)     
@@ -23,21 +47,20 @@ Common options:
  --retain_blastp_hits <string>          blastp output in '-outfmt 6' format.
                                         Any ORF with a blast match will be retained in the final output.
 
- --single_best_orf                      Retain only the single best ORF per transcript.
-                                        (Best is defined as having (optionally pfam and/or blast support), coding score, and longest orf)
+ --all_good_orfs                        Retain all good orfs per transcript (default: only single best is retained
+                                                                             where best is defined as having (optional 
+                                                                             pfam and/or blast support), longest orf, and coding score)
+                                        
 
-     --single_allow_score_lt0           Under --single_best_orf, include best ORF even if there's no homology and the LL score < 0 
+ --single_allow_score_lt0               Under --single_best_orf, include best ORF even if there's no homology and the LL score < 0 
 
  --cpu <int>                            Use multiple cores for cd-hit-est. (default=1)
 
  -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia, ...)
 
-  --refine_starts                       identifies potential start codons for 5' partial ORFs using a PWM.
+ --no_refine_starts                     start refinement identifies potential start codons for 5' partial ORFs using a PWM, process on by default.
 
 Advanced options
-
- --train <string>                       FASTA file with ORFs to train Markov Mod for protein identification; otherwise 
-                                        longest non-redundant ORFs used
 
  -T <int>                               If no --train, top longest ORFs to train Markov Model (hexamer stats) (default: 500)
                                         Note, 10x this value are first selected for use with cd-hit to remove redundancies,
@@ -72,22 +95,7 @@ See L<http://golgi.harvard.edu/biolinks/gencode.html>. These are currently suppo
 
 
 
-use strict;
-use warnings;
-use FindBin;
-use Pod::Usage;
-use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
-use Data::Dumper;
-use List::Util qw (min max);
-use File::Basename;
 
-use lib ("$FindBin::RealBin/PerlLib");
-
-use POSIX qw(ceil);
-use Gene_obj;
-use Nuc_translator;
-use Fasta_reader;
-use Longest_orf;
 
 my $UTIL_DIR = "$FindBin::RealBin/util";
 $ENV{PATH} = "$UTIL_DIR/bin:$ENV{PATH}";
@@ -106,17 +114,35 @@ my $verbose;
 my $search_pfam = "";
 my ($reuse,$pfam_out);
 
-my $RETAIN_LONG_ORFS = 900;
+
+my $RETAIN_LONG_ORFS_MODE = 'dynamic';
+my $RETAIN_LONG_ORFS_MIN_LENGTH = 900;
+my @GC_TO_MIN_LONG_ORF_LENGTH = ( [25, 449],
+                                  [30, 470],
+                                  [35, 489],
+                                  [40, 501],
+                                  [45, 546],
+                                  [50, 582],
+                                  [55, 633],
+                                  [60, 722],
+                                  [65, 830],
+                                  [70, 1002],
+                                  [75, 1257],
+                                  [80, 1728] );
+
+
+
+
 
 
 my $retain_pfam_hits_file;
 my $retain_blastp_hits_file;
 my $cpu = 1;
 my $MPI_DEBUG = 1;
-my $single_best_orf_flag = 0;
+my $all_good_orfs_flag = 0;
 my $genetic_code = "";
 
-my $REFINE_START_CODONS_FLAG = 0;
+my $NO_REFINE_START_CODONS_FLAG = 0;
 
 
 my $SINGLE_ALLOW_SCORE_LT0_FLAG = 0;
@@ -132,7 +158,8 @@ my $SINGLE_ALLOW_SCORE_LT0_FLAG = 0;
              'search_pfam=s' => \$search_pfam,
              'reuse' => \$reuse,
 
-             'retain_long_orfs=i' => \$RETAIN_LONG_ORFS,
+             'retain_long_orfs_mode' => \$RETAIN_LONG_ORFS_MODE,
+             'retain_long_orfs_length=i' => \$RETAIN_LONG_ORFS_MIN_LENGTH,
 
              'debug' => \$MPI_DEBUG,
              
@@ -140,16 +167,14 @@ my $SINGLE_ALLOW_SCORE_LT0_FLAG = 0;
              'retain_blastp_hits=s' => \$retain_blastp_hits_file,
              'cpu=i' => \$cpu,
 
-             'single_best_orf' => \$single_best_orf_flag,
+             'all_good_orfs' => \$all_good_orfs_flag,
              'single_allow_score_lt0' => \$SINGLE_ALLOW_SCORE_LT0_FLAG,
 
              
              'G=s' => \$genetic_code,
 
-             'refine_starts' => \$REFINE_START_CODONS_FLAG,
-             
-
-             
+             'no_refine_starts' => \$NO_REFINE_START_CODONS_FLAG,
+                          
              );
 
 
@@ -170,74 +195,79 @@ if ($genetic_code) {
     $genetic_code = " --genetic_code $genetic_code";
 }
 
+
+if ($RETAIN_LONG_ORFS_MODE !~ /^(strict|dynamic)$/) {
+    die "Error, --retain_long_orfs_mode must be 'strict' or 'dynamic', [$RETAIN_LONG_ORFS_MODE] not recognized";
+}
+
+
 main: {
     my $workdir = basename($transcripts_file) . ".transdecoder_dir"; 
     
     unless (-d $workdir) {
         die "Error, cannot find directory: $workdir,  be sure to first run TransDecoder.LongOrfs before TransDecoder.Predict\n\n";
     }
-        
+
+    my $checkpoints_dir = "$workdir.__checkpoints";
+    if (! -d $checkpoints_dir) {
+        mkdir($checkpoints_dir);
+    }
+    
+    my $pipeliner = new Pipeliner('-verbose' => 2);
+    $pipeliner->set_checkpoint_dir($checkpoints_dir);
+    
     my $prefix = "$workdir/longest_orfs";
     my $cds_file = "$prefix.cds";
     my $gff3_file = "$prefix.gff3";
     my $pep_file = "$prefix.pep";
 
     ## Train a Markov model based on user-provided file or longest candidate CDS sequences, score all candidates, and select the final set.
-
-    my $top_cds_file;
-    my $nr_top_orfs_file;
-    if ($train_file) {
-
-        if (! -s $train_file) {
-            die "Error, cannot locate train file: $train_file";
-        }
-        $top_cds_file = $train_file;
-    }
-    else {
-        $top_cds_file = "$cds_file.top_${top_ORFs_train}_longest";
-        my $checkpoint = "$top_cds_file.ok";
+    
+    my $top_cds_file = "$cds_file.top_${top_ORFs_train}_longest";
+    {
+        
         # to speed things up only check for redundancy up to x the number of entries we want
         my $red_num = $top_ORFs_train * 10;
         my $red_num_cds_longest_file = "$cds_file.top_longest_${red_num}";
-        $nr_top_orfs_file = "$red_num_cds_longest_file.nr80";
-        if (! -e $checkpoint) {
-            # to speed things up only check for redundancy up to x the number of entries we want
-            my $red_num = $top_ORFs_train * 10;
-            my $red_num_cds_longest_file = "$cds_file.top_longest_${red_num}";
-            &process_cmd("$UTIL_DIR/get_top_longest_fasta_entries.pl $cds_file $red_num $max_prot_length_for_training > $red_num_cds_longest_file");
-            &process_cmd("$cd_hit_est_exec -r 1 -i $red_num_cds_longest_file -T $cpu -c 0.80 -o $red_num_cds_longest_file.nr80 ");
-            &process_cmd("$UTIL_DIR/get_top_longest_fasta_entries.pl $red_num_cds_longest_file.nr80 $top_ORFs_train > $top_cds_file");
         
-            &process_cmd("touch $checkpoint");
-        }
+        $pipeliner->add_commands(new Command("$UTIL_DIR/get_top_longest_fasta_entries.pl $cds_file $red_num $max_prot_length_for_training > $red_num_cds_longest_file",
+                                             "get_longest_orfs.ok"));
+        
+        $pipeliner->add_commands(new Command("$cd_hit_est_exec -r 1 -i $red_num_cds_longest_file -T $cpu -c 0.80 -o $red_num_cds_longest_file.nr80", "nr80.ok"));
+        
+        $pipeliner->add_commands(new Command("$UTIL_DIR/get_top_longest_fasta_entries.pl $red_num_cds_longest_file.nr80 $top_ORFs_train > $top_cds_file",
+                                             "top_train_select.ok"));
+        
+    
+        $pipeliner->run();
+    
     }
     
-    
+        
     # get hexamer scores
     my $hexamer_scores_file = "$workdir/hexamer.scores";
     my $hexamer_checkpoint = "$hexamer_scores_file.ok";
-    if (! -e $hexamer_checkpoint) {
-        
-        my $base_freqs_file = "$workdir/base_freqs.dat";
+    my $base_freqs_file = "$workdir/base_freqs.dat";
 
-        my $cmd = "$UTIL_DIR/seq_n_baseprobs_to_logliklihood_vals.pl $top_cds_file $base_freqs_file > $hexamer_scores_file";
-        &process_cmd($cmd);
-
-        &process_cmd("touch $hexamer_checkpoint");
+    if ($RETAIN_LONG_ORFS_MODE eq 'dynamic') {
+        $RETAIN_LONG_ORFS_MIN_LENGTH = &get_dynamic_retain_long_orf_length($base_freqs_file, \@GC_TO_MIN_LONG_ORF_LENGTH);
     }
+    
 
+    # score kmers for Markov model
+    $pipeliner->add_commands(new Command("$UTIL_DIR/seq_n_baseprobs_to_loglikelihood_vals.pl $top_cds_file $base_freqs_file > $hexamer_scores_file",
+                                         "hexamer_scores.ok") );
+    
     # score all cds entries
     my $cds_scores_file = "$cds_file.scores";
     my $cds_scores_checkpoint = "$cds_scores_file.ok";
-    if (! -e $cds_scores_checkpoint) {
-        my $cmd = "$UTIL_DIR/score_CDS_liklihood_all_6_frames.pl $cds_file $hexamer_scores_file > $cds_scores_file";
-        &process_cmd($cmd);
-        
-        &process_cmd("touch $cds_scores_checkpoint");
-    }
+    $pipeliner->add_commands(new Command("$UTIL_DIR/score_CDS_likelihood_all_6_frames.pl $cds_file $hexamer_scores_file > $cds_scores_file",
+                                         "score_cdss.ok"));
 
+    $pipeliner->run();
+    
     ## Retain those that have pfam matches
-
+    
     my %has_pfam_hit;
     
     if ($retain_pfam_hits_file) {
@@ -259,6 +289,7 @@ main: {
         open (my $ifh, "$cds_file.scores") or die "Error, cannot open file $cds_file.scores";
         while (<$ifh>) {
             chomp;
+            if (/^\#/) { next; }
             my ($acc, $orf_length, @scores) = split(/\t/);
 
             my @ATTS;
@@ -278,7 +309,7 @@ main: {
                 push (@ATTS, "BLASTP");
                 print STDERR "-$acc flagged as having a blastp match.\n" if $verbose;
             }
-            if ($orf_length >= $RETAIN_LONG_ORFS) {
+            if ($orf_length >= $RETAIN_LONG_ORFS_MIN_LENGTH) {
                 $keep_flag = 1;
                 push (@ATTS, "LONGORF");
             }
@@ -286,7 +317,7 @@ main: {
                 $keep_flag = 1;
                 push (@ATTS, "FRAMESCORE");
             }
-            if ($keep_flag == 0 && $single_best_orf_flag && $SINGLE_ALLOW_SCORE_LT0_FLAG) {
+            if ($keep_flag == 0 && $SINGLE_ALLOW_SCORE_LT0_FLAG) {
               # keep all ORFs if single_best_orf flag is taken and let
               # single_best_ORF_per_transcript.pl decide which to keep
                 $keep_flag = 1;
@@ -304,10 +335,10 @@ main: {
         }
         close $ifh;
         close $ofh;
-    
-
+        
+        
         # report on the categories of the selected ORFs
-        print STDERR "\n#####################\nCounts of kept entries according to attributes:\n";
+        print STDERR "\n#####################\nCounts of kept entries according to attributes, prior to 'best' orf select (unless --all_good_orfs):\n";
         foreach my $att (reverse sort {$att_counter{$a}<=>$att_counter{$b}} keys %att_counter) {
             my $count = $att_counter{$att};
             print STDERR join("\t", $att, $count) . "\n";
@@ -316,13 +347,15 @@ main: {
     }
     
     # index the current gff file:
-    my $cmd = "$UTIL_DIR/index_gff3_files_by_isoform.pl $gff3_file";
-    &process_cmd($cmd);
+    $pipeliner->add_commands(new Command("$UTIL_DIR/index_gff3_files_by_isoform.pl $gff3_file",
+                                         "index_gff3.ok"));
     
     # retrieve the best entries:
-    $cmd = "$UTIL_DIR/gene_list_to_gff.pl $acc_file $gff3_file.inx > $cds_file.best_candidates.gff3";
-    &process_cmd($cmd);
-    
+    $pipeliner->add_commands(new Command("$UTIL_DIR/gene_list_to_gff.pl $acc_file $gff3_file.inx > $cds_file.best_candidates.gff3",
+                                         "retrieve_best_orf_candidates.ok"));
+
+
+    $pipeliner->run();
     
     ##############################
     ## Generate the final outputs.
@@ -333,15 +366,14 @@ main: {
     {
                         
         # exclude shadow orfs (smaller orfs in different reading frame that are eclipsed by longer orfs)
-        $cmd = "$UTIL_DIR/remove_eclipsed_ORFs.pl $cds_file.best_candidates.gff3 > $cds_file.eclipsed_removed.gff3";
+        $pipeliner->add_commands(new Command("$UTIL_DIR/remove_eclipsed_ORFs.pl $cds_file.best_candidates.gff3 > $cds_file.eclipsed_removed.gff3",
+                                             "remove_eclipsed_orfs.ok"));
 
         my $target_final_file = "$cds_file.eclipsed_removed.gff3";
         
-        &process_cmd($cmd);
-
         
-        if ($single_best_orf_flag) {
-            $cmd = "$UTIL_DIR/single_best_ORF_per_transcript.pl ";
+        unless ($all_good_orfs_flag) {
+            my $cmd = "$UTIL_DIR/single_best_ORF_per_transcript.pl ";
             if ($retain_blastp_hits_file) {
                 $cmd .= " --blast_hits $retain_blastp_hits_file ";
             }
@@ -350,24 +382,26 @@ main: {
             }
             $cmd .= " --gff3_file $cds_file.eclipsed_removed.gff3 --cds_scores $cds_file.scores > $cds_file.single_best_orf.gff3";
             
-            &process_cmd($cmd);
-
+            $pipeliner->add_commands(new Command($cmd, "extract_single_best_orf.ok"));
+            
             $target_final_file = "$cds_file.single_best_orf.gff3";
         }
 
         ## start codon refinement
-        if ($nr_top_orfs_file && $REFINE_START_CODONS_FLAG) {
-            $cmd = "$UTIL_DIR/train_start_PWM.pl --transcripts $transcripts_file --selected_orfs $nr_top_orfs_file --out_prefix $workdir/start_refinement";
-            &process_cmd($cmd);
-
+        unless ($NO_REFINE_START_CODONS_FLAG) {
+            my $cmd = "$UTIL_DIR/train_start_PWM.pl --transcripts $transcripts_file --selected_orfs $top_cds_file --out_prefix $workdir/start_refinement";
+            $pipeliner->add_commands(new Command($cmd, "train_start_pwm.ok"));
+            
             my $revised_orf_gff3_file = "$target_final_file.revised_starts.gff3";
             $cmd = "$UTIL_DIR/start_codon_refinement.pl --transcripts $transcripts_file --gff3_file $target_final_file > $revised_orf_gff3_file";
-            &process_cmd($cmd);
+            $pipeliner->add_commands(new Command($cmd, "revise_starts.ok"));
 
             $target_final_file = $revised_orf_gff3_file;
             
         }
-                
+        
+        $pipeliner->run();
+
         
         &process_cmd("cp $target_final_file $final_output_prefix.gff3");
                 
@@ -377,7 +411,7 @@ main: {
         my $gff3_file = "$final_output_prefix.gff3";
         my $bed_file = $gff3_file;
         $bed_file =~ s/\.gff3$/\.bed/;
-        $cmd = "$UTIL_DIR/gff3_file_to_bed.pl $gff3_file > $bed_file";
+        my $cmd = "$UTIL_DIR/gff3_file_to_bed.pl $gff3_file > $bed_file";
         &process_cmd($cmd);
         
     
@@ -486,4 +520,41 @@ sub check_program() {
         push( @paths, $path );
     }
     return @paths;
+}
+
+
+####
+sub get_dynamic_retain_long_orf_length {
+    my ($base_freqs_file, $GC_to_min_orf_length_aref) = @_;
+
+    my $pct_GC = -1;
+
+    open(my $fh, $base_freqs_file) or confess "Error, cannot open file: $base_freqs_file";
+    while (<$fh>) {
+        chomp;
+        my ($base, $count, $ratio) = split(/\t/);
+        if ($base eq 'C') {
+            $pct_GC = 2 * $ratio * 100;
+            last;
+        }
+    }
+    close $fh;
+
+    unless ($pct_GC > 0) {
+        confess "Error, didn't parse percent C from file: $base_freqs_file";
+    }
+
+    
+    foreach my $bin (@$GC_to_min_orf_length_aref) {
+        my ($gc, $min_len) = @$bin;
+
+        if ($gc <= $pct_GC) {
+            return($min_len);
+        }
+    }
+
+    # if we got here, then GC content must be crazy high!
+    # in this case, rely entirely on Markov model for coding determination.
+    return(1000000); #effectively infinity here.
+
 }

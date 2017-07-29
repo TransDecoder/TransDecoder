@@ -6,6 +6,6 @@ fi
 
 ../../TransDecoder.LongOrfs -t Trinity.fasta 
 
-../../TransDecoder.Predict -t Trinity.fasta  --single_best_orf $*
+../../TransDecoder.Predict -t Trinity.fasta  $*
 
 exit 0

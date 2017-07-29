@@ -35,6 +35,7 @@ foreach my $file (<*>) {
 
 
 `rm -rf ./pasa_assemblies.fasta.transdecoder_dir/`;
+`rm -rf ./pasa_assemblies.fasta.transdecoder_dir.__checkpoints`;
 
 
 exit(0);
