@@ -91,16 +91,16 @@ main: {
     $cmd = "$utildir/feature_scores_to_ROC.pl $out_prefix.feature.scores > $out_prefix.feature.scores.roc";
     $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/roc_features.ok"));
 
-    $cmd = "$utildir/plot_ROC.Rscript $out_prefix.feature.scores.roc";
+    $cmd = "$utildir/plot_ROC.Rscript $out_prefix.feature.scores.roc || :";
     $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/rocplot.ok"));
     
     $cmd = "$utildir/compute_AUC.pl $out_prefix.feature.scores.roc";
     $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/aucplot.ok"));
 
-    $cmd = "$utildir/make_seqLogo.Rscript $out_prefix.+.pwm";
+    $cmd = "$utildir/make_seqLogo.Rscript $out_prefix.+.pwm || :";
     $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/seqlogo.+.ok"));
 
-    $cmd = "$utildir/make_seqLogo.Rscript $out_prefix.-.pwm";
+    $cmd = "$utildir/make_seqLogo.Rscript $out_prefix.-.pwm || :";
     $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/seqlogo.-.ok"));
 
         
@@ -128,16 +128,15 @@ main: {
     $cmd = "$utildir/feature_scores_to_ROC.pl $out_prefix.enhanced.feature.scores > $out_prefix.enhanced.feature.scores.roc";
     $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/enhanced_roc_features.ok"));
 
-    $cmd = "$utildir/plot_ROC.Rscript $out_prefix.enhanced.feature.scores.roc";
+    $cmd = "$utildir/plot_ROC.Rscript $out_prefix.enhanced.feature.scores.roc || :";
     $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/enhanced_rocplot.ok"));
     
     $cmd = "$utildir/compute_AUC.pl $out_prefix.enhanced.feature.scores.roc";
     $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/enhanced_aucplot.ok"));
     
-    $cmd = "$utildir/make_seqLogo.Rscript $out_prefix.enhanced.+.pwm";
+    $cmd = "$utildir/make_seqLogo.Rscript $out_prefix.enhanced.+.pwm || :";
     $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/seqlogo.enhanced.+.ok"));
-    
-    
+        
     
     $pipeliner->run();
 
