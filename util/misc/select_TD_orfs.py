@@ -28,8 +28,9 @@ def main():
 
     select(prediction_list, long_orfs_scored_file + ".markov_5.gff", predicted_orf_coords, markov_val="5")
     select(prediction_list, long_orfs_scored_file + ".longest_single_only.gff", predicted_orf_coords, markov_val="5", longest_single_orf=True)
-    select(prediction_list, long_orfs_scored_file + ".longest_single_only.max3.gff", predicted_orf_coords, markov_val="5", longest_single_orf=True, require_F1_max_all=False)
-
+    select(prediction_list, long_orfs_scored_file + ".longest_single_only.c900.gff", predicted_orf_coords, markov_val="5", longest_single_orf=True, capture_long_orfs_size=900)
+    select(prediction_list, long_orfs_scored_file + ".longest_single_only.c500.gff", predicted_orf_coords, markov_val="5", longest_single_orf=True, capture_long_orfs_size=500)
+    
     
     
     sys.exit(0)
@@ -96,7 +97,7 @@ def parse_predictions_and_scores(long_orfs_scored_file, predicted_orf_coords):
 
 
 
-    prediction_list.sort(key=lambda x: x['orf_struct']['lend'])
+    prediction_list.sort(key=lambda x: x['orf_length'])
 
     prediction_list.reverse()
 
@@ -108,7 +109,8 @@ def select(prediction_list, output_file, predicted_orf_coords,
            require_pos_F1 = True,
            require_F1_max_all = True,
            require_F1_max_3 = True,
-           longest_single_orf = False):
+           longest_single_orf = False,
+           capture_long_orfs_size=-1):
 
     sys.stderr.write("-writing {}\n".format(output_file))
 
@@ -164,6 +166,11 @@ def select(prediction_list, output_file, predicted_orf_coords,
             max_nonF1_score = max(nonF1_scores)
             if max_nonF1_score > score_1:
                 pass_orf = False
+
+
+        if capture_long_orfs_size > 0 and orf_length >= capture_long_orfs_size:
+            # free pass
+            pass_orf = True
         
         if pass_orf:
             ## passed filters, report it
