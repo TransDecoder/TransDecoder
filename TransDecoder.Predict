@@ -54,8 +54,6 @@ Common options:
 
  --single_allow_score_lt0               Under --single_best_orf, include best ORF even if there's no homology and the LL score < 0 
 
- --cpu <int>                            Use multiple cores for cd-hit-est. (default=1)
-
  -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia, ...)
 
  --no_refine_starts                     start refinement identifies potential start codons for 5' partial ORFs using a PWM, process on by default.
@@ -63,7 +61,7 @@ Common options:
 Advanced options
 
  -T <int>                               If no --train, top longest ORFs to train Markov Model (hexamer stats) (default: 500)
-                                        Note, 10x this value are first selected for use with cd-hit to remove redundancies,
+                                        Note, 10x this value are first selected for removing redundancies,
                                         and then this -T value of longest ORFs are selected from the non-redundant set.
 
 =cut
@@ -100,8 +98,6 @@ See L<http://golgi.harvard.edu/biolinks/gencode.html>. These are currently suppo
 my $UTIL_DIR = "$FindBin::RealBin/util";
 $ENV{PATH} = "$UTIL_DIR/bin:$ENV{PATH}";
 
-
-my ($cd_hit_est_exec) = &check_program('cd-hit-est');
 
 my ($transcripts_file,$train_file);
 
@@ -233,9 +229,9 @@ main: {
         $pipeliner->add_commands(new Command("$UTIL_DIR/get_top_longest_fasta_entries.pl $cds_file $red_num $max_prot_length_for_training > $red_num_cds_longest_file",
                                              "get_longest_orfs.ok"));
         
-        $pipeliner->add_commands(new Command("$cd_hit_est_exec -r 1 -i $red_num_cds_longest_file -T $cpu -c 0.80 -o $red_num_cds_longest_file.nr80", "nr80.ok"));
+        $pipeliner->add_commands(new Command("$UTIL_DIR/exclude_similar_proteins.pl $red_num_cds_longest_file > $red_num_cds_longest_file.nr", "nr.ok"));
         
-        $pipeliner->add_commands(new Command("$UTIL_DIR/get_top_longest_fasta_entries.pl $red_num_cds_longest_file.nr80 $top_ORFs_train > $top_cds_file",
+        $pipeliner->add_commands(new Command("$UTIL_DIR/get_top_longest_fasta_entries.pl $red_num_cds_longest_file.nr $top_ORFs_train > $top_cds_file",
                                              "top_train_select.ok"));
         
     

@@ -1,13 +1,12 @@
 SHELL := /bin/bash
 
 all:
-	cd ./transdecoder_plugins/ && $(MAKE) all
+	@echo Nothing to build.  Run \'make test\' to run example executions on each of the sample data sets provided.
 
 clean:
-	cd ./transdecoder_plugins/ && $(MAKE) clean
-	cd ./sample_data && ./cleanme.pl
+	cd ./sample_data && make clean
 
 test:
-	cd ./sample_data/ && ./runMe.sh
+	cd ./sample_data/ && make test
 
 
