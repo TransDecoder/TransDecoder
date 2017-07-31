@@ -17,19 +17,14 @@ def main():
 
     prediction_list = parse_predictions_and_scores(long_orfs_scored_file, predicted_orf_coords)
 
+    
+    select(prediction_list, long_orfs_scored_file + ".all_best_orfs.gff", predicted_orf_coords)
 
-    #select(long_orfs_scored_file, long_orfs_scored_file + ".markov_val_any.gff", predicted_orf_coords)
+    select(prediction_list, long_orfs_scored_file + ".longest_single_only.gff", predicted_orf_coords, longest_single_orf=True)
 
-    #select(long_orfs_scored_file, long_orfs_scored_file + ".markov_2.gff", predicted_orf_coords, markov_val="2")
+    select(prediction_list, long_orfs_scored_file + ".longest_single_only.c900.gff", predicted_orf_coords, longest_single_orf=True, capture_long_orfs_size=900)
 
-    #select(long_orfs_scored_file, long_orfs_scored_file + ".markov_3.gff", predicted_orf_coords, markov_val="3")
-
-    #select(long_orfs_scored_file, long_orfs_scored_file + ".markov_4.gff", predicted_orf_coords, markov_val="4")
-
-    select(prediction_list, long_orfs_scored_file + ".markov_5.gff", predicted_orf_coords, markov_val="5")
-    select(prediction_list, long_orfs_scored_file + ".longest_single_only.gff", predicted_orf_coords, markov_val="5", longest_single_orf=True)
-    select(prediction_list, long_orfs_scored_file + ".longest_single_only.c900.gff", predicted_orf_coords, markov_val="5", longest_single_orf=True, capture_long_orfs_size=900)
-    select(prediction_list, long_orfs_scored_file + ".longest_single_only.c500.gff", predicted_orf_coords, markov_val="5", longest_single_orf=True, capture_long_orfs_size=500)
+    select(prediction_list, long_orfs_scored_file + ".longest_single_only.c500.gff", predicted_orf_coords, longest_single_orf=True, capture_long_orfs_size=500)
     
     
     
