@@ -1,3 +1,11 @@
+
+## 2017-August-4   v3.0 release
+-single best orf now selected by default.  If more than the single best orf is wanted, use the  --all_good_orfs  parameter.
+-start codon refinement is now done by default. To turn it off and get the original behavior of extending to the longest orf position, use parameter:  --no_refine_starts
+-cdhit has been removed and replaced by our own fast method for removing redundancies.
+
+
+
 ## 2016-03-11 v2.1 release
 -added cpu parameter to TransDecoder.predict
 -retaining gene identifier information from cufflinks output

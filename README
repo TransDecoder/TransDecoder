@@ -9,19 +9,11 @@ It uses the following criteria:
 *    the above coding score is greatest when the ORF is scored in the 1st reading frame as compared to scores in the other 5 reading frames.
 *    if a candidate ORF is found fully encapsulated by the coordinates of another candidate ORF, the longer one is reported. However, a single transcript can report multiple ORFs (allowing for operons, chimeras, etc).
 *    optional the putative peptide has a match to a Pfam domain above the noise cutoff score.
+*    start codon positions are refined according to a start-codon position weight matrix based feature scoring.
 
-The software is primarily maintained by Brian Haas at the Broad Institute and Alexie Papanicolaou at the Commonwealth Scientific and Industrial Research Organisation (CSIRO). It is integrated into other related software such as Trinity, PASA, EVidenceModeler, and Trinotate.
 
 Full documentation is provided at: http://transdecoder.github.io
 
-===========================
-To build just TransDecoder:
 
-Please make sure you read http://transdecoder.github.io before proceeding.
-
-   %  make
-
-
-See sample_data/ directory for example usage.
 
 
