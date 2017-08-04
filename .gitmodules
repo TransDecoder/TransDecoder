@@ -1,3 +1,6 @@
 [submodule "TransDecoder.lrgTests"]
 	path = TransDecoder.lrgTests
 	url = https://github.com/TransDecoder/TransDecoder.lrgTests.git
+[submodule "TransDecoder.wiki"]
+	path = TransDecoder.wiki
+	url = https://github.com/TransDecoder/TransDecoder.wiki.git
