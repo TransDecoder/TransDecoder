@@ -53,7 +53,8 @@ sub add_feature_seq_to_pwm {
         confess "Error, pwm_len: $pwm_len and feature_seq len: " . length($feature_seq) . " are unmatched.";
     }
     if ($feature_seq =~ /[^GATC]/) {
-        confess "Error, feature_seq: $feature_seq contains non-GATC chars.";
+        print STDERR "Error, feature_seq: $feature_seq contains non-GATC chars... skipping\n";
+        return;
     }
     
     my @chars = split(//, $feature_seq);
