@@ -1,4 +1,9 @@
 
+## 2017-August-13 v4.0.1 release
+
+-non-fatal if non-GATC char encountered while building start pwm
+
+
 
 ## 2017-August-4   v4.0.0 release
 
