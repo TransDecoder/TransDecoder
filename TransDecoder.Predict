@@ -154,7 +154,7 @@ my $SINGLE_ALLOW_SCORE_LT0_FLAG = 0;
              'search_pfam=s' => \$search_pfam,
              'reuse' => \$reuse,
 
-             'retain_long_orfs_mode' => \$RETAIN_LONG_ORFS_MODE,
+             'retain_long_orfs_mode=s' => \$RETAIN_LONG_ORFS_MODE,
              'retain_long_orfs_length=i' => \$RETAIN_LONG_ORFS_MIN_LENGTH,
 
              'debug' => \$MPI_DEBUG,
