@@ -1,3 +1,7 @@
+## 2017-August-16 v4.0.2 release
+
+-bugfix - allows target transcriptome to be located outside of the working directory.
+
 
 ## 2017-August-13 v4.0.1 release
 
