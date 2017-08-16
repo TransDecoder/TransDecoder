@@ -14,7 +14,7 @@ use Data::Dumper;
 use List::Util qw (max);
 use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
 use PWM;
-
+use File::Basename;
 
 
 my $atg_pwm_pos = 20;
@@ -71,8 +71,15 @@ if ($adj_pct > 30 || $adj_pct < 0) {
 
 main: {
 
+    # should be in the output directory
+    
     # get transdecoder start train files
-    my $transdecoder_dir = "${transcripts_file}.transdecoder_dir";
+    my $transdecoder_dir = basename($transcripts_file) . ".transdecoder_dir";
+    unless (-d $transdecoder_dir) {
+        die "Error, cannot locate transdecoder working directory as: $transdecoder_dir";
+    }
+    
+
     my $pwm_plus = "${transdecoder_dir}/start_refinement.enhanced.+.pwm";
     my $pwm_minus = "${transdecoder_dir}/start_refinement.-.pwm";
     
