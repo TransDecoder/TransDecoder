@@ -39,7 +39,7 @@ Required:
 Common options:
  
  --retain_long_orfs_length <int>         under 'strict' mode, retain all ORFs found that are equal or longer than these many nucleotides even if no other evidence 
-                                         marks it as coding (default: $RETAIN_LONG_ORFS_MIN_LENGTH) so essentially turned off by default.)
+                                         marks it as coding (default: 1000000) so essentially turned off by default.)
 
  --retain_pfam_hits <string>            domain table output file from running hmmscan to search Pfam (see transdecoder.github.io for info)     
                                         Any ORF with a pfam domain hit will be retained in the final output.

@@ -1,22 +1,16 @@
-## 2017-August-16 v4.0.3 release
-
--bugfix - allows target transcriptome to be located outside of the working directory.
-         - option processing corrected for --retain_long_orfs_mode
-         -non-fatal if non-GATC char encountered while building start pwm
-
-
-
-v0.0.1 and v0.0.2 are now removed.
 
 
 
 
-## 2017-August-4   v4.0.0 release
+## v4.1.0
 
 -single best orf now selected by default.  If more than the single best orf is wanted, use the  --all_good_orfs  parameter.
 -start codon refinement is now done by default. To turn it off and get the original behavior of extending to the longest orf position, use parameter:  --no_refine_starts
 -cdhit has been removed and replaced by our own fast method for removing redundancies.
--minimum orf length to retain regardless of coding metrics is set based on GC content.
+-selection of coding regions is strictly governed by Markov-based likelihood scores across reading frames. No auto-retention of long orfs by default, but can be activated by parameter:   --retain_long_orfs_length
+
+
+** all v4 releases pre-v4.1 were fairly quickly retracted due to bugs and insufficient benchmarking **
 
 
 ## v3.0.2 release Oct 31, 2016
