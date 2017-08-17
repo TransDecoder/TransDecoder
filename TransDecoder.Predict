@@ -21,6 +21,9 @@ use Pipeliner;
 use DelimParser;
 
 
+my $RETAIN_LONG_ORFS_MIN_LENGTH = 1000000; # so essentially, off by default
+
+
 =pod
 
 =head1 NAME
@@ -35,12 +38,8 @@ Required:
 
 Common options:
  
- --retain_long_orfs_mode <string>        'dynamic' or 'strict' (default: dynamic)
-                                        In dynamic mode, sets range according to 1%FDR in random sequence of same GC content.
-                                        In strict, uses --retain_long_orfs_length parameter
-
  --retain_long_orfs_length <int>         under 'strict' mode, retain all ORFs found that are equal or longer than these many nucleotides even if no other evidence 
-                                         marks it as coding (default: 900 bp => 300aa)
+                                         marks it as coding (default: $RETAIN_LONG_ORFS_MIN_LENGTH) so essentially turned off by default.)
 
  --retain_pfam_hits <string>            domain table output file from running hmmscan to search Pfam (see transdecoder.github.io for info)     
                                         Any ORF with a pfam domain hit will be retained in the final output.
@@ -112,26 +111,6 @@ my $search_pfam = "";
 my ($reuse,$pfam_out);
 
 
-my $RETAIN_LONG_ORFS_MODE = 'dynamic';
-my $RETAIN_LONG_ORFS_MIN_LENGTH = 900;
-my @GC_TO_MIN_LONG_ORF_LENGTH = ( [25, 449],
-                                  [30, 470],
-                                  [35, 489],
-                                  [40, 501],
-                                  [45, 546],
-                                  [50, 582],
-                                  [55, 633],
-                                  [60, 722],
-                                  [65, 830],
-                                  [70, 1002],
-                                  [75, 1257],
-                                  [80, 1728] );
-
-
-
-
-
-
 my $retain_pfam_hits_file;
 my $retain_blastp_hits_file;
 my $cpu = 1;
@@ -153,7 +132,6 @@ my $SINGLE_ALLOW_SCORE_LT0_FLAG = 0;
              'search_pfam=s' => \$search_pfam,
              'reuse' => \$reuse,
 
-             'retain_long_orfs_mode=s' => \$RETAIN_LONG_ORFS_MODE,
              'retain_long_orfs_length=i' => \$RETAIN_LONG_ORFS_MIN_LENGTH,
 
              'debug' => \$MPI_DEBUG,
@@ -189,10 +167,6 @@ if ($genetic_code) {
     $genetic_code = " --genetic_code $genetic_code";
 }
 
-
-if ($RETAIN_LONG_ORFS_MODE !~ /^(strict|dynamic)$/) {
-    die "Error, --retain_long_orfs_mode must be 'strict' or 'dynamic', [$RETAIN_LONG_ORFS_MODE] not recognized";
-}
 
 
 main: {
@@ -243,11 +217,7 @@ main: {
     my $hexamer_checkpoint = "$hexamer_scores_file.ok";
     my $base_freqs_file = "$workdir/base_freqs.dat";
 
-    if ($RETAIN_LONG_ORFS_MODE eq 'dynamic') {
-        $RETAIN_LONG_ORFS_MIN_LENGTH = &get_dynamic_retain_long_orf_length($base_freqs_file, \@GC_TO_MIN_LONG_ORF_LENGTH);
-    }
     
-
     # score kmers for Markov model
     $pipeliner->add_commands(new Command("$UTIL_DIR/seq_n_baseprobs_to_loglikelihood_vals.pl $top_cds_file $base_freqs_file > $hexamer_scores_file",
                                          "hexamer_scores.ok") );
@@ -529,38 +499,4 @@ sub check_program() {
 }
 
 
-####
-sub get_dynamic_retain_long_orf_length {
-    my ($base_freqs_file, $GC_to_min_orf_length_aref) = @_;
 
-    my $pct_GC = -1;
-
-    open(my $fh, $base_freqs_file) or confess "Error, cannot open file: $base_freqs_file";
-    while (<$fh>) {
-        chomp;
-        my ($base, $count, $ratio) = split(/\t/);
-        if ($base eq 'C') {
-            $pct_GC = 2 * $ratio * 100;
-            last;
-        }
-    }
-    close $fh;
-
-    unless ($pct_GC > 0) {
-        confess "Error, didn't parse percent C from file: $base_freqs_file";
-    }
-
-    
-    foreach my $bin (@$GC_to_min_orf_length_aref) {
-        my ($gc, $min_len) = @$bin;
-
-        if ($gc <= $pct_GC) {
-            return($min_len);
-        }
-    }
-
-    # if we got here, then GC content must be crazy high!
-    # in this case, rely entirely on Markov model for coding determination.
-    return(1000000); #effectively infinity here.
-
-}
