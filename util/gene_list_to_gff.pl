@@ -23,14 +23,10 @@ open (my $fh, $gene_ID_list) or die $!;
 while (<$fh>) {
     unless (/\w/) { next;}
     chomp;
-	my ($gene_id, $com_name) = split (/\t/);
+	my ($gene_id, @rest) = split (/\t/);
     $gene_id =~ s/\s+//;
     
     my $gene_obj = $gene_obj_indexer->get_gene($gene_id);
-	
-	if (defined ($com_name) && $com_name =~ /\w/) {
-		$gene_obj->{com_name} = $com_name;
-	}
 
     print $gene_obj->to_GFF3_format(source => "transdecoder") . "\n";
     

@@ -18,6 +18,7 @@ use Nuc_translator;
 use Fasta_reader;
 use Longest_orf;
 use Pipeliner;
+use DelimParser;
 
 
 =pod
@@ -163,7 +164,6 @@ my $SINGLE_ALLOW_SCORE_LT0_FLAG = 0;
 
              'all_good_orfs' => \$all_good_orfs_flag,
              'single_allow_score_lt0' => \$SINGLE_ALLOW_SCORE_LT0_FLAG,
-
              
              'G=s' => \$genetic_code,
 
@@ -281,11 +281,25 @@ main: {
         
         open (my $ofh, ">$acc_file") or die "Error, cannot write to $acc_file";
         open (my $ifh, "$cds_file.scores") or die "Error, cannot open file $cds_file.scores";
-        while (<$ifh>) {
-            chomp;
-            if (/^\#/) { next; }
-            my ($acc, $markov_order, $orf_length, @scores) = split(/\t/);
+        my $tabreader = new DelimParser::Reader($ifh, "\t");
+        while (my $row = $tabreader->get_row()) {
+
+            my ($acc, $orf_length, @scores) = ($row->{'#acc'},
+                                               $row->{'seq_length'},
+                                               $row->{'score_1'}, $row->{'score_2'}, $row->{'score_3'},
+                                               $row->{'score_4'}, $row->{'score_5'}, $row->{'score_6'});
             
+            unless ($orf_length > 0) {
+                confess "Error, orf length not extracted from : " . Dumper($row);
+            }
+            
+            # make sure we have score vals
+            foreach my $score (@scores) {
+                unless (defined $score) {
+                    confess "Error, missing a score entry for: " . Dumper($row);
+                }
+            }
+                        
             my @ATTS;
             
             my $score_1 = shift @scores;
@@ -319,12 +333,10 @@ main: {
             }
             
             if ($keep_flag) {
-                print $ofh "$acc\n";
-
-                if(scalar(@ATTS)) {
-                  my $att_string = join("|", sort @ATTS);
-                  $att_counter{$att_string}++;
-                }
+                my $att_string = join("|", sort @ATTS);
+                $att_counter{$att_string}++;
+                print $ofh "$acc\t$att_string\n";
+                
             }
         }
         close $ifh;
@@ -347,7 +359,7 @@ main: {
     # retrieve the best entries:
     $pipeliner->add_commands(new Command("$UTIL_DIR/gene_list_to_gff.pl $acc_file $gff3_file.inx > $cds_file.best_candidates.gff3",
                                          "retrieve_best_orf_candidates.ok"));
-
+    
 
     $pipeliner->run();
     

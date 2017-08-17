@@ -9,6 +9,7 @@ use Gene_obj_indexer;
 use GFF3_utils;
 use Carp;
 use Data::Dumper;
+use DelimParser;
 use List::Util qw (max);
 use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
 
@@ -203,27 +204,37 @@ sub parse_blastp_hits_file {
 }
 
 sub parse_CDS_scores_file {
-  my ($cds_scores_file) = @_;
-
-  unless (-e $cds_scores_file) {
-    die "Error, cannot find file $cds_scores_file";
-  }
-
-  my %cds_scores;
-
-  open (my $fh, $cds_scores_file) or die "Error, cannot open file $cds_scores_file";
-  while (<$fh>) {
-    chomp;
-    my @x = split(/\t/);
-    my ($acc, $orf_length, @scores) = split(/\t/);
-    my $score = shift @scores;
-    if(max(@scores) > $score) {
-      $score -= max(@scores);
+    my ($cds_scores_file) = @_;
+    
+    unless (-e $cds_scores_file) {
+        die "Error, cannot find file $cds_scores_file";
     }
+    
+    my %cds_scores;
+    
+    open (my $fh, $cds_scores_file) or die "Error, cannot open file $cds_scores_file";
+    my $tabreader = new DelimParser::Reader($fh, "\t");
+    while (my $row = $tabreader->get_row()) {
+        
+        my ($acc, @scores) = ($row->{'#acc'}, 
+                              $row->{'score_1'}, $row->{'score_2'}, $row->{'score_3'},
+                              $row->{'score_4'}, $row->{'score_5'}, $row->{'score_6'});
 
-    $cds_scores{$acc} = $score;
-  }
-  close $fh;
-
-  return(%cds_scores);
+        # make sure we have score vals
+        foreach my $score (@scores) {
+            unless (defined $score) {
+                confess "Error, missing a score entry for: " . Dumper($row);
+            }
+        }
+        
+        my $score = shift @scores;
+        if(max(@scores) > $score) {
+            $score -= max(@scores);
+        }
+        
+        $cds_scores{$acc} = $score;
+    }
+    close $fh;
+    
+    return(%cds_scores);
 }
