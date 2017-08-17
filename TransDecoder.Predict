@@ -140,11 +140,9 @@ my $genetic_code = "";
 
 my $NO_REFINE_START_CODONS_FLAG = 0;
 
-
 my $SINGLE_ALLOW_SCORE_LT0_FLAG = 0;
 
 &GetOptions( 't=s' => \$transcripts_file,
-             'train:s' => \$train_file,
 
              'h' => \$help,
              'v' => \$verbose,
@@ -286,8 +284,8 @@ main: {
         while (<$ifh>) {
             chomp;
             if (/^\#/) { next; }
-            my ($acc, $orf_length, @scores) = split(/\t/);
-
+            my ($acc, $markov_order, $orf_length, @scores) = split(/\t/);
+            
             my @ATTS;
             
             my $score_1 = shift @scores;
