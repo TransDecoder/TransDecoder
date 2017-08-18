@@ -11,11 +11,16 @@ use List::Util qw(min);
 
 my $usage = "usage: $0 CDS hexamerScores\n\n";
 
+
+my $MAX_REPEAT_COUNT = 3;
+
 my $cds_file = $ARGV[0] or die $usage;
 my $kmer_scores_file = $ARGV[1] or die $usage;
 
 
 my %scores = &parse_kmer_scores($kmer_scores_file);
+
+
 
 main: {
 
@@ -71,6 +76,8 @@ sub score_CDS_via_Markov {
 		return(0);
 	}
 
+    my %repeat_counter;
+    
     my $score = 0;
     for (my $i = 0; $i < $seq_length; $i++) {
         my $frame = $i % 3;
@@ -90,6 +97,9 @@ sub score_CDS_via_Markov {
             }
         }
         
+
+        $repeat_counter{$framed_kmer}++;
+        if ($repeat_counter{$framed_kmer} > $MAX_REPEAT_COUNT) { next; }
         
         my $framed_kmer = "${kmer}-${frame}";
         my $loglikelihood = $scores{$framed_kmer} || 0;
