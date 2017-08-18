@@ -5,6 +5,7 @@ import re
 import matplotlib.pyplot as plt
 import argparse
 import subprocess
+import numpy as np
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                  description="plot likelihood profile for sequence ")
@@ -16,6 +17,7 @@ parser.add_argument("--longest_orfs_cds", type=str, required=True, help="long or
 parser.add_argument("--kmer_scores", type=str, required=True, help= "kmer likelihood score file")
 
 parser.add_argument("--sort", action='store_true')
+parser.add_argument("--cumsum", action='store_true')
 
 args = parser.parse_args()
 
@@ -34,7 +36,12 @@ def main():
     if args.sort:
         score_vec.sort()
 
-    plt.plot(range(1,len(score_vec)+1), score_vec, marker ='+')
+    if args.cumsum:
+        plt.plot(range(1,len(score_vec)+1), np.cumsum(score_vec), marker ='o')
+    else:
+        plt.plot(range(1,len(score_vec)+1), score_vec, marker ='+')
+    
+    
     plt.show()
 
 
