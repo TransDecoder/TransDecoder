@@ -98,10 +98,15 @@ sub score_CDS_via_Markov {
         }
         
 
-        $repeat_counter{$framed_kmer}++;
-        if ($repeat_counter{$framed_kmer} > $MAX_REPEAT_COUNT) { next; }
         
         my $framed_kmer = "${kmer}-${frame}";
+
+
+        $repeat_counter{$framed_kmer}++;
+        
+        #if ($repeat_counter{$framed_kmer} > $MAX_REPEAT_COUNT) { next; }
+        
+
         my $loglikelihood = $scores{$framed_kmer} || 0;
 
 

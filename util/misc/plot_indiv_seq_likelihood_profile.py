@@ -60,7 +60,7 @@ def score_seq(seq, framed_kmer_likelihoods):
             if codon in ('TAA', 'TAG', 'TGA'):
                 break
 
-
+            
         #print("i:{}, markov_use:{}, kmer:{}".format(i, markov_use, kmer))
         framed_kmer = "{}-{}".format(kmer, frame)
 
