@@ -17,15 +17,53 @@ def main():
 
     prediction_list = parse_predictions_and_scores(long_orfs_scored_file, predicted_orf_coords)
 
-    
-    select(prediction_list, long_orfs_scored_file + ".all_best_orfs.gff", predicted_orf_coords)
 
-    select(prediction_list, long_orfs_scored_file + ".longest_single_only.gff", predicted_orf_coords, longest_single_orf=True)
+    def default_frame_analysis_func(frame_scores):
+        frame_1_score = frame_scores[0]
+        if frame_1_score > 0 and frame_1_score > max(frame_scores[1:]):
+            return True
+        else:
+            return False
 
-    select(prediction_list, long_orfs_scored_file + ".longest_single_only.c900.gff", predicted_orf_coords, longest_single_orf=True, capture_long_orfs_size=900)
+    select(prediction_list, long_orfs_scored_file + ".def_all_best_orfs.gff", predicted_orf_coords, default_frame_analysis_func)
 
-    select(prediction_list, long_orfs_scored_file + ".longest_single_only.c500.gff", predicted_orf_coords, longest_single_orf=True, capture_long_orfs_size=500)
-    
+    select(prediction_list, long_orfs_scored_file + ".def_single_best_orf.gff", predicted_orf_coords, default_frame_analysis_func, longest_single_orf=True)
+
+    select(prediction_list, long_orfs_scored_file + ".def_single_best_orf_c700.gff", predicted_orf_coords, default_frame_analysis_func, longest_single_orf=True, capture_long_orfs_size=700)
+    select(prediction_list, long_orfs_scored_file + ".def_single_best_orf_c1000.gff", predicted_orf_coords, default_frame_analysis_func, longest_single_orf=True, capture_long_orfs_size=1000)
+
+
+    def fst_gt0(frame_scores):
+        frame_1_score = frame_scores[0]
+        if frame_1_score > 0:
+            return True
+        else:
+            return False
+
+    select(prediction_list, long_orfs_scored_file + ".t1_gt0_all.gff", predicted_orf_coords, fst_gt0, longest_single_orf=False)
+    select(prediction_list, long_orfs_scored_file + ".t1_gt0_single_best_orf.gff", predicted_orf_coords, fst_gt0, longest_single_orf=True)
+
+
+
+    def best_first_three(frame_scores):
+        frame_1_score = frame_scores[0]
+        if frame_1_score > 0 and frame_1_score > max(frame_scores[1:3]):
+            return True
+        else:
+            return False
+
+    select(prediction_list, long_orfs_scored_file + ".t3_single_best_orf.gff", predicted_orf_coords, best_first_three, longest_single_orf=True)
+
+    def best_first_four(frame_scores):
+        frame_1_score = frame_scores[0]
+        if frame_1_score > 0 and frame_1_score > max(frame_scores[1:4]):
+            return True
+        else:
+            return False
+
+
+    select(prediction_list, long_orfs_scored_file + ".t4_single_best_orf.gff", predicted_orf_coords, best_first_four, longest_single_orf=True)
+
     
     
     sys.exit(0)
@@ -100,10 +138,8 @@ def parse_predictions_and_scores(long_orfs_scored_file, predicted_orf_coords):
 
 
 def select(prediction_list, output_file, predicted_orf_coords,
+           frame_analysis_func,
            markov_val=None,
-           require_pos_F1 = True,
-           require_F1_max_all = True,
-           require_F1_max_3 = True,
            longest_single_orf = False,
            capture_long_orfs_size=-1):
 
@@ -148,20 +184,10 @@ def select(prediction_list, output_file, predicted_orf_coords,
 
             pass_orf = False
 
-        if pass_orf and require_pos_F1 and score_1 <= 0:
+
+        if pass_orf and not frame_analysis_func(frame_scores):
             pass_orf = False
-
-        if pass_orf and require_F1_max_all:
-            nonF1_scores = (score_2, score_3, score_4, score_5, score_6)
-            max_nonF1_score = max(nonF1_scores)
-            if max_nonF1_score > score_1:
-                pass_orf = False
-        elif pass_orf and require_F1_max_3:
-            nonF1_scores = (score_2, score_3)
-            max_nonF1_score = max(nonF1_scores)
-            if max_nonF1_score > score_1:
-                pass_orf = False
-
+        
 
         if capture_long_orfs_size > 0 and orf_length >= capture_long_orfs_size:
             # free pass

@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import argparse
 import subprocess
 import numpy as np
+import collections
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                  description="plot likelihood profile for sequence ")
@@ -18,6 +19,7 @@ parser.add_argument("--kmer_scores", type=str, required=True, help= "kmer likeli
 
 parser.add_argument("--sort", action='store_true')
 parser.add_argument("--cumsum", action='store_true')
+parser.add_argument("--max_repeat", type=int, required=False, default=None, help="max repeat count for framed hexamer")
 
 args = parser.parse_args()
 
@@ -52,6 +54,8 @@ def score_seq(seq, framed_kmer_likelihoods):
     seq = seq.upper()
 
 
+    framed_kmer_counter = collections.defaultdict(int)
+
     for i in range(0, len(seq)):
         frame = i % 3
 
@@ -70,6 +74,10 @@ def score_seq(seq, framed_kmer_likelihoods):
             
         #print("i:{}, markov_use:{}, kmer:{}".format(i, markov_use, kmer))
         framed_kmer = "{}-{}".format(kmer, frame)
+        framed_kmer_counter[framed_kmer] += 1
+
+        if args.max_repeat is not None and framed_kmer_counter[framed_kmer] > args.max_repeat:
+            continue
 
         loglikelihood = framed_kmer_likelihoods[framed_kmer]
 
