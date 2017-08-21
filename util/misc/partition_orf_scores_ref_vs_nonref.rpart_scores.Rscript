@@ -1,0 +1,61 @@
+#!/usr/bin/env Rscript
+
+#options(stringsAsFactors = FALSE)
+
+library('caret')
+library('rpart.plot')
+
+
+num_longest = 500
+max_length = 5000
+
+main = function () {
+    
+    args<-commandArgs(TRUE)
+
+    if (length(args) == 0) {
+        stop("require param: cds.longest.scores")
+    }
+
+    data_file = args[1]
+    
+    data = read.table(data_file, header=T, com='', row.names=1)
+
+    target_data = len_normalize_adj(data)
+
+    rownames(target_data) = NULL
+    
+    write.table(target_data, 'adj.data', quote=F, sep="\t")
+
+    f = as.formula(reforf ~.)
+    
+    t = train(f, target_data, method='rpart')
+    
+    pdf(paste0(data_file, ".rpart.results.pdf"))
+    rpart.plot(t$finalModel)
+
+        
+    dev.off()
+    message("done")
+    
+    
+    
+    
+}
+
+len_normalize_adj = function(data) {
+
+        
+    scores = data[,c('score_1', 'score_2', 'score_3', 'score_4', 'score_5', 'score_6')]
+
+    len_norm_scores = sweep(scores, 1, data$seq_length, '/')
+
+    len_norm_scores = cbind(seq_length=data$seq_length, len_norm_scores, reforf=data$reforf)
+    
+    return(len_norm_scores)
+    
+}
+    
+
+main()
+    

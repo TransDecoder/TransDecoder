@@ -1,0 +1,77 @@
+#!/usr/bin/env Rscript
+
+#options(stringsAsFactors = FALSE)
+
+library('caret')
+library('rpart.plot')
+
+
+num_longest = 500
+max_length = 5000
+
+main = function () {
+    
+    args<-commandArgs(TRUE)
+
+    if (length(args) == 0) {
+        stop("require param: cds.longest.scores")
+    }
+
+    data_file = args[1]
+    
+    data = read.table(data_file, header=T, com='', row.names=1)
+
+    rand_idx = grep("rand", row.names(data))
+
+    rand_data = data[rand_idx,]
+    reg_data = data[-rand_idx,]
+
+    rand_data = len_normalize_adj(rand_data)
+    reg_data = len_normalize_adj(reg_data)
+
+    rand_data = data.frame(rand_data, myvar='NO')
+    reg_data = data.frame(reg_data, myvar='YES')
+
+    target_data = rbind(rand_data, reg_data)
+    rownames(target_data) = NULL
+    
+    write.table(target_data, 'adj.data', quote=F, sep="\t")
+
+    f = as.formula(myvar ~.)
+    
+    t = train(f, target_data, method='rpart')
+    
+    pdf(paste0(data_file, ".rpart.results.pdf"))
+    rpart.plot(t$finalModel)
+
+    boxplot(reg_data[,1:6], outline=F, main='top_orfs')
+    boxplot(rand_data[,1:6], outline=F, main='rand')
+    
+    dev.off()
+    message("done")
+    
+    
+    
+    
+}
+
+len_normalize_adj = function(data) {
+
+    data = data[data$seq_length <= max_length,]
+    data = data[rev(order(data$seq_length)),]
+
+    num_top_select = min(num_longest, nrow(data))
+    
+    data = data[1:num_top_select,]
+    
+    scores = data[,c('score_1', 'score_2', 'score_3', 'score_4', 'score_5', 'score_6')]
+
+    len_norm_scores = sweep(scores, 1, data$seq_length, '/')
+
+    return(len_norm_scores)
+    
+}
+    
+
+main()
+    
