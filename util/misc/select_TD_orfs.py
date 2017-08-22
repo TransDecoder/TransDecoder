@@ -3,7 +3,7 @@
 import sys, os, re
 
 
-usage = "\n\n\tusage: {} longest_orfs.cds longest_orfs.cds.scored\n\n"
+usage = "\n\n\tusage: {} longest_orfs.cds longest_orfs.cds.scores\n\n"
 if len(sys.argv) < 3:
     sys.stderr.write(usage)
     sys.exit(1)
@@ -32,6 +32,18 @@ def main():
     select(prediction_list, long_orfs_scored_file + ".def_single_best_orf_c700.gff", predicted_orf_coords, default_frame_analysis_func, longest_single_orf=True, capture_long_orfs_size=700)
     select(prediction_list, long_orfs_scored_file + ".def_single_best_orf_c1000.gff", predicted_orf_coords, default_frame_analysis_func, longest_single_orf=True, capture_long_orfs_size=1000)
 
+
+    def fst_is_max(frame_scores):
+        frame_1_score = frame_scores[0]
+        if frame_1_score > max(frame_scores[1:]):
+            return True
+        else:
+            return False
+
+    select(prediction_list, long_orfs_scored_file + ".fst_max_all.gff", predicted_orf_coords, fst_is_max)
+
+    select(prediction_list, long_orfs_scored_file + ".fst_max_single.gff", predicted_orf_coords, fst_is_max, longest_single_orf=True)
+    
 
     def fst_gt0(frame_scores):
         frame_1_score = frame_scores[0]
