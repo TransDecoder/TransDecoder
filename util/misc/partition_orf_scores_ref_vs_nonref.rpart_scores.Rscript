@@ -3,11 +3,9 @@
 #options(stringsAsFactors = FALSE)
 
 library('caret')
+library('rpart')
 library('rpart.plot')
 
-
-num_longest = 500
-max_length = 5000
 
 main = function () {
     
@@ -21,20 +19,51 @@ main = function () {
     
     data = read.table(data_file, header=T, com='', row.names=1)
 
+    ## filter out non-ref orfs in non-random data
+    #data = data[ union(which(data$reforf == "YES"), grep("rand", rownames(data))), ]
+    
+
+    ## length normalize
+    
     target_data = len_normalize_adj(data)
+    
+    write.table(target_data, paste0(data_file, '.adj.data'), quote=F, sep="\t")
 
+
+    
+    rand_indices = grep("rand", rownames(target_data))
     rownames(target_data) = NULL
-    
-    write.table(target_data, 'adj.data', quote=F, sep="\t")
 
-    f = as.formula(reforf ~.)
     
-    t = train(f, target_data, method='rpart')
+        
+    #trctrl = trainControl(method='repeatedcv', number=10, repeats=3)
+    #
+    #f = as.formula(reforf ~ .)
+    #
+    #t = train(f, target_data, method='rpart',
+    #          trControl=trctrl,
+    #          tuneLength = 10)
+
+
+    t = rpart(reforf ~ ., target_data)
+    
+    print(t)
     
     pdf(paste0(data_file, ".rpart.results.pdf"))
-    rpart.plot(t$finalModel)
+    #rpart.plot(t$finalModel)
 
-        
+    rpart.plot(t)
+    
+    boxplot(target_data[target_data$reforf == "YES",][, c('score_1', 'score_2', 'score_3', 'score_4', 'score_5', 'score_6')], main='ref orfs', outline=F)
+    abline(h=0, col='blue')
+    
+    boxplot(target_data[target_data$reforf == "NO",][, c('score_1', 'score_2', 'score_3', 'score_4', 'score_5', 'score_6')], main='non-ref orfs', outline=F)
+    abline(h=0, col='red')
+
+    boxplot(target_data[rand_indices,][, c('score_1', 'score_2', 'score_3', 'score_4', 'score_5', 'score_6')], main='random orfs', outline=F)
+    abline(h=0, col='red')
+
+    
     dev.off()
     message("done")
     
@@ -50,7 +79,9 @@ len_normalize_adj = function(data) {
 
     len_norm_scores = sweep(scores, 1, data$seq_length, '/')
 
-    len_norm_scores = cbind(seq_length=data$seq_length, len_norm_scores, reforf=data$reforf)
+    s1_is_max = (data$score_1 > apply(data[,c('score_2', 'score_3', 'score_4', 'score_5', 'score_6')], 1, max))
+    
+    len_norm_scores = cbind(seq_length=data$seq_length, len_norm_scores, s1_is_max=s1_is_max, reforf=data$reforf)
     
     return(len_norm_scores)
     
