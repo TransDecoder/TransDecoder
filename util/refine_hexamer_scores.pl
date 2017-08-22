@@ -39,8 +39,8 @@ my $left_iqr = $hex_scores[int($#hex_scores * 0.25)]->{loglikelihood};
 my $right_iqr = $hex_scores[int($#hex_scores * 0.75)]->{loglikelihood};
 my $center_iqr = ($left_iqr + $right_iqr)/2;
 my $iqr_1pt5 = 1.5 * ($right_iqr - $left_iqr);
-my $lower_1pt5_iqr = $center_iqr - ($iqr_1pt5/2);
-my $upper_1pt5_iqr = $center_iqr + ($iqr_1pt5/2);
+my $lower_1pt5_iqr = $left_iqr - $iqr_1pt5;
+my $upper_1pt5_iqr = $right_iqr + $iqr_1pt5;
 
 print STDERR "left_iqr: $left_iqr\n"
     . "right_iqr: $right_iqr\n"
