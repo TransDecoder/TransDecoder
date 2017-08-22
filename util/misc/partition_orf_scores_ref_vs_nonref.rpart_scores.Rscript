@@ -26,15 +26,51 @@ main = function () {
     ## length normalize
     
     target_data = len_normalize_adj(data)
+
+    pdf(paste0(data_file, ".rpart.results.pdf"))
     
-    write.table(target_data, paste0(data_file, '.adj.data'), quote=F, sep="\t")
+    run_rpart(target_data, paste0(data_file, '.adj.all.data'))
 
 
-    
     rand_indices = grep("rand", rownames(target_data))
-    rownames(target_data) = NULL
+
+
+    ## ref orfs vs. non-ref orfs on target sequences:
+    ref_vs_nonref_data = target_data[-grep("rand", rownames(target_data)),]
+    run_rpart(ref_vs_nonref_data, '.adj.ref_vs_nonref.data')
+
+    ## ref orfs vs. random orfs
+    ref_vs_rand_data = target_data[union(grep("rand", rownames(target_data)), which(target_data$reforf == "YES")),]
+    run_rpart(ref_vs_rand_data, '.adj.ref_vs_rand.data')
 
     
+    boxplot(target_data[target_data$reforf == "YES",][, c('score_1', 'score_2', 'score_3', 'score_4', 'score_5', 'score_6')], main='ref orfs', outline=F)
+    abline(h=0, col='blue')
+    
+    boxplot(ref_vs_nonref_data[ref_vs_nonref_data$reforf == "NO",][, c('score_1', 'score_2', 'score_3', 'score_4', 'score_5', 'score_6')], main='non-ref orfs', outline=F)
+    abline(h=0, col='red')
+    
+    boxplot(ref_vs_rand_data[ref_vs_rand_data$reforf == "NO",][, c('score_1', 'score_2', 'score_3', 'score_4', 'score_5', 'score_6')], main='random orfs', outline=F)
+    abline(h=0, col='orange')
+
+        
+    dev.off()
+    message("done")
+    
+    
+    
+    
+    
+
+    
+}
+
+run_rpart = function(target_data, target_data_outfile) {
+        
+    write.table(target_data, target_data_outfile, quote=F, sep="\t")
+    
+    rownames(target_data) = NULL
+        
         
     #trctrl = trainControl(method='repeatedcv', number=10, repeats=3)
     #
@@ -45,29 +81,16 @@ main = function () {
     #          tuneLength = 10)
 
 
-    t = rpart(reforf ~ ., target_data)
+    t = rpart(reforf ~ seq_length + score_1 + s1_is_max, target_data,
+              control=rpart.control(minsplit=10, cp=0.005))
     
     print(t)
     
-    pdf(paste0(data_file, ".rpart.results.pdf"))
+    
     #rpart.plot(t$finalModel)
 
-    rpart.plot(t)
-    
-    boxplot(target_data[target_data$reforf == "YES",][, c('score_1', 'score_2', 'score_3', 'score_4', 'score_5', 'score_6')], main='ref orfs', outline=F)
-    abline(h=0, col='blue')
-    
-    boxplot(target_data[target_data$reforf == "NO",][, c('score_1', 'score_2', 'score_3', 'score_4', 'score_5', 'score_6')], main='non-ref orfs', outline=F)
-    abline(h=0, col='red')
-
-    boxplot(target_data[rand_indices,][, c('score_1', 'score_2', 'score_3', 'score_4', 'score_5', 'score_6')], main='random orfs', outline=F)
-    abline(h=0, col='red')
-
-    
-    dev.off()
-    message("done")
-    
-    
+    rpart.plot(t, main=target_data_outfile)
+               
     
     
 }
