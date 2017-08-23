@@ -11,6 +11,9 @@ if len(sys.argv) < 3:
 long_orfs_cds_file = sys.argv[1]
 long_orfs_scored_file = sys.argv[2]
 
+ORIG_TRANSDECODER_FLAG = False
+
+
 def main():
 
     predicted_orf_coords = retrieve_orf_coords(long_orfs_cds_file)
@@ -25,12 +28,12 @@ def main():
         else:
             return False
 
-    select(prediction_list, long_orfs_scored_file + ".def_all_best_orfs.gff", predicted_orf_coords, default_frame_analysis_func)
+    #select(prediction_list, long_orfs_scored_file + ".def_all_best_orfs.gff", predicted_orf_coords, default_frame_analysis_func)
 
-    select(prediction_list, long_orfs_scored_file + ".def_single_best_orf.gff", predicted_orf_coords, default_frame_analysis_func, longest_single_orf=True)
+    #select(prediction_list, long_orfs_scored_file + ".def_single_best_orf.gff", predicted_orf_coords, default_frame_analysis_func, longest_single_orf=True)
 
-    select(prediction_list, long_orfs_scored_file + ".def_single_best_orf_c700.gff", predicted_orf_coords, default_frame_analysis_func, longest_single_orf=True, capture_long_orfs_size=700)
-    select(prediction_list, long_orfs_scored_file + ".def_single_best_orf_c1000.gff", predicted_orf_coords, default_frame_analysis_func, longest_single_orf=True, capture_long_orfs_size=1000)
+    #select(prediction_list, long_orfs_scored_file + ".def_single_best_orf_c700.gff", predicted_orf_coords, default_frame_analysis_func, longest_single_orf=True, capture_long_orfs_size=700)
+    #select(prediction_list, long_orfs_scored_file + ".def_single_best_orf_c1000.gff", predicted_orf_coords, default_frame_analysis_func, longest_single_orf=True, capture_long_orfs_size=1000)
 
     select_custom(prediction_list, long_orfs_scored_file + ".def_single_custom.gff", predicted_orf_coords)
     
@@ -191,6 +194,11 @@ def select_custom(prediction_list, output_file, predicted_orf_coords):
 
     longest_single_orf = True
 
+
+    import collections
+    
+    transcript_to_selected_orfs = collections.defaultdict(list)
+
     for prediction in prediction_list:
 
         orf_id = prediction['orf_id']
@@ -217,30 +225,75 @@ def select_custom(prediction_list, output_file, predicted_orf_coords):
         fst_is_max = (frame_scores[0] > max(frame_scores[1:]))
         fst_gt_zero = (frame_scores[0] > 0)
 
-        
-        #if not (fst_is_max and fst_gt_zero):
-        #    pass_orf = False
-        
-        fst_max3 = (frame_scores[0] > max(frame_scores[1:3]))
-        
-        if orf_length >= long_orf_size:
-            pass_orf = True
-        elif orf_length >= moderate_orf_size:
-            if not (fst_max3 and fst_gt_zero):
-                pass_orf = False
-        else:
+
+        if ORIG_TRANSDECODER_FLAG:
+            # standard alg
+            
             if not (fst_is_max and fst_gt_zero):
                 pass_orf = False
-        
-        if pass_orf:
-            ## passed filters, report it
-        
-            ofh.write("\t".join([transcript_id, "selected", "CDS",
-                                 str(lend), str(rend), '.',
-                                 orient, '.', orf_id]) + "\n")
+        else:
             
-            seen_orf_ids.add(orf_id)
-            seen_transcript_ids.add(transcript_id)
+            
+            fst_max3 = (frame_scores[0] > max(frame_scores[1:3]))
+
+            if orf_length >= long_orf_size:
+                pass_orf = True
+            elif orf_length >= moderate_orf_size:
+                if not (fst_max3 and fst_gt_zero):
+                    pass_orf = False
+            else:
+                if not (fst_max3 and fst_gt_zero):
+                    pass_orf = False
+
+        if pass_orf:
+
+            transcript_to_selected_orfs[transcript_id].append(prediction)
+
+
+
+
+
+
+    for transcript_id in transcript_to_selected_orfs:
+
+        prediction_list = transcript_to_selected_orfs[transcript_id]
+
+        
+        if ORIG_TRANSDECODER_FLAG:
+            prediction_list.sort(key=lambda x: x['orf_length'], reverse=True)
+        else:
+            prediction_list.sort(key=lambda x: x['frame_scores'][0], reverse=True)
+        
+        selected_preds = []
+        
+        for prediction in prediction_list:
+        
+            ## passed filters, report it
+
+                                
+            # ensure it doesn't overlap a selected one.
+            found_overlap = False
+            for pred in selected_preds:
+                if prediction['orf_struct']['lend'] < pred['orf_struct']['rend'] and \
+                   prediction['orf_struct']['rend'] > pred['orf_struct']['lend']:
+                    found_overlap = True
+                    break
+            
+            if not found_overlap:
+                selected_preds.append(prediction)
+        
+        selected_preds.sort(key=lambda x: x['orf_length'], reverse=True)
+
+        top_selected_pred = selected_preds[0]
+        orf_struct = top_selected_pred['orf_struct']
+        
+        ofh.write("\t".join([transcript_id, "selected", "CDS",
+                             str(orf_struct['lend']), str(orf_struct['rend']), '.',
+                             orf_struct['orient'], str(top_selected_pred['frame_scores'][0]), top_selected_pred['orf_id']]) + "\n")
+            
+           
+
+
 
     return
 
