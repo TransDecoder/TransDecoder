@@ -1,43 +1,40 @@
 #!/usr/bin/env python
 
 import sys, os, re
-
-
-usage = "\n\n\tusage: {} longest_orfs.cds longest_orfs.cds.scores\n\n"
-if len(sys.argv) < 3:
-    sys.stderr.write(usage)
-    sys.exit(1)
-
-long_orfs_cds_file = sys.argv[1]
-long_orfs_scored_file = sys.argv[2]
-
+import collections
+    
 ORIG_TRANSDECODER_FLAG = False
-
 
 def main():
 
+
+    import argparse
+
+    parser = argparse.ArgumentParser(description="transdecoder orf selection algorithm", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument("--long_orfs_cds", dest="long_orfs_cds_filename", type=str, default="", required=True, help="longest_orfs.cds file")
+    parser.add_argument("--long_orfs_scores", dest="long_orfs_scores_filename", type=str, default="", required=True, help="longest_orfs.cds.scores file")
+    parser.add_argument("--single_best", dest="single_best_flag", action='store_true', default=False, help="select only single best orf")
+
+    args = parser.parse_args()
+    
+    long_orfs_cds_file = args.long_orfs_cds_filename
+    long_orfs_scored_file = args.long_orfs_scores_filename
+    
+    
     predicted_orf_coords = retrieve_orf_coords(long_orfs_cds_file)
 
     prediction_list = parse_predictions_and_scores(long_orfs_scored_file, predicted_orf_coords)
 
-
-    def default_frame_analysis_func(frame_scores):
-        frame_1_score = frame_scores[0]
-        if frame_1_score > 0 and frame_1_score > max(frame_scores[1:]):
-            return True
-        else:
-            return False
-
-    #select(prediction_list, long_orfs_scored_file + ".def_all_best_orfs.gff", predicted_orf_coords, default_frame_analysis_func)
-
-    #select(prediction_list, long_orfs_scored_file + ".def_single_best_orf.gff", predicted_orf_coords, default_frame_analysis_func, longest_single_orf=True)
-
-    #select(prediction_list, long_orfs_scored_file + ".def_single_best_orf_c700.gff", predicted_orf_coords, default_frame_analysis_func, longest_single_orf=True, capture_long_orfs_size=700)
-    #select(prediction_list, long_orfs_scored_file + ".def_single_best_orf_c1000.gff", predicted_orf_coords, default_frame_analysis_func, longest_single_orf=True, capture_long_orfs_size=1000)
-
-    select_custom(prediction_list, long_orfs_scored_file + ".def_single_custom.gff", predicted_orf_coords)
     
+    trans_to_preds_list = select(prediction_list, long_orfs_scored_file + ".def_single_custom.gff", predicted_orf_coords)
+    
+    if args.single_best_flag:
+        trans_to_preds_list = select_single_orf_per_transcript(trans_to_preds_list)
 
+
+    write_preds_to_file(trans_to_preds_list, sys.stdout)
+    
     
     
     sys.exit(0)
@@ -111,91 +108,9 @@ def parse_predictions_and_scores(long_orfs_scored_file, predicted_orf_coords):
     return prediction_list
 
 
-def select(prediction_list, output_file, predicted_orf_coords,
-           frame_analysis_func,
-           markov_val=None,
-           longest_single_orf = False,
-           capture_long_orfs_size=-1):
 
-    sys.stderr.write("-writing {}\n".format(output_file))
-
+def select(prediction_list, predicted_orf_coords, long_orf_size = 1000, moderate_orf_size = 500):
     
-    ofh = open(output_file, 'w')
-
-    seen_orf_ids = set() 
-    seen_transcript_ids = set()
-
-    for prediction in prediction_list:
-
-        orf_id = prediction['orf_id']
-        markov_order = prediction['markov_order']
-        orf_length = prediction['orf_length']
-        frame_scores = prediction['frame_scores']
-        (score_1, score_2, score_3, score_4, score_5, score_6) = frame_scores
-
-        orf_struct = prediction['orf_struct']
-
-        transcript_id = orf_struct['transcript_id']
-        lend = orf_struct['lend']
-        rend = orf_struct['rend']
-        orient = orf_struct['orient']
-
-        
-        if orf_id in seen_orf_ids:
-            # in case already selected under a different Markov model
-            continue
-
-        if longest_single_orf and transcript_id in seen_transcript_ids:
-            continue
-
-        ###########################
-        ## apply filtering criteria
-        pass_orf = True
-        
-        if pass_orf and \
-               markov_val is not None and \
-               markov_val != markov_order:
-
-            pass_orf = False
-
-
-        if pass_orf and not frame_analysis_func(frame_scores):
-            pass_orf = False
-        
-
-        if capture_long_orfs_size > 0 and orf_length >= capture_long_orfs_size:
-            # free pass
-            pass_orf = True
-        
-        if pass_orf:
-            ## passed filters, report it
-        
-            ofh.write("\t".join([transcript_id, "selected", "CDS",
-                                 str(lend), str(rend), '.',
-                                 orient, '.', orf_id]) + "\n")
-            
-            seen_orf_ids.add(orf_id)
-            seen_transcript_ids.add(transcript_id)
-
-    return
-
-
-def select_custom(prediction_list, output_file, predicted_orf_coords):
-
-    long_orf_size = 1000
-    moderate_orf_size = 500
-    
-    sys.stderr.write("-writing {}\n".format(output_file))
-    
-    ofh = open(output_file, 'w')
-
-    seen_orf_ids = set() 
-    seen_transcript_ids = set()
-
-    longest_single_orf = True
-
-
-    import collections
     
     transcript_to_selected_orfs = collections.defaultdict(list)
 
@@ -214,9 +129,6 @@ def select_custom(prediction_list, output_file, predicted_orf_coords):
         rend = orf_struct['rend']
         orient = orf_struct['orient']
 
-        
-        if longest_single_orf and transcript_id in seen_transcript_ids:
-            continue
 
         ###########################
         ## apply filtering criteria
@@ -224,7 +136,7 @@ def select_custom(prediction_list, output_file, predicted_orf_coords):
 
         fst_is_max = (frame_scores[0] > max(frame_scores[1:]))
         fst_gt_zero = (frame_scores[0] > 0)
-
+        fst_max3 = (frame_scores[0] > max(frame_scores[1:3]))
 
         if ORIG_TRANSDECODER_FLAG:
             # standard alg
@@ -233,9 +145,6 @@ def select_custom(prediction_list, output_file, predicted_orf_coords):
                 pass_orf = False
         else:
             
-            
-            fst_max3 = (frame_scores[0] > max(frame_scores[1:3]))
-
             if orf_length >= long_orf_size:
                 pass_orf = True
             elif orf_length >= moderate_orf_size:
@@ -250,9 +159,16 @@ def select_custom(prediction_list, output_file, predicted_orf_coords):
             transcript_to_selected_orfs[transcript_id].append(prediction)
 
 
+    
+    return transcript_to_selected_orfs
 
 
 
+def select_single_orf_per_transcript(transcript_to_selected_orfs):
+
+
+    ret_transcript_to_selected_orfs = collections.defaultdict(list)
+    
 
     for transcript_id in transcript_to_selected_orfs:
 
@@ -285,11 +201,26 @@ def select_custom(prediction_list, output_file, predicted_orf_coords):
         selected_preds.sort(key=lambda x: x['orf_length'], reverse=True)
 
         top_selected_pred = selected_preds[0]
-        orf_struct = top_selected_pred['orf_struct']
-        
-        ofh.write("\t".join([transcript_id, "selected", "CDS",
-                             str(orf_struct['lend']), str(orf_struct['rend']), '.',
-                             orf_struct['orient'], str(top_selected_pred['frame_scores'][0]), top_selected_pred['orf_id']]) + "\n")
+
+        ret_transcript_to_selected_orfs[transcript_id].append(top_selected_pred)
+
+
+    return ret_transcript_to_selected_orfs
+
+
+def write_preds_to_file(transcript_to_selected_orfs, ofh):
+
+
+    for transcript_id in transcript_to_selected_orfs:
+
+        pred_list = transcript_to_selected_orfs[transcript_id]
+
+        for pred in pred_list:
+            orf_struct = pred['orf_struct']
+                        
+            ofh.write("\t".join([transcript_id, "selected", "CDS",
+                                 str(orf_struct['lend']), str(orf_struct['rend']), '.',
+                                 orf_struct['orient'], str(pred['frame_scores'][0]), pred['orf_id']]) + "\n")
             
            
 
@@ -301,4 +232,6 @@ def select_custom(prediction_list, output_file, predicted_orf_coords):
 
 
 if __name__ == '__main__':
+
     main()
+    
