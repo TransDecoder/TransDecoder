@@ -32,49 +32,8 @@ def main():
     select(prediction_list, long_orfs_scored_file + ".def_single_best_orf_c700.gff", predicted_orf_coords, default_frame_analysis_func, longest_single_orf=True, capture_long_orfs_size=700)
     select(prediction_list, long_orfs_scored_file + ".def_single_best_orf_c1000.gff", predicted_orf_coords, default_frame_analysis_func, longest_single_orf=True, capture_long_orfs_size=1000)
 
-
-    def fst_is_max(frame_scores):
-        frame_1_score = frame_scores[0]
-        if frame_1_score > max(frame_scores[1:]):
-            return True
-        else:
-            return False
-
-    select(prediction_list, long_orfs_scored_file + ".fst_max_all.gff", predicted_orf_coords, fst_is_max)
-
-    select(prediction_list, long_orfs_scored_file + ".fst_max_single.gff", predicted_orf_coords, fst_is_max, longest_single_orf=True)
+    select_custom(prediction_list, long_orfs_scored_file + ".def_single_custom.gff", predicted_orf_coords)
     
-
-    def fst_gt0(frame_scores):
-        frame_1_score = frame_scores[0]
-        if frame_1_score > 0:
-            return True
-        else:
-            return False
-
-    select(prediction_list, long_orfs_scored_file + ".t1_gt0_all.gff", predicted_orf_coords, fst_gt0, longest_single_orf=False)
-    select(prediction_list, long_orfs_scored_file + ".t1_gt0_single_best_orf.gff", predicted_orf_coords, fst_gt0, longest_single_orf=True)
-
-
-
-    def best_first_three(frame_scores):
-        frame_1_score = frame_scores[0]
-        if frame_1_score > 0 and frame_1_score > max(frame_scores[1:3]):
-            return True
-        else:
-            return False
-
-    select(prediction_list, long_orfs_scored_file + ".t3_single_best_orf.gff", predicted_orf_coords, best_first_three, longest_single_orf=True)
-
-    def best_first_four(frame_scores):
-        frame_1_score = frame_scores[0]
-        if frame_1_score > 0 and frame_1_score > max(frame_scores[1:4]):
-            return True
-        else:
-            return False
-
-
-    select(prediction_list, long_orfs_scored_file + ".t4_single_best_orf.gff", predicted_orf_coords, best_first_four, longest_single_orf=True)
 
     
     
@@ -204,6 +163,74 @@ def select(prediction_list, output_file, predicted_orf_coords,
         if capture_long_orfs_size > 0 and orf_length >= capture_long_orfs_size:
             # free pass
             pass_orf = True
+        
+        if pass_orf:
+            ## passed filters, report it
+        
+            ofh.write("\t".join([transcript_id, "selected", "CDS",
+                                 str(lend), str(rend), '.',
+                                 orient, '.', orf_id]) + "\n")
+            
+            seen_orf_ids.add(orf_id)
+            seen_transcript_ids.add(transcript_id)
+
+    return
+
+
+def select_custom(prediction_list, output_file, predicted_orf_coords):
+
+    long_orf_size = 1000
+    moderate_orf_size = 500
+    
+    sys.stderr.write("-writing {}\n".format(output_file))
+    
+    ofh = open(output_file, 'w')
+
+    seen_orf_ids = set() 
+    seen_transcript_ids = set()
+
+    longest_single_orf = True
+
+    for prediction in prediction_list:
+
+        orf_id = prediction['orf_id']
+        markov_order = prediction['markov_order']
+        orf_length = prediction['orf_length']
+        frame_scores = prediction['frame_scores']
+        (score_1, score_2, score_3, score_4, score_5, score_6) = frame_scores
+
+        orf_struct = prediction['orf_struct']
+
+        transcript_id = orf_struct['transcript_id']
+        lend = orf_struct['lend']
+        rend = orf_struct['rend']
+        orient = orf_struct['orient']
+
+        
+        if longest_single_orf and transcript_id in seen_transcript_ids:
+            continue
+
+        ###########################
+        ## apply filtering criteria
+        pass_orf = True
+
+        fst_is_max = (frame_scores[0] > max(frame_scores[1:]))
+        fst_gt_zero = (frame_scores[0] > 0)
+
+        
+        #if not (fst_is_max and fst_gt_zero):
+        #    pass_orf = False
+        
+        fst_max3 = (frame_scores[0] > max(frame_scores[1:3]))
+        
+        if orf_length >= long_orf_size:
+            pass_orf = True
+        elif orf_length >= moderate_orf_size:
+            if not (fst_max3 and fst_gt_zero):
+                pass_orf = False
+        else:
+            if not (fst_is_max and fst_gt_zero):
+                pass_orf = False
         
         if pass_orf:
             ## passed filters, report it

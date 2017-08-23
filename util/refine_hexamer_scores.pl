@@ -26,13 +26,6 @@ while (<$fh>) {
 
 @hex_scores = sort {$a->{loglikelihood} <=> $b->{loglikelihood}} @hex_scores;
 
-my $median_val = $hex_scores[ int($#hex_scores/2) ]->{loglikelihood};
-
-# adjust all so median at zero
-foreach my $struct (@hex_scores) {
-    $struct->{loglikelihood} -= $median_val;
-}
-
 # adjust extremes
 # define IQR
 my $left_iqr = $hex_scores[int($#hex_scores * 0.25)]->{loglikelihood};
