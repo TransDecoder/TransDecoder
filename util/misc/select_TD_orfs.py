@@ -15,6 +15,7 @@ def main():
     parser.add_argument("--long_orfs_cds", dest="long_orfs_cds_filename", type=str, default="", required=True, help="longest_orfs.cds file")
     parser.add_argument("--long_orfs_scores", dest="long_orfs_scores_filename", type=str, default="", required=True, help="longest_orfs.cds.scores file")
     parser.add_argument("--single_best", dest="single_best_flag", action='store_true', default=False, help="select only single best orf")
+    parser.add_argument("--td_orig", dest="td_orig_flag", action='store_true', default=False, help='use the original TD algorithm')
 
     args = parser.parse_args()
     
@@ -26,8 +27,32 @@ def main():
 
     prediction_list = parse_predictions_and_scores(long_orfs_scored_file, predicted_orf_coords)
 
+
+    def orig_transdecoder_algorithm(seq_length, frame_scores):
+        return (fst_gt_zero(frame_scores) and fst_is_max_all(frame_scores))
+
+    def custom_td_alg(orf_length, frame_scores, long_orf_size=1000, moderate_orf_size=500):
+
+        pass_orf = True
+        
+        if orf_length >= long_orf_size:
+            pass_orf = True # stays true
+        elif orf_length >= moderate_orf_size:
+            if not (fst_is_max3(frame_scores) and fst_gt_zero(frame_scores)):
+                pass_orf = False
+        else:
+            if not (fst_is_max3(frame_scores) and fst_gt_zero(frame_scores)):
+                pass_orf = False
+
+        return pass_orf
+
+
+    select_alg = custom_td_alg
+    if args.td_orig_flag:
+        select_alg = orig_transdecoder_algorithm
     
-    trans_to_preds_list = select(prediction_list, long_orfs_scored_file + ".def_single_custom.gff", predicted_orf_coords)
+    
+    trans_to_preds_list = select(prediction_list, predicted_orf_coords, select_alg)
     
     if args.single_best_flag:
         trans_to_preds_list = select_single_orf_per_transcript(trans_to_preds_list)
@@ -38,6 +63,16 @@ def main():
     
     
     sys.exit(0)
+
+
+def fst_is_max_all(frame_scores):
+    return (frame_scores[0] > max(frame_scores[1:]))
+
+def fst_gt_zero(frame_scores):
+    return (frame_scores[0] > 0)
+
+def fst_is_max3(frame_scores):
+    return (frame_scores[0] > max(frame_scores[1:3]))
 
 
 
@@ -109,7 +144,7 @@ def parse_predictions_and_scores(long_orfs_scored_file, predicted_orf_coords):
 
 
 
-def select(prediction_list, predicted_orf_coords, long_orf_size = 1000, moderate_orf_size = 500):
+def select(prediction_list, predicted_orf_coords, selection_alg):
     
     
     transcript_to_selected_orfs = collections.defaultdict(list)
@@ -132,30 +167,9 @@ def select(prediction_list, predicted_orf_coords, long_orf_size = 1000, moderate
 
         ###########################
         ## apply filtering criteria
-        pass_orf = True
-
-        fst_is_max = (frame_scores[0] > max(frame_scores[1:]))
-        fst_gt_zero = (frame_scores[0] > 0)
-        fst_max3 = (frame_scores[0] > max(frame_scores[1:3]))
-
-        if ORIG_TRANSDECODER_FLAG:
-            # standard alg
-            
-            if not (fst_is_max and fst_gt_zero):
-                pass_orf = False
-        else:
-            
-            if orf_length >= long_orf_size:
-                pass_orf = True
-            elif orf_length >= moderate_orf_size:
-                if not (fst_max3 and fst_gt_zero):
-                    pass_orf = False
-            else:
-                if not (fst_max3 and fst_gt_zero):
-                    pass_orf = False
+        pass_orf = selection_alg(orf_length, frame_scores)
 
         if pass_orf:
-
             transcript_to_selected_orfs[transcript_id].append(prediction)
 
 
