@@ -15,14 +15,14 @@ def main():
     parser.add_argument("--long_orfs_cds", dest="long_orfs_cds_filename", type=str, default="", required=True, help="longest_orfs.cds file")
     parser.add_argument("--long_orfs_scores", dest="long_orfs_scores_filename", type=str, default="", required=True, help="longest_orfs.cds.scores file")
     parser.add_argument("--single_best", dest="single_best_flag", action='store_true', default=False, help="select only single best orf")
+    parser.add_argument("--all_good_orfs", dest="all_good_orfs", action='store_true', default=False, help="retain all good orfs allowing overlaps")
     parser.add_argument("--td_orig", dest="td_orig_flag", action='store_true', default=False, help='use the original TD algorithm')
 
     args = parser.parse_args()
     
     long_orfs_cds_file = args.long_orfs_cds_filename
     long_orfs_scored_file = args.long_orfs_scores_filename
-    
-    
+        
     predicted_orf_coords = retrieve_orf_coords(long_orfs_cds_file)
 
     prediction_list = parse_predictions_and_scores(long_orfs_scored_file, predicted_orf_coords)
@@ -51,12 +51,17 @@ def main():
     if args.td_orig_flag:
         select_alg = orig_transdecoder_algorithm
     
-    
-    trans_to_preds_list = select(prediction_list, predicted_orf_coords, select_alg)
-    
-    if args.single_best_flag:
-        trans_to_preds_list = select_single_orf_per_transcript(trans_to_preds_list)
 
+    # all good orfs
+    trans_to_preds_list = select(prediction_list, predicted_orf_coords, select_alg)
+
+    if not args.all_good_orfs:
+        # by default, we prune overlaps
+        trans_to_preds_list = select_best_non_overlapping_orfs(trans_to_preds_list)
+        
+    elif args.single_best_flag:
+        trans_to_preds_list = select_single_orf_per_transcript(trans_to_preds_list)
+    
 
     write_preds_to_file(trans_to_preds_list, sys.stdout)
     
@@ -181,7 +186,30 @@ def select(prediction_list, predicted_orf_coords, selection_alg):
 def select_single_orf_per_transcript(transcript_to_selected_orfs):
 
 
+    non_overlapping_orfs = select_best_non_overlapping_orfs(transcript_to_selected_orfs)
+
     ret_transcript_to_selected_orfs = collections.defaultdict(list)
+    
+
+    for transcript_id in non_overlapping_orfs:
+
+        prediction_list = non_overlapping_orfs[transcript_id]
+                
+        prediction_list.sort(key=lambda x: x['orf_length'], reverse=True)
+        #prediction_list.sort(key=lambda x: x['frame_scores'][0], reverse=True)
+
+        top_selected_pred = prediction_list[0]
+        
+        ret_transcript_to_selected_orfs[transcript_id].append(top_selected_pred)
+        
+        
+    return ret_transcript_to_selected_orfs
+
+
+def select_best_non_overlapping_orfs(transcript_to_selected_orfs):
+
+
+    ret_transcript_to_non_overlapping_orfs = collections.defaultdict(list)
     
 
     for transcript_id in transcript_to_selected_orfs:
@@ -214,12 +242,11 @@ def select_single_orf_per_transcript(transcript_to_selected_orfs):
         
         selected_preds.sort(key=lambda x: x['orf_length'], reverse=True)
 
-        top_selected_pred = selected_preds[0]
-
-        ret_transcript_to_selected_orfs[transcript_id].append(top_selected_pred)
+        ret_transcript_to_non_overlapping_orfs[transcript_id].extend(selected_preds)
 
 
-    return ret_transcript_to_selected_orfs
+    return ret_transcript_to_non_overlapping_orfs
+
 
 
 def write_preds_to_file(transcript_to_selected_orfs, ofh):
