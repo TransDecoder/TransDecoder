@@ -35,18 +35,15 @@ my $usage = <<__EOUSAGE__;
 #
 #  --pfam_hits <string>          pfam hits file
 #
-#  --all_good_orfs               retain all orfs that meet selection criteria
-#                                (by default, overlapping orfs w/ lower frame scores are removed) 
-#
 #  --single_best_orf          retain single longest orf that meets selection criteria
 #
+#  --verbose                  show orf rankings in stderr
 #
-#
-#       ORF selection requirement:
+#       Initial ORF selection requirement:
 #
 #            blast_hit |  pfam_hit | (frame_score[0] > 0 and frame_score[0] > max(frame_score[1], frame_score[2]) )
 #
-#       ORF prioritization scheme:
+#       Subsequent ORF prioritization scheme:
 #
 #            homology_count, frame_score[0], orf_length
 # 
@@ -61,16 +58,16 @@ my $gff3_file;
 my $blast_hits_file;
 my $pfam_hits_file;
 my $cds_scores_file;
-my $ALL_GOOD_ORFS_FLAG = 0;
 my $SINGLE_BEST_ORF_FLAG = 0;
 
 my $MAX_PCT_OVERLAP = 10;
 my $help_flag;
+my $verbose_flag = 0;
 
 &GetOptions( # required
              'gff3_file=s' => \$gff3_file,
              'cds_scores=s' => \$cds_scores_file,
-
+             
              # optional
 
              'min_length_auto_accept=i' => \$min_length_auto_accept,
@@ -78,11 +75,10 @@ my $help_flag;
              'blast_hits=s' => \$blast_hits_file,
              'pfam_hits=s' => \$pfam_hits_file,
              
-             'all_good_orfs' => \$ALL_GOOD_ORFS_FLAG,
              'single_best_orf' => \$SINGLE_BEST_ORF_FLAG,
 
              'help|h' => \$help_flag,
-             
+             'verbose|v' => \$verbose_flag,
     );
 
 if (@ARGV) {
@@ -95,10 +91,6 @@ if ($help_flag) {
 
 unless ($gff3_file && $cds_scores_file) {
     die $usage;
-}
-
-if ($ALL_GOOD_ORFS_FLAG && $SINGLE_BEST_ORF_FLAG) {
-    die "Error, options --all_good_orfs and --single_best_orf are mutually exclusive";
 }
 
 main: {
@@ -187,19 +179,21 @@ main: {
             
         } @gene_entries;
 
-        
-        print STDERR "ORFs prioritized as:\n";
-        foreach my $entry (@gene_entries) {
-            print STDERR "\t" . join("\t", $entry->{gene_obj}->{Model_feat_name}, 
-                                     "homology_count: " . $entry->{homology_count},
-                                     "cds_score: " . $entry->{cds_scores}[0],
-                                     "len: " . $entry->{length}) . "\n";
+
+        if ($verbose_flag) {
+            print STDERR "ORFs prioritized as:\n";
+            foreach my $entry (@gene_entries) {
+                print STDERR "\t" . join("\t", $entry->{gene_obj}->{Model_feat_name}, 
+                                         "homology_count: " . $entry->{homology_count},
+                                         "cds_score: " . $entry->{cds_scores}[0],
+                                         "len: " . $entry->{length}) . "\n";
+            }
         }
         
 
-        unless ($ALL_GOOD_ORFS_FLAG) {
-            @gene_entries = &remove_overlapping_orfs(@gene_entries);
-        }
+
+        @gene_entries = &remove_overlapping_orfs(@gene_entries);
+        
         
         if ($SINGLE_BEST_ORF_FLAG) {
             ## re-sort and take the longest one w/ homology info:
@@ -221,7 +215,7 @@ main: {
 
             my $com_name = $gene_obj->{com_name};
 
-            my $adj_comname = $com_name;
+            my $adj_comname = $com_name . ",score=" . $gene_entry->{cds_scores}[0];
             
             if (my $blast_hits = $blast_hits{$model_id}) {
                 $adj_comname .= $blast_hits;
@@ -230,10 +224,8 @@ main: {
                 $adj_comname .= $pfam_hits;
             }
 
-            if ($adj_comname ne $com_name) {
-                $gene_obj->{com_name} =  $adj_comname;
-            }
-            
+
+            $gene_obj->{com_name} =  $adj_comname;            
             
             print $gene_obj->to_GFF3_format(source => "transdecoder") . "\n";
         }

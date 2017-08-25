@@ -52,11 +52,6 @@ Common options:
  --retain_blastp_hits <string>          blastp output in '-outfmt 6' format.
                                         Any ORF with a blast match will be retained in the final output.
 
- --all_good_orfs                        Retain all good orfs per transcript (default: only single best is retained
-                                                                             where best is defined as having (optional 
-                                                                             pfam and/or blast support), longest orf, and coding score)
-                                        
-
  --single_best_only                     Retain only the single best orf per transcript (prioritized by homology then orf length)
 
  -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia, ...)
@@ -156,7 +151,6 @@ my $retain_pfam_hits_file;
 my $retain_blastp_hits_file;
 my $cpu = 1;
 my $MPI_DEBUG = 1;
-my $all_good_orfs_flag = 0;
 my $single_best_flag = 0;
 
 my $genetic_code = "";
@@ -183,7 +177,6 @@ my $NO_REFINE_START_CODONS_FLAG = 0;
              'retain_blastp_hits=s' => \$retain_blastp_hits_file,
              'cpu=i' => \$cpu,
 
-             'all_good_orfs' => \$all_good_orfs_flag,
              'single_best_only' => \$single_best_flag,
              
              'G=s' => \$genetic_code,
@@ -198,10 +191,6 @@ pod2usage(-verbose => 2, -output => \*STDERR) if ($help);
 
 if (@ARGV) {
     die "Error, don't understand options: @ARGV";
-}
-
-if ($single_best_flag && $all_good_orfs_flag) {
-    die "Error, --single_best_only and --all_good_orfs are mutually exclusive";
 }
 
 
@@ -292,10 +281,7 @@ main: {
         $select_cmd .= " --blast_hits $retain_blastp_hits_file ";
     }
 
-    if ($all_good_orfs_flag) {
-        $select_cmd .= " --all_good_orfs ";
-    }
-    elsif ($single_best_flag) {
+    if ($single_best_flag) {
         $select_cmd .= " --single_best_orf ";
     }
     $select_cmd .= " > $cds_file.best_candidates.gff3 ";
@@ -466,6 +452,8 @@ sub get_dynamic_retain_long_orf_length {
     }
     close $fh;
 
+    print STDERR "PCT_GC: $pct_GC\n";
+    
     unless ($pct_GC > 0) {
         confess "Error, didn't parse percent C from file: $base_freqs_file";
     }
@@ -473,12 +461,12 @@ sub get_dynamic_retain_long_orf_length {
 
     foreach my $bin (@$GC_to_min_orf_length_aref) {
         my ($gc, $min_len) = @$bin;
-
-        if ($gc <= $pct_GC) {
+        
+        if ($pct_GC <= $gc) {
             return($min_len);
         }
     }
-
+    
     # if we got here, then GC content must be crazy high!
     # in this case, rely entirely on Markov model for coding determination.
     return(1000000); #effectively infinity here.
