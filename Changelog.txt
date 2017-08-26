@@ -1,4 +1,9 @@
+## v5.0.0 August 26, 2017
 
+-algorithm updates: frame[0] score > 0 and max for first 3 reading frames (instead of all 6), and orf with highest frame[0] score is chosen allowing for minimal overlap among selected predictions.
+-option --single_best_only provides the single longest of the selected orfs per contig.
+-long orfs unlikely to appear in random sequence are automatically selected as candidates with this minimal long orf length set dynamically according to GC content.
+-orf score and blast or pfam info is propagated to gff3 output
 
 
 
