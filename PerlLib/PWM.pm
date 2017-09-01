@@ -215,8 +215,9 @@ sub build_pwm {
         }
         
         # now convert to relative freqs
+        @chars = qw(G A T C); # the complete set of chars we care about.
         foreach my $char (@chars) {
-            my $val = $pos_freqs_aref->[$i]->{$char};
+            my $val = $pos_freqs_aref->[$i]->{$char} || 0;
             my $prob = sprintf("%.6f", ($val + $PSEUDOCOUNT) / ($sum + 4 * $PSEUDOCOUNT) );
             $self->{pos_probs}->[$i]->{$char} = $prob;
         }
