@@ -96,12 +96,14 @@ main: {
     my @scored_features;
     foreach my $feature (@init_features) {
         my $score = $pwm_plus->score_plus_minus_pwm($feature, $pwm_minus);
-        push (@scored_features, 
-              { score => $score,
-                seq => $feature,
-              } );
+        if ($score ne "NA") {
+            push (@scored_features, 
+                  { score => $score,
+                    seq => $feature,
+                  } );
+        }
     }
-
+    
     # sort by score ascendingly
     @scored_features = sort {$a->{score} <=> $b->{score}} @scored_features;
     
