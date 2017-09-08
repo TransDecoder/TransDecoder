@@ -16,6 +16,7 @@ cleanme.pl
 runMe.sh
 Trinity.fasta.gz
 Makefile
+genome_alignments.gmap.gff3.gz
                         );
 
 

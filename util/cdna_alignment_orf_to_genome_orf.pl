@@ -11,7 +11,7 @@ use GFF3_utils;
 use Data::Dumper;
 use Fasta_reader;
 
-my $usage = "\nusage: $0 cdna_orfs.genes.gff3 cdna_genome.alignments.gff3 cdna.fasta\n\n";
+my $usage = "\nusage: $0 cdna_orfs.genes.gff3 cdna_genome.alignments.gff3 cdna.fasta [DEBUG]\n\n";
 
 my $cdna_orfs_gff3 = $ARGV[0] or die $usage;
 my $cdna_genome_gff3 = $ARGV[1] or die $usage;
@@ -27,22 +27,30 @@ foreach my $file ($cdna_orfs_gff3, $cdna_genome_gff3, $cdna_fasta) {
 
 my $WARNING_COUNT = 0; # count those orfs that appear to be on strand opposite from the transcribed strand.
 
+my $DEBUG = $ARGV[3];
+
 main: {
 
+    print STDERR "-parsing cdna lengths\n" if $DEBUG;
     my %cdna_seq_lengths = &parse_cdna_seq_lengths($cdna_fasta);
     
     my %orf_counter;
 
+    print STDERR "-parse transcript alignment info\n" if $DEBUG;
     my %cdna_acc_to_transcript_structure = &parse_transcript_alignment_info($cdna_genome_gff3);
 
     ## parse ORFs on cDNAs
 
+    print STDERR "-index $cdna_orfs_gff3\n" if $DEBUG;
     my $gene_obj_indexer_href = {};
     ## associate gene identifiers with contig id's.
     my $contig_to_gene_list_href = &GFF3_utils::index_GFF3_gene_objs($cdna_orfs_gff3, $gene_obj_indexer_href);
 
 
     my %isolated_gene_id_to_new_genes;
+
+    my $count_propagated = 0;
+    my $total = 0;
     
     foreach my $asmbl_id (sort keys %$contig_to_gene_list_href) {
         ## $asmbl_id is the actual Transcript identifier from which ORFs were predicted.
@@ -51,9 +59,17 @@ main: {
     
         foreach my $gene_id (@gene_ids) { # gene identifiers as given by transdecoder on the transcript sequences
             my $gene_obj_ref = $gene_obj_indexer_href->{$gene_id};
+
+            $total++;
             
-            my $transcript_struct = $cdna_acc_to_transcript_structure{$asmbl_id} or die "Error, no cdna struct for $asmbl_id";
+            my $transcript_struct = $cdna_acc_to_transcript_structure{$asmbl_id};
+            unless ($transcript_struct) {
+                print STDERR "-WARNING, $asmbl_id has no genome representation... skipping\n";
+                next;
+            }
             
+            #print "$gene_obj_ref\n";
+
             
             eval {
                 my $new_orf_gene = &place_orf_in_cdna_alignment_context($transcript_struct, $gene_obj_ref, \%cdna_seq_lengths);
@@ -76,24 +92,25 @@ main: {
                     $new_orf_gene->{TU_feat_name} = $use_gene_id;
                     $new_orf_gene->{Model_feat_name} = $gene_obj_ref->{Model_feat_name};
 
+                    print STDERR "New orf: " . $new_orf_gene->toString() if $DEBUG;
                     push (@{$isolated_gene_id_to_new_genes{$use_gene_id}}, $new_orf_gene);
-                    
+
+                    $count_propagated++;
                 }
             };
 
             if ($@) {
                 
-                print STDERR "Error occurred.\n";
+                print STDERR "Error, $gene_id couldn't be fully propagated:\n";
                 
                 print STDERR Dumper($transcript_struct);
                 print STDERR $gene_obj_ref->toString();
                 print STDERR "$@";
-                die;
             }
             
         }
     }
-
+    
     ## output results:
     foreach my $gene_id (sort keys %isolated_gene_id_to_new_genes) {
 
@@ -112,7 +129,10 @@ main: {
         
         print $parent_gene_obj->to_GFF3_format(source => "transdecoder") . "\n";
     }
-        
+
+
+    print STDERR "\n\n\tDone.  $count_propagated / $total transcript orfs could be propagated to the genome\n\n";
+    
     exit(0);
 
 }
@@ -125,8 +145,11 @@ sub parse_transcript_alignment_info {
 
     open (my $fh, $cdna_align_gff3) or die "Error, cannot open file $cdna_align_gff3";
     while (<$fh>) {
+        if (/^\#/) { next; }
         unless (/\w/) { next; }
 
+        my $line = $_;
+        
         my @x = split(/\t/);
         my $contig = $x[0];
         my $lend = $x[3];
@@ -134,7 +157,7 @@ sub parse_transcript_alignment_info {
         my $orient = $x[6];
         my $info = $x[8];
 
-        $info =~ /Target=(\S+)/ or die "Error, cannot parse ID from $info";
+        $info =~ /Target=(\S+)/ or die "Error, cannot parse ID from info [$info] of line $line";
         my $asmbl = $1;
 
         my $trans_id = "";
@@ -182,6 +205,8 @@ sub parse_transcript_alignment_info {
 sub place_orf_in_cdna_alignment_context {
     my ($transcript_struct, $orf_gene_obj, $cdna_seq_lengths_href) = @_;
 
+    #print $orf_gene_obj->toString();
+    
     my $trans_seq_length = $cdna_seq_lengths_href->{ $transcript_struct->{asmbl} } or confess "Error, no length for " . Dumper($transcript_struct) . " Please be sure to use a cDNA fasta file and not a genome fasta file for your commandline parameter.";
     
 
@@ -199,10 +224,16 @@ sub place_orf_in_cdna_alignment_context {
         }
     }
 
+    #print Dumper(\@cds_coords);
+    
     @cds_coords = sort {$a->[0]<=>$b->[0]} @cds_coords;
 
     my $cds_span_lend = $cds_coords[0]->[0];
     my $cds_span_rend = $cds_coords[$#cds_coords]->[1];
+
+    unless ($cds_span_lend && $cds_span_rend) {
+        die "Error, missing cds span for gene: " . $orf_gene_obj->toString();
+    }
     
     if ($cds_span_rend > $trans_seq_length) {
         $cds_span_rend = $trans_seq_length;
@@ -303,7 +334,7 @@ sub from_cdna_lend {
     }
     
 
-    die "Error, couldn't localize pt $pt within coordsets: " . Dumper($coords_aref);
+    die "Error, couldn't localize pt [$pt] within coordsets: " . Dumper($coords_aref);
 
     return;
 }
