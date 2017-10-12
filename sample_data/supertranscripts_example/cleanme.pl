@@ -15,7 +15,7 @@ my @files_to_keep = qw (cleanme.pl
                         runMe.sh
 Makefile
 supertranscripts.fasta 
-supertranscripts.gff3
+supertranscripts.gtf
                                          );
 
 
