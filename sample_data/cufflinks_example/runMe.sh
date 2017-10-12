@@ -21,10 +21,10 @@ fi
 
 
 ## generate alignment gff3 formatted output
-../../util/cufflinks_gtf_to_alignment_gff3.pl transcripts.gtf > transcripts.gff3
+../../util/gtf_to_alignment_gff3.pl transcripts.gtf > transcripts.gff3
 
 ## generate transcripts fasta file
-../../util/cufflinks_gtf_genome_to_cdna_fasta.pl transcripts.gtf test.genome.fasta > transcripts.fasta 
+../../util/gtf_genome_to_cdna_fasta.pl transcripts.gtf test.genome.fasta > transcripts.fasta 
 
 ## Extract the long ORFs
 ../../TransDecoder.LongOrfs -t transcripts.fasta
@@ -58,7 +58,7 @@ fi
 ## make bed files for viewing with GenomeView
 
 # covert cufflinks gtf to bed
-../../util/cufflinks_gtf_to_bed.pl transcripts.gtf > transcripts.bed
+../../util/gtf_to_bed.pl transcripts.gtf > transcripts.bed
 
 # convert the genome-based gene-gff3 file to bed
 ../../util/gff3_file_to_bed.pl transcripts.fasta.transdecoder.genome.gff3 > transcripts.fasta.transdecoder.genome.bed
