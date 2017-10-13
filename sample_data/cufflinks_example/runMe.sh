@@ -1,4 +1,6 @@
-#!/bin/bash -ve
+#!/bin/bash
+
+set -ev
 
 export PERL_HASH_SEED=0
 
@@ -29,7 +31,7 @@ fi
 ## Extract the long ORFs
 ../../TransDecoder.LongOrfs -t transcripts.fasta
 
-
+cmd=""
 ## Predict likely ORFs
 if [ 1 ]; then   # always doing this now.
 
@@ -45,11 +47,14 @@ if [ 1 ]; then   # always doing this now.
     
     
     ## use pfam and blast results:
-    ../../TransDecoder.Predict  -t transcripts.fasta --retain_pfam_hits pfam.domtblout --retain_blastp_hits blastp.outfmt6   -v
+    cmd="../../TransDecoder.Predict  -t transcripts.fasta --retain_pfam_hits pfam.domtblout --retain_blastp_hits blastp.outfmt6   -v"
 else
     # just coding metrics
-    ../../TransDecoder.Predict -t transcripts.fasta 
+    cmd="../../TransDecoder.Predict -t transcripts.fasta"
 fi
+
+eval $cmd $ARGS
+
 
 ## convert to genome coordinates
 ../../util/cdna_alignment_orf_to_genome_orf.pl transcripts.fasta.transdecoder.gff3 transcripts.gff3 transcripts.fasta > transcripts.fasta.transdecoder.genome.gff3
@@ -63,6 +68,9 @@ fi
 # convert the genome-based gene-gff3 file to bed
 ../../util/gff3_file_to_bed.pl transcripts.fasta.transdecoder.genome.gff3 > transcripts.fasta.transdecoder.genome.bed
 
+
+# ensure no fatal problems w/ pep file
+../../util/fasta_prot_checker.pl transcripts.fasta.transdecoder.pep
 
 # Done!  Coding region genome annotations provided as: transcripts.fasta.transdecoder.genome.\*
 

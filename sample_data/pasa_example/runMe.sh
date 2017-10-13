@@ -22,9 +22,15 @@ cut -f2,3 pasa_assemblies_described.txt > pasa.gene_trans_map.txt
 
 ../../TransDecoder.LongOrfs -t pasa_assemblies.fasta --gene_trans_map pasa.gene_trans_map.txt
 
-../../TransDecoder.Predict -t pasa_assemblies.fasta
+
+
+../../TransDecoder.Predict -t pasa_assemblies.fasta $ARGS
 
 ../../util/cdna_alignment_orf_to_genome_orf.pl  pasa_assemblies.fasta.transdecoder.gff3 pasa_assemblies.gff3 pasa_assemblies.fasta  >  pasa_assemblies.fasta.transdecoder.genome.gff3
+
+
+../../util/fasta_prot_checker.pl pasa_assemblies.fasta.transdecoder.pep
+
 
 echo "Done.  See pasa_assemblies.fasta.transdecoder.\*"
 

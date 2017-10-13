@@ -17,7 +17,8 @@ export PERL_HASH_SEED=0
 
 
 ## Predict likely ORFs
-../../TransDecoder.Predict -t stringtie_merged.transcripts.fasta
+
+../../TransDecoder.Predict -t stringtie_merged.transcripts.fasta $ARGS
 
 
 ## convert to genome coordinates
@@ -32,6 +33,8 @@ export PERL_HASH_SEED=0
 # convert the genome-based gene-gff3 file to bed
 ../../util/gff3_file_to_bed.pl stringtie_merged.transcripts.fasta.transdecoder.genome.gff3  > stringtie_merged.transcripts.fasta.transdecoder.genome.bed  
 
+
+../../util/fasta_prot_checker.pl stringtie_merged.transcripts.fasta.transdecoder.pep
 
 # Done!  Coding region genome annotations provided as: transcripts.fasta.transdecoder.genome.\*
 

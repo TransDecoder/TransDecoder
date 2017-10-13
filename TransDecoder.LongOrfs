@@ -24,8 +24,6 @@ Optional:
 
  -S                                     strand-specific (only analyzes top strand)
 
- -p <int>                               shorten potential 5' partials if they are this percentage of the original protein or longer.
-
 =head1 Genetic Codes
 
 See L<http://golgi.harvard.edu/biolinks/gencode.html>. These are currently supported:
@@ -76,8 +74,6 @@ my ($transcripts_file);
 
 my $genetic_code='universal';
 
-my $preserve_full_lengths = undef;
-
 my $TOP_STRAND_ONLY = 0;
 
 my $help;
@@ -95,7 +91,6 @@ my $MPI_DEBUG = 1;
              'h' => \$help,
              'v' => \$verbose,
              'S' => \$TOP_STRAND_ONLY, 
-             'p=i' => \$preserve_full_lengths,
              'gene_trans_map=s' => \$gene_trans_map_file,
     );
 
@@ -175,6 +170,9 @@ main: {
     chomp $num_total_trans;
     print STDERR "-total transcripts to examine: $num_total_trans\n";
 
+
+    my %SEEN_PROT_ID;
+    
 	my $fasta_reader = new Fasta_reader($transcripts_file);
 	while (my $seq_obj = $fasta_reader->next()) {
 		
@@ -199,9 +197,6 @@ main: {
 		@orf_structs = reverse sort {$a->{length}<=>$b->{length}} @orf_structs;
         print "checking for fp in $acc \n" if ($SEE);
         
-        if (defined($preserve_full_lengths)) {
-            $longest_orf_finder->check_for_fp_5prime_partials($MIN_PROT_LENGTH,\@orf_structs,$preserve_full_lengths) 
-        }
 		
         while (@orf_structs) {
             my $orf = shift @orf_structs;
@@ -252,8 +247,8 @@ main: {
             $gene_obj->{asmbl_id} = $acc;
             
             $model_counter++;
-
-
+            
+            
             my $gene_id;
             if (%gene_trans_map) {
                 $gene_id = $gene_trans_map{$acc} or die "Error, cannot locate gene identifier for transcript acc: [$acc]";
@@ -262,13 +257,28 @@ main: {
                 $gene_id = $parsed_gene_id;
             }
             else {
-                $gene_id = "Gene.$model_counter";
+                $gene_id = "GENE.$acc";
+            }
+
+            my $model_id;
+            {
+                ########### Important #############
+                ## gene ID and model ID must be unique for each entry, but also decipherable for later on.
+                ###################################
+                
+                my $pcounter = 1;
+                $model_id = "${acc}.p$pcounter";
+                while ($SEEN_PROT_ID{$model_id}) {
+                    $pcounter++;
+                    $model_id = "${acc}.p$pcounter";
+                }
+                $SEEN_PROT_ID{$model_id} = 1;
+                
+                $gene_id = "${gene_id}~~${model_id}";
+                
+                ###################################3
             }
             
-            ## gene ID and model ID must be unique for each entry, but also decipherable for later on.
-            $gene_id = "${gene_id}::${acc}::g.$model_counter";
-            my $model_id = "${gene_id}::m.$model_counter";
-                        
             $gene_obj->{TU_feat_name} = $gene_id;
             $gene_obj->{Model_feat_name} = $model_id;
                         

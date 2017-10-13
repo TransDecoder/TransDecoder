@@ -1,0 +1,9 @@
+
+
+In case it's of interest:
+
+run
+    make ARGS=--no_refine_starts
+
+for a fast run-through, excluding the time-consuming start-refinement step.
+

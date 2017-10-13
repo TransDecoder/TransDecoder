@@ -11,8 +11,12 @@ set -ev
 # run TransDecoder
 ../../TransDecoder.LongOrfs -t transcripts.fasta
 
-../../TransDecoder.Predict -t transcripts.fasta
+cmd="../../TransDecoder.Predict -t transcripts.fasta"
+if [ $1 ]; then
+    cmd="$cmd --no_refine_starts"
+fi
 
+eval $cmd
 
 # propagate predicted ORFs to the supertranscript gff3 file:
 ../../util/cdna_alignment_orf_to_genome_orf.pl transcripts.fasta.transdecoder.gff3 supertranscripts.gff3 transcripts.fasta > supertranscripts.wOrfs.gff3
