@@ -1,3 +1,12 @@
+## v5.0.2, Oct 20, 2017
+protein identifiers are more manageable (ex. ${transcript_acc}.p1, .p2, ..., .pn)
+added example for use w/ supertranscripts
+
+
+## TransDecoder Release v5.0.1, Sept 12, 2017
+the start-adjustment can now cope with sequences containing non-{GATC} characters.
+
+
 ## v5.0.0 August 26, 2017
 
 -algorithm updates: frame[0] score > 0 and max for first 3 reading frames (instead of all 6), and orf with highest frame[0] score is chosen allowing for minimal overlap among selected predictions.
