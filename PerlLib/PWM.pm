@@ -156,7 +156,7 @@ sub simulate_feature {
             }
         }
         if (! $selected_flag) {
-            croak "Error, didn't select a random char for feature seq";
+            confess "Error, didn't select a random char for feature seq";
         }
     }
 
@@ -171,10 +171,10 @@ sub write_pwm_file {
     my ($self, $filename) = @_;
 
     unless ($self->is_pwm_built()) {
-        croak "Error, pwm needs to be built first before writing to file";
+        confess "Error, pwm needs to be built first before writing to file";
     }
     
-    open (my $ofh, ">$filename") or croak "Error, cannot write to file: $filename";
+    open (my $ofh, ">$filename") or confess "Error, cannot write to file: $filename";
 
     my $pos_probs_aref = $self->{pos_probs};
     my $pwm_length = $self->get_pwm_length();
@@ -254,13 +254,13 @@ sub score_pwm_using_base_freqs {
     }
     
     if (! $self->is_pwm_built()) {
-        croak("pwm not built yet!");
+        confess("pwm not built yet!");
     }
     
     my $pwm_length = $self->get_pwm_length();
 
     if (length($target_sequence) != $pwm_length) {
-        croak "Error, len(target_sequence)=" . length($target_sequence) . " and pwm length = $pwm_length";
+        confess "Error, len(target_sequence)=" . length($target_sequence) . " and pwm length = $pwm_length";
     }
 
     my %mask;
@@ -329,13 +329,13 @@ sub score_plus_minus_pwm {
     }
     
     if (! $self->is_pwm_built()) {
-        croak("pwm not built yet!");
+        confess("pwm not built yet!");
     }
     
     my $pwm_length = $self->get_pwm_length();
 
     if (length($target_sequence) != $pwm_length) {
-        croak "Error, len(target_sequence)=" . length($target_sequence) . " and pwm length = $pwm_length";
+        confess "Error, len(target_sequence)=" . length($target_sequence) . " and pwm length = $pwm_length";
     }
 
     my %mask;
