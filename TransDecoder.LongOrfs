@@ -19,6 +19,9 @@ use Fasta_reader;
 use Longest_orf;
 use Pipeliner;
 
+
+my $VERSION = "__BLEEDING_EDGE__";
+
 my $UTIL_DIR = "$FindBin::RealBin/util";
 $ENV{PATH} = "$UTIL_DIR/bin:$ENV{PATH}";
 
@@ -66,6 +69,8 @@ my $usage = <<__EOUSAGE__;
 $genetic_code_options
 #
 #
+#   --version                              show version tag ($VERSION)
+#
 #########################################################################################
 
 
@@ -85,6 +90,8 @@ my $gene_trans_map_file;
 
 my $MPI_DEBUG = 1;
 
+my $show_version_flag;
+
 &GetOptions( 't=s' => \$transcripts_file,
              'm=i' => \$MIN_PROT_LENGTH,
              'G=s' => \$genetic_code,
@@ -92,13 +99,19 @@ my $MPI_DEBUG = 1;
              'v' => \$verbose,
              'S' => \$TOP_STRAND_ONLY, 
              'gene_trans_map=s' => \$gene_trans_map_file,
+             'version' => \$show_version_flag,
     );
-
 
 
 if ($help) {
     die $usage;
 }
+
+if ($show_version_flag) {
+    print "TransDecoder.LongOrfs $VERSION\n";
+    exit(0);
+}
+
 
 if (@ARGV) {
     die "Error, don't understand options: @ARGV";

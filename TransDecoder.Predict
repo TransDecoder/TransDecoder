@@ -21,6 +21,8 @@ use Pipeliner;
 use DelimParser;
 
 
+my $VERSION = "__BLEEDING_EDGE__";
+
 my $RETAIN_LONG_ORFS_MIN_LENGTH = 1000000; # so essentially, off by default
 
 
@@ -81,6 +83,7 @@ my $usage = <<__EOUSAGE__;
 #
 $genetic_code_options
 #
+#  --version                           show version ($VERSION)
 #
 #########################################################################################
 
@@ -151,6 +154,8 @@ my $single_best_flag = 0;
 my $NO_REFINE_START_CODONS_FLAG = 0;
 
 
+my $show_version_flag;
+
 &GetOptions( 't=s' => \$transcripts_file,
 
              'h' => \$help,
@@ -175,6 +180,9 @@ my $NO_REFINE_START_CODONS_FLAG = 0;
              'G=s' => \$genetic_code,
 
              'no_refine_starts' => \$NO_REFINE_START_CODONS_FLAG,
+
+             'version' => \$show_version_flag,
+             
                           
              );
 
@@ -182,6 +190,12 @@ my $NO_REFINE_START_CODONS_FLAG = 0;
 if ($help) {
     die $usage;
 }
+
+if ($show_version_flag) {
+    print "TransDecoder.Predict $VERSION\n";
+    exit(0);
+}
+
 
 if (@ARGV) {
     die "Error, don't understand options: @ARGV";
