@@ -21,7 +21,8 @@ use Pipeliner;
 use DelimParser;
 
 
-my $VERSION = "__BLEEDING_EDGE__";
+#my $VERSION = "__BLEEDING_EDGE__";
+my $VERSION = "5.1.0";
 
 my $RETAIN_LONG_ORFS_MIN_LENGTH = 1000000; # so essentially, off by default
 
