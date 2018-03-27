@@ -1,3 +1,11 @@
+## v5.1.0, Mar 27, 2018
+
+Better support for different genetic codes as described here:
+https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
+
+Also, shouldn't report UTR records for cases where the coding region starts at a partial codon.
+
+
 ## v5.0.2, Oct 20, 2017
 protein identifiers are more manageable (ex. ${transcript_acc}.p1, .p2, ..., .pn)
 added example for use w/ supertranscripts
