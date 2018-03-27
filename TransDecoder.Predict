@@ -24,74 +24,69 @@ use DelimParser;
 my $RETAIN_LONG_ORFS_MIN_LENGTH = 1000000; # so essentially, off by default
 
 
-=pod
+my $genetic_code = "Universal";
+my $genetic_code_options = join("\n", &Nuc_translator::get_genetic_codes());
 
-=head1 NAME
+my $usage = <<__EOUSAGE__;
 
-L<Transdecoder|http://transdecoder.sourceforge.net> - Transcriptome Protein Prediction
-
-=head1 USAGE
-
-Required:
-
- -t <string>                            transcripts.fasta
-
-Common options:
-
-
- --retain_long_orfs_mode <string>        'dynamic' or 'strict' (default: dynamic)
-                                        In dynamic mode, sets range according to 1%FDR in random sequence of same GC content.
-
- 
- --retain_long_orfs_length <int>         under 'strict' mode, retain all ORFs found that are equal or longer than these many nucleotides even if no other evidence 
-                                         marks it as coding (default: 1000000) so essentially turned off by default.)
-
- --retain_pfam_hits <string>            domain table output file from running hmmscan to search Pfam (see transdecoder.github.io for info)     
-                                        Any ORF with a pfam domain hit will be retained in the final output.
- 
- --retain_blastp_hits <string>          blastp output in '-outfmt 6' format.
-                                        Any ORF with a blast match will be retained in the final output.
-
- --single_best_only                     Retain only the single best orf per transcript (prioritized by homology then orf length)
-
- -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia, ...)
-
- --no_refine_starts                     start refinement identifies potential start codons for 5' partial ORFs using a PWM, process on by default.
-
-Advanced options
-
- -T <int>                               If no --train, top longest ORFs to train Markov Model (hexamer stats) (default: 500)
-                                        Note, 10x this value are first selected for removing redundancies,
-                                        and then this -T value of longest ORFs are selected from the non-redundant set.
-
-=cut
-
-=head1 Genetic Codes
-
-See L<http://golgi.harvard.edu/biolinks/gencode.html>. These are currently supported:
-
- universal (default)
- Euplotes
- Tetrahymena
- Candida
- Acetabularia
- Mitochondrial-Canonical
- Mitochondrial-Vertebrates
- Mitochondrial-Arthropods
- Mitochondrial-Echinoderms
- Mitochondrial-Molluscs
- Mitochondrial-Ascidians
- Mitochondrial-Nematodes
- Mitochondrial-Platyhelminths
- Mitochondrial-Yeasts
- Mitochondrial-Euascomycetes
- Mitochondrial-Protozoans
+########################################################################################
+#             ______                 ___                  __
+#            /_  __/______ ____ ___ / _ \\___ _______  ___/ /__ ____
+#             / / / __/ _ `/ _\\(_-</ // / -_) __/ _ \\/ _  / -_) __/
+#            /_/ /_/ \\_,_/_//_/___/____/\\__/\\__/\\___/\\_,_/\\__/_/   .Predict
+#
+########################################################################################
+#
+#  Transdecoder.LongOrfs|http://transdecoder.github.io> - Transcriptome Protein Prediction
+#
+#
+#  Required:
+#
+#   -t <string>                            transcripts.fasta
+#
+#  Common options:
+#
+#
+#   --retain_long_orfs_mode <string>        'dynamic' or 'strict' (default: dynamic)
+#                                        In dynamic mode, sets range according to 1%FDR in random sequence of same GC content.
+#
+# 
+#   --retain_long_orfs_length <int>         under 'strict' mode, retain all ORFs found that are equal or longer than these many nucleotides even if no other evidence 
+#                                         marks it as coding (default: 1000000) so essentially turned off by default.)
+#
+#   --retain_pfam_hits <string>            domain table output file from running hmmscan to search Pfam (see transdecoder.github.io for info)     
+#                                        Any ORF with a pfam domain hit will be retained in the final output.
+# 
+#   --retain_blastp_hits <string>          blastp output in '-outfmt 6' format.
+#                                        Any ORF with a blast match will be retained in the final output.
+#
+#   --single_best_only                     Retain only the single best orf per transcript (prioritized by homology then orf length)
+#
+#   -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia, ...)
+#
+#   --no_refine_starts                     start refinement identifies potential start codons for 5' partial ORFs using a PWM, process on by default.
+#
+##  Advanced options
+#
+#    -T <int>                               If no --train, top longest ORFs to train Markov Model (hexamer stats) (default: 500)
+#                                        Note, 10x this value are first selected for removing redundancies,
+#                                        and then this -T value of longest ORFs are selected from the non-redundant set.
+#  Genetic Codes
+#
+#
+#   --genetic_code <string>                Universal (default)
+#
+#        Genetic Codes (derived from: https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi)
+#
+#
+$genetic_code_options
+#
+#
+#########################################################################################
 
 
-=cut
-    
-
-
+__EOUSAGE__
+    ;
 
 
 
@@ -153,8 +148,6 @@ my $cpu = 1;
 my $MPI_DEBUG = 1;
 my $single_best_flag = 0;
 
-my $genetic_code = "";
-
 my $NO_REFINE_START_CODONS_FLAG = 0;
 
 
@@ -186,8 +179,9 @@ my $NO_REFINE_START_CODONS_FLAG = 0;
              );
 
 
-
-pod2usage(-verbose => 2, -output => \*STDERR) if ($help);
+if ($help) {
+    die $usage;
+}
 
 if (@ARGV) {
     die "Error, don't understand options: @ARGV";
@@ -196,13 +190,14 @@ if (@ARGV) {
 
 our $SEE = $verbose;
 
-pod2usage(-verbose => 2, -output => \*STDERR, -message => "No transcript file (-t)\n") unless ($transcripts_file && -s $transcripts_file);
+unless ($transcripts_file && -s $transcripts_file) {
+    die $usage;
+}
 
 
 if ($genetic_code) {
     $genetic_code = " --genetic_code $genetic_code";
 }
-
 
 
 main: {

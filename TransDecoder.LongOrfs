@@ -1,52 +1,5 @@
 #!/usr/bin/env perl
 
-my $MIN_PROT_LENGTH = 100;
-
-=pod
-
-=head1 NAME
-
-L<Transdecoder.LongOrfs|http://transdecoder.github.io> - Transcriptome Protein Prediction
-
-=head1 USAGE
-
-Required:
-
- -t <string>                            transcripts.fasta
-
-Optional:
-
- --gene_trans_map <string>              gene-to-transcript identifier mapping file (tab-delimited, gene_id<tab>trans_id<return> ) 
-
- -m <int>                               minimum protein length (default: 100)
- 
- -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia)
-
- -S                                     strand-specific (only analyzes top strand)
-
-=head1 Genetic Codes
-
-See L<http://golgi.harvard.edu/biolinks/gencode.html>. These are currently supported:
-
- universal (default)
- Euplotes
- Tetrahymena
- Candida
- Acetabularia
- Mitochondrial-Canonical
- Mitochondrial-Vertebrates
- Mitochondrial-Arthropods
- Mitochondrial-Echinoderms
- Mitochondrial-Molluscs
- Mitochondrial-Ascidians
- Mitochondrial-Nematodes
- Mitochondrial-Platyhelminths
- Mitochondrial-Yeasts
- Mitochondrial-Euascomycetes
- Mitochondrial-Protozoans
-
-=cut
-
 
 use strict;
 use warnings;
@@ -73,6 +26,53 @@ $ENV{PATH} = "$UTIL_DIR/bin:$ENV{PATH}";
 my ($transcripts_file);
 
 my $genetic_code='universal';
+my $genetic_code_options = join("\n", &Nuc_translator::get_genetic_codes());
+
+
+my $MIN_PROT_LENGTH = 100;
+
+my $usage = <<__EOUSAGE__;
+
+########################################################################################
+#             ______                 ___                  __
+#            /_  __/______ ____ ___ / _ \\___ _______  ___/ /__ ____
+#             / / / __/ _ `/ _\\(_-</ // / -_) __/ _ \\/ _  / -_) __/
+#            /_/ /_/ \\_,_/_//_/___/____/\\__/\\__/\\___/\\_,_/\\__/_/   .LongOrfs
+#                                                       
+########################################################################################
+#
+#  Transdecoder.LongOrfs|http://transdecoder.github.io> - Transcriptome Protein Prediction
+#
+#
+#  Required:
+#
+#    -t <string>                            transcripts.fasta
+#
+#  Optional:
+#
+#   --gene_trans_map <string>              gene-to-transcript identifier mapping file (tab-delimited, gene_id<tab>trans_id<return> ) 
+#
+#   -m <int>                               minimum protein length (default: 100)
+# 
+#   -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia)
+#  
+#   -S                                     strand-specific (only analyzes top strand)
+#
+#   --genetic_code <string>                Universal (default)
+#
+#        Genetic Codes (derived from: https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi)
+#
+#
+$genetic_code_options
+#
+#
+#########################################################################################
+
+
+__EOUSAGE__
+
+    ;
+
 
 my $TOP_STRAND_ONLY = 0;
 
@@ -96,7 +96,9 @@ my $MPI_DEBUG = 1;
 
 
 
-pod2usage(-verbose => 2, -output => \*STDERR) if ($help);
+if ($help) {
+    die $usage;
+}
 
 if (@ARGV) {
     die "Error, don't understand options: @ARGV";
@@ -104,8 +106,10 @@ if (@ARGV) {
 
 our $SEE = $verbose;
 
-pod2usage(-verbose => 2,
-          -output => \*STDERR) unless ($transcripts_file && -s $transcripts_file);
+unless ($transcripts_file && -s $transcripts_file) {
+    die $usage;
+}
+
 
 if ($genetic_code ne 'universal') {
     &Nuc_translator::use_specified_genetic_code($genetic_code);
