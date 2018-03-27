@@ -288,10 +288,14 @@ main: {
     $pipeliner->add_commands(new Command("$UTIL_DIR/score_CDS_likelihood_all_6_frames.pl $cds_file $hexamer_scores_file > $cds_scores_file",
                                          "score_cdss.ok"));
 
+    $pipeliner->run();
 
 
+    ##############
     ## select orfs
 
+    # -- and always run commands below, no checkpointing, because could involve adding or changing pfam or blast hits --
+    
     my $select_cmd = "$UTIL_DIR/select_best_ORFs_per_transcript.pl --gff3_file $gff3_file --cds_scores $cds_scores_file "
         . " --min_length_auto_accept $RETAIN_LONG_ORFS_MIN_LENGTH ";
 
@@ -306,12 +310,10 @@ main: {
         $select_cmd .= " --single_best_orf ";
     }
     $select_cmd .= " > $cds_file.best_candidates.gff3 ";
-    
-    $pipeliner->add_commands(new Command($select_cmd, "orf_select.ok"));
-    
-    $pipeliner->run();
 
-        
+    &process_cmd($select_cmd);
+
+            
     
     my $final_output_prefix = basename($transcripts_file) . ".transdecoder";
 
@@ -319,18 +321,14 @@ main: {
     
     ## start codon refinement
     unless ($NO_REFINE_START_CODONS_FLAG) {
-        my $cmd = "$UTIL_DIR/train_start_PWM.pl --transcripts $transcripts_file --selected_orfs $top_cds_file --out_prefix $workdir/start_refinement";
-        $pipeliner->add_commands(new Command($cmd, "train_start_pwm.ok"));
-                
+        my $cmd = "$UTIL_DIR/train_start_PWM.pl --transcripts $transcripts_file --selected_orfs $top_cds_file --out_prefix $workdir/start_refinement";        
+        &process_cmd($cmd);
+        
         my $revised_orf_gff3_file = "$target_final_file.revised_starts.gff3";
         $cmd = "$UTIL_DIR/start_codon_refinement.pl --transcripts $transcripts_file --gff3_file $target_final_file > $revised_orf_gff3_file";
-        $pipeliner->add_commands(new Command($cmd, "revise_starts.ok"));
-        
-            
-        $pipeliner->run();
+        &process_cmd($cmd);
         
         $target_final_file = $revised_orf_gff3_file;
-        
     }
     
     
