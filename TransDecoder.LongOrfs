@@ -17,7 +17,6 @@ use Gene_obj;
 use Nuc_translator;
 use Fasta_reader;
 use Longest_orf;
-use Pipeliner;
 
 
 my $VERSION = "__BLEEDING_EDGE__";
