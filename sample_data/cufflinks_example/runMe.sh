@@ -13,12 +13,12 @@ if [ ! -e transcripts.gtf ]; then
     gunzip -c transcripts.gtf.gz > transcripts.gtf
 fi
 
-if [ ! -e blastp.outfmt6 ]; then
-    gunzip -c blastp.outfmt6.gz > blastp.outfmt6
+if [ ! -e mini_Pfam-A.hmm ]; then
+    gunzip -c mini_Pfam-A.hmm.gz > mini_Pfam-A.hmm
 fi
 
-if [ ! -e pfam.domtblout ]; then
-    gunzip -c pfam.domtblout.gz > pfam.domtblout
+if [ ! -e mini_sprot.db.pep ]; then
+    gunzip -c mini_sprot.db.pep.gz > mini_sprot.db.pep
 fi
 
 
@@ -33,27 +33,35 @@ fi
 
 cmd=""
 ## Predict likely ORFs
-if [ 1 ]; then   # always doing this now.
+if [ "$1" == "" ]; then   # always doing this now.
+    # just coding metrics
+    cmd="../../TransDecoder.Predict -t transcripts.fasta"
 
+else
+    
     # this is how I would have run blast and pfam but I'm using precomputed results for ease of demonstration.
     #BLASTDB=/seq/RNASEQ/DBs/TRINOTATE_RESOURCES/TRINOTATE_V3/uniprot_sprot.pep
     #PFAMDB=/seq/RNASEQ/DBs/TRINOTATE_RESOURCES/TRINOTATE_V3/Pfam-A.hmm
     #
     ## run blast
     #blastp -query transcripts.fasta.transdecoder_dir/longest_orfs.pep -db $BLASTDB -max_target_seqs 1 -outfmt 6 -evalue 1e-5 > blastp.outfmt6
+
+    makeblastdb -in mini_sprot.db.pep -dbtype prot
+    blastp -query transcripts.fasta.transdecoder_dir/longest_orfs.pep -db mini_sprot.db.pep -max_target_seqs 1 -outfmt 6 -evalue 1e-5 > blastp.outfmt6
+
     #
     ## run pfam
     #hmmscan --domtblout pfam.domtblout $PFAMDB transcripts.fasta.transdecoder_dir/longest_orfs.pep > pfam.log
-    
-    
+
+    hmmpress -f mini_Pfam-A.hmm
+    hmmscan --domtblout pfam.domtblout mini_Pfam-A.hmm transcripts.fasta.transdecoder_dir/longest_orfs.pep
+        
     ## use pfam and blast results:
     cmd="../../TransDecoder.Predict  -t transcripts.fasta --retain_pfam_hits pfam.domtblout --retain_blastp_hits blastp.outfmt6   -v"
-else
-    # just coding metrics
-    cmd="../../TransDecoder.Predict -t transcripts.fasta"
+    
 fi
 
-eval $cmd $ARGS
+eval $cmd
 
 
 ## convert to genome coordinates

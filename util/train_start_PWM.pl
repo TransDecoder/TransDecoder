@@ -65,7 +65,7 @@ unless ($transcripts_file && $selected_orfs_file && $out_prefix) {
 
 main: {
 
-    my $checkpoints_dir = "${out_prefix}__checkpoints";
+    my $checkpoints_dir = "${out_prefix}_" . time() . "_checkpoints";
     if (! -d $checkpoints_dir) {
         mkdir($checkpoints_dir) or die $!;
     }
