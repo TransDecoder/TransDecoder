@@ -16,12 +16,9 @@ my @files_to_keep = qw (cleanme.pl
                         test.genome.fasta.gz
                         test.tophat.sam.gz
                         transcripts.gtf.gz
-                 
-
-blastp.outfmt6.gz
-pfam.domtblout.gz
-Makefile
-
+                 Makefile
+mini_Pfam-A.hmm.gz
+mini_sprot.db.pep.gz
                                          );
 
 

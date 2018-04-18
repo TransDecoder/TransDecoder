@@ -13,6 +13,14 @@ if [ ! -e transcripts.gtf ]; then
     gunzip -c transcripts.gtf.gz > transcripts.gtf
 fi
 
+if [ ! -e mini_Pfam-A.hmm ]; then
+    gunzip -c mini_Pfam-A.hmm.gz > mini_Pfam-A.hmm
+fi
+
+if [ ! -e mini_sprot.db.pep ]; then
+    gunzip -c mini_sprot.db.pep.gz > mini_sprot.db.pep
+fi
+
 
 ## generate alignment gff3 formatted output
 ../../util/gtf_to_alignment_gff3.pl transcripts.gtf > transcripts.gff3
@@ -37,11 +45,17 @@ else
     #
     ## run blast
     #blastp -query transcripts.fasta.transdecoder_dir/longest_orfs.pep -db $BLASTDB -max_target_seqs 1 -outfmt 6 -evalue 1e-5 > blastp.outfmt6
+
+    makeblastdb -in mini_sprot.db.pep -dbtype prot
+    blastp -query transcripts.fasta.transdecoder_dir/longest_orfs.pep -db mini_sprot.db.pep -max_target_seqs 1 -outfmt 6 -evalue 1e-5 > blastp.outfmt6
+
     #
     ## run pfam
     #hmmscan --domtblout pfam.domtblout $PFAMDB transcripts.fasta.transdecoder_dir/longest_orfs.pep > pfam.log
-    
-    
+
+    hmmpress -f mini_Pfam-A.hmm
+    hmmscan --domtblout pfam.domtblout mini_Pfam-A.hmm transcripts.fasta.transdecoder_dir/longest_orfs.pep
+        
     ## use pfam and blast results:
     cmd="../../TransDecoder.Predict  -t transcripts.fasta --retain_pfam_hits pfam.domtblout --retain_blastp_hits blastp.outfmt6   -v"
     
