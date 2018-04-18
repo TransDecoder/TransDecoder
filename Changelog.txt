@@ -1,3 +1,9 @@
+## v5.2.0, April 18, 2018
+
+Allow to rerun w/ blast and pfam results and to just reexecute the steps needed to take those data into account.
+The test runner now includes a small pfam and blast on-the-fly execution step as well.
+
+
 ## v5.1.0, Mar 27, 2018
 
 Better support for different genetic codes as described here:
