@@ -13,14 +13,6 @@ if [ ! -e transcripts.gtf ]; then
     gunzip -c transcripts.gtf.gz > transcripts.gtf
 fi
 
-if [ ! -e blastp.outfmt6 ]; then
-    gunzip -c blastp.outfmt6.gz > blastp.outfmt6
-fi
-
-if [ ! -e pfam.domtblout ]; then
-    gunzip -c pfam.domtblout.gz > pfam.domtblout
-fi
-
 
 ## generate alignment gff3 formatted output
 ../../util/gtf_to_alignment_gff3.pl transcripts.gtf > transcripts.gff3
