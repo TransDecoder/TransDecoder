@@ -80,8 +80,8 @@ main: {
                     $new_orf_gene->{asmbl_id} = $transcript_struct->{contig};
                     #$new_orf_gene->{TU_feat_name} = "t.$asmbl_id.$orf_count";
                     #$new_orf_gene->{Model_feat_name} = "m.$asmbl_id.$orf_count";
-                    $new_orf_gene->{com_name} = "ORF";
-
+                    $new_orf_gene->{com_name} = $gene_obj_ref->{com_name}; #"ORF";
+                    
                     my $use_gene_id = $transcript_struct->{gene_id};
                     unless ($use_gene_id) {
                         ## extract the orig gene id from the incoming gene obj

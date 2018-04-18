@@ -33,8 +33,12 @@ fi
 
 cmd=""
 ## Predict likely ORFs
-if [ 1 ]; then   # always doing this now.
+if [ "$1" == "" ]; then   # always doing this now.
+    # just coding metrics
+    cmd="../../TransDecoder.Predict -t transcripts.fasta"
 
+else
+    
     # this is how I would have run blast and pfam but I'm using precomputed results for ease of demonstration.
     #BLASTDB=/seq/RNASEQ/DBs/TRINOTATE_RESOURCES/TRINOTATE_V3/uniprot_sprot.pep
     #PFAMDB=/seq/RNASEQ/DBs/TRINOTATE_RESOURCES/TRINOTATE_V3/Pfam-A.hmm
@@ -48,12 +52,10 @@ if [ 1 ]; then   # always doing this now.
     
     ## use pfam and blast results:
     cmd="../../TransDecoder.Predict  -t transcripts.fasta --retain_pfam_hits pfam.domtblout --retain_blastp_hits blastp.outfmt6   -v"
-else
-    # just coding metrics
-    cmd="../../TransDecoder.Predict -t transcripts.fasta"
+    
 fi
 
-eval $cmd $ARGS
+eval $cmd
 
 
 ## convert to genome coordinates
