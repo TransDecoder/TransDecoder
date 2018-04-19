@@ -129,7 +129,10 @@ if ($genetic_code ne 'universal') {
     &Nuc_translator::use_specified_genetic_code($genetic_code);
 }
 
-
+my $workdir = &ensure_full_path(basename($transcripts_file) . ".transdecoder_dir"); 
+unless (-d $workdir) {
+    mkdir($workdir) or die "Error, cannot mkdir $workdir.";
+}
 
 my $checkpoints_dir = "$workdir.__checkpoints_longorfs";
 if (! -d $checkpoints_dir) {
@@ -152,10 +155,6 @@ main: {
         $transcripts_file = $uncompressed_transcripts_file;
     }
         
-    my $workdir = basename($transcripts_file) . ".transdecoder_dir"; 
-    unless (-d $workdir) {
-        mkdir($workdir) or die "Error, cannot mkdir $workdir.";
-    }
     
     my %gene_trans_map;
     if ($gene_trans_map_file) {
