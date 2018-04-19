@@ -131,6 +131,15 @@ if ($genetic_code ne 'universal') {
 
 
 
+my $checkpoints_dir = "$workdir.__checkpoints_longorfs";
+if (! -d $checkpoints_dir) {
+    mkdir($checkpoints_dir);
+}
+
+my $pipeliner = new Pipeliner('-verbose' => 2);
+$pipeliner->set_checkpoint_dir($checkpoints_dir);
+
+
 main: {
 
     if ($transcripts_file =~ /\.gz$/) {
@@ -147,13 +156,6 @@ main: {
     unless (-d $workdir) {
         mkdir($workdir) or die "Error, cannot mkdir $workdir.";
     }
-
-    my $longorf_checkpoint = "$workdir/__longorfs.ok";
-    if (-e $longorf_checkpoint) {
-        print STDERR "-longorfs already completed, checkpoint identified at: $longorf_checkpoint\n";
-        exit(0);
-    }
-    
     
     my %gene_trans_map;
     if ($gene_trans_map_file) {
@@ -168,16 +170,21 @@ main: {
     
     
     my $base_freqs_file = "$workdir/base_freqs.dat";
-    my $base_freqs_checkpoint = "$base_freqs_file.ok";
-    if (! -e $base_freqs_checkpoint) {
-        print STDERR "\n\n-first extracting base frequencies, we'll need them later.\n";
-        my $cmd = "$UTIL_DIR/compute_base_probs.pl $transcripts_file $TOP_STRAND_ONLY > $base_freqs_file";
-        &process_cmd($cmd);
-        
-        &process_cmd("touch $base_freqs_checkpoint");
+    my $base_freqs_checkpoint = "base_freqs_file.ok";
+    my $msg = "\n\n-first extracting base frequencies, we'll need them later.\n";
+    my $cmd = "$UTIL_DIR/compute_base_probs.pl $transcripts_file $TOP_STRAND_ONLY > $base_freqs_file";
+    $pipeliner->add_commands(new Command($cmd, $base_freqs_checkpoint, $msg));
+
+    $pipeliner->run();
+
+
+    my $longorf_checkpoint = "$checkpoints_dir/TD.longorfs.ok";
+
+    if (-e $longorf_checkpoint) {
+        print STDERR "-skipping long orf extraction, already completed earlier as per checkpoint: $longorf_checkpoint\n";
+        exit(0);
     }
     
-
     
     my $prefix = "$workdir/longest_orfs";
     my $cds_file = "$prefix.cds";

@@ -9,6 +9,7 @@ use Data::Dumper;
 use List::Util qw (min max);
 use File::Basename;
 use Carp;
+use Digest::MD5;
 
 use lib ("$FindBin::RealBin/PerlLib");
 
@@ -272,7 +273,7 @@ main: {
         
     # get hexamer scores
     my $hexamer_scores_file = "$workdir/hexamer.scores";
-    my $hexamer_checkpoint = "$hexamer_scores_file.ok";
+    my $hexamer_checkpoint = "hexamer_scores_file.ok";
     my $base_freqs_file = "$workdir/base_freqs.dat";
 
     if ($RETAIN_LONG_ORFS_MODE eq 'dynamic') {
@@ -294,9 +295,19 @@ main: {
 
     ##############
     ## select orfs
-
-    # -- and always run commands below, no checkpointing, because could involve adding or changing pfam or blast hits --
     
+    ## Steps below may be rerun if input parameters are set differently (such as including pfam or blast results in a subsequent run).
+
+    my @checkpoint_inputs = ($transcripts_file);
+    if ($retain_pfam_hits_file) {
+        push (@checkpoint_inputs, $retain_pfam_hits_file);
+    }
+    if ($retain_blastp_hits_file) {
+        push (@checkpoint_inputs, $retain_blastp_hits_file);
+    }
+    my $big_checkpoint_string = join("^", @checkpoint_inputs);
+    my $checkpoint_hashcode = Digest::MD5::md5_hex($big_checkpoint_string);
+        
     my $select_cmd = "$UTIL_DIR/select_best_ORFs_per_transcript.pl --gff3_file $gff3_file --cds_scores $cds_scores_file "
         . " --min_length_auto_accept $RETAIN_LONG_ORFS_MIN_LENGTH ";
 
@@ -312,9 +323,8 @@ main: {
     }
     $select_cmd .= " > $cds_file.best_candidates.gff3 ";
 
-    &process_cmd($select_cmd);
-
-            
+    $pipeliner->add_commands(new Command($select_cmd, "select_best_orfs.$checkpoint_hashcode.ok", "Selecting best orfs"));
+                
     
     my $final_output_prefix = basename($transcripts_file) . ".transdecoder";
 
@@ -323,44 +333,42 @@ main: {
     ## start codon refinement
     unless ($NO_REFINE_START_CODONS_FLAG) {
         my $cmd = "$UTIL_DIR/train_start_PWM.pl --transcripts $transcripts_file --selected_orfs $top_cds_file --out_prefix $workdir/start_refinement";        
-        &process_cmd($cmd);
+        $pipeliner->add_commands(new Command($cmd, "train_start_PWM.$checkpoint_hashcode.ok", "Training start codon pattern recognition"));
         
         my $revised_orf_gff3_file = "$target_final_file.revised_starts.gff3";
         $cmd = "$UTIL_DIR/start_codon_refinement.pl --transcripts $transcripts_file --gff3_file $target_final_file > $revised_orf_gff3_file";
-        &process_cmd($cmd);
-        
+        $pipeliner->add_commands(new Command($cmd, "revise_starts.$checkpoint_hashcode.ok", "Refining start codon selections."));
+                
         $target_final_file = $revised_orf_gff3_file;
     }
+    $pipeliner->add_commands(new Command("cp $target_final_file $final_output_prefix.gff3",
+                                         "copy_to_final_outputfile.$checkpoint_hashcode.ok",
+                                         "copying output to final output file: $final_output_prefix.gff3") );
     
-    
-    &process_cmd("cp $target_final_file $final_output_prefix.gff3");
-                
     ## write final outputs:
-
+    
     {
         ## make a BED file for viewing in IGV
         my $gff3_file = "$final_output_prefix.gff3";
         my $bed_file = $gff3_file;
         $bed_file =~ s/\.gff3$/\.bed/;
         my $cmd = "$UTIL_DIR/gff3_file_to_bed.pl $gff3_file > $bed_file";
-        &process_cmd($cmd);
-        
-        
+        $pipeliner->add_commands(new Command($cmd, "make_final_bed.$checkpoint_hashcode.ok", "Making bed file: $bed_file"));
+                        
         # make a peptide file:
         my $best_pep_file = $gff3_file;
         $best_pep_file =~ s/\.gff3$/\.pep/;
         $cmd = "$UTIL_DIR/gff3_file_to_proteins.pl --gff3 $gff3_file --fasta $transcripts_file $genetic_code > $best_pep_file";
-        &process_cmd($cmd);
-        
-        
-        
+        $pipeliner->add_commands(new Command($cmd, "make_final_pep.$checkpoint_hashcode.ok", "Making pep file: $best_pep_file"));
+                
         # make a CDS file:
         my $best_cds_file = $best_pep_file;
         $best_cds_file =~ s/\.pep$/\.cds/;
         $cmd = "$UTIL_DIR/gff3_file_to_proteins.pl --gff3 $gff3_file --fasta $transcripts_file --seqType CDS $genetic_code > $best_cds_file";
-        &process_cmd($cmd);
+        $pipeliner->add_commands(new Command($cmd, "make_final_cds.$checkpoint_hashcode.ok", "Making cds file: $best_cds_file"));
     }
     
+    $pipeliner->run();
     
     print STDERR "transdecoder is finished.  See output files $final_output_prefix.\*\n\n\n";
     
