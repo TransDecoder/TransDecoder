@@ -128,19 +128,6 @@ if ($genetic_code ne 'universal') {
     &Nuc_translator::use_specified_genetic_code($genetic_code);
 }
 
-my $workdir = &Pipeliner::ensure_full_path(basename($transcripts_file) . ".transdecoder_dir"); 
-unless (-d $workdir) {
-    mkdir($workdir) or die "Error, cannot mkdir $workdir.";
-}
-
-my $checkpoints_dir = "$workdir.__checkpoints_longorfs";
-if (! -d $checkpoints_dir) {
-    mkdir($checkpoints_dir);
-}
-
-my $pipeliner = new Pipeliner('-verbose' => 2);
-$pipeliner->set_checkpoint_dir($checkpoints_dir);
-
 
 main: {
 
@@ -153,8 +140,21 @@ main: {
         }
         $transcripts_file = $uncompressed_transcripts_file;
     }
-        
+
+
+    my $workdir = &Pipeliner::ensure_full_path(basename($transcripts_file) . ".transdecoder_dir"); 
+    unless (-d $workdir) {
+        mkdir($workdir) or die "Error, cannot mkdir $workdir.";
+    }
     
+    my $checkpoints_dir = "$workdir.__checkpoints_longorfs";
+    if (! -d $checkpoints_dir) {
+        mkdir($checkpoints_dir);
+    }
+    
+    my $pipeliner = new Pipeliner('-verbose' => 2);
+    $pipeliner->set_checkpoint_dir($checkpoints_dir);
+        
     my %gene_trans_map;
     if ($gene_trans_map_file) {
         open(my $fh, $gene_trans_map_file) or die "Error, cannot open file $gene_trans_map_file";
