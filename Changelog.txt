@@ -1,4 +1,4 @@
-## v5.2.0, April 18, 2018
+## v5.2.0, April 21, 2018
 
 Allow to rerun w/ blast and pfam results and to just reexecute the steps needed to take those data into account.
 The test runner now includes a small pfam and blast on-the-fly execution step as well.
