@@ -88,7 +88,7 @@ main: {
     foreach my $start_info (@starts) {
         my ($transcript_acc, $start_coord, $orient) = @$start_info;
         
-        my $transcript_seq = $seqs{$transcript_acc};
+        my $transcript_seq = uc $seqs{$transcript_acc};
 
         if ($orient eq '-') {
             # convert info to (+) strand

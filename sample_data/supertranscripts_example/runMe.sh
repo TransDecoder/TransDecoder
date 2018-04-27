@@ -24,5 +24,5 @@ eval $cmd
 # make bed file for visualization
 ../../util/gff3_file_to_bed.pl supertranscripts.wOrfs.gff3 > supertranscripts.wOrfs.bed
 
-
-
+# convert to gtf as companion to the gff3 file (some other tools prefer gtf format)
+../../util/gff3_gene_to_gtf_format.pl supertranscripts.wOrfs.gff3 supertranscripts.fasta  > supertranscripts.wOrfs.gtf
