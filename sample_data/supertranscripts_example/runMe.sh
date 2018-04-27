@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ev
+set -ex
 
 # convert to gff3 alignment format
 ../../util/gtf_to_alignment_gff3.pl supertranscripts.gtf > supertranscripts.gff3
@@ -26,3 +26,6 @@ eval $cmd
 
 # convert to gtf as companion to the gff3 file (some other tools prefer gtf format)
 ../../util/gff3_gene_to_gtf_format.pl supertranscripts.wOrfs.gff3 supertranscripts.fasta  > supertranscripts.wOrfs.gtf
+
+
+echo Done
