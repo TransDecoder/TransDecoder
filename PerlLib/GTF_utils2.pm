@@ -1,9 +1,8 @@
-package GTF_utils;
+package GTF_utils2; # removes DB_File and Gene_obj_indexer requirement.
 
 use strict;
 use warnings;
 use Gene_obj;
-use Gene_obj_indexer;
 use GTF;
 use Carp;
 use Data::Dumper;
@@ -22,7 +21,12 @@ sub index_GTF_gene_objs {
 
 sub index_GTF_gene_objs_from_GTF {
     my ($gtf_filename, $gene_obj_indexer) = @_;
+
+    unless (ref $gene_obj_indexer eq "HASH") {
+        confess "Error, \$gene_obj_indexer must be a hash ref";
+    }
     
+        
     ## 
     #print STDERR "\n-caching genes.\n";
     my %seqname_map;
@@ -47,14 +51,9 @@ sub index_GTF_gene_objs_from_GTF {
 
 
         my $seqname = $gene_obj->{asmbl_id};
-        
-		if (ref $gene_obj_indexer eq "HASH") {
-			$gene_obj_indexer->{$gene_id} = $gene_obj;
-		}
-		else {
-			$gene_obj_indexer->store_gene($gene_id, $gene_obj) if(ref $gene_obj_indexer);
-		}
-		
+        		
+        $gene_obj_indexer->{$gene_id} = $gene_obj;
+				
         # add to gene list for asmbl_id
         my $gene_list = $seqname_map{$seqname};
         unless (ref $gene_list) {
