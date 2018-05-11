@@ -20,8 +20,8 @@ use Longest_orf;
 use Pipeliner;
 
 
-my $VERSION = "__BLEEDING_EDGE__";
-#my $VERSION = "5.2.0";
+#my $VERSION = "__BLEEDING_EDGE__";
+my $VERSION = "5.3.0";
 
 my $UTIL_DIR = "$FindBin::RealBin/util";
 $ENV{PATH} = "$UTIL_DIR/bin:$ENV{PATH}";

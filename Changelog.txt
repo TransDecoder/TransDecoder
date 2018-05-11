@@ -1,3 +1,7 @@
+## v5.3.0, May 11, 2018
+Removed DB_File requirement
+
+
 ## v5.2.0, April 21, 2018
 
 Allow to rerun w/ blast and pfam results and to just reexecute the steps needed to take those data into account.
