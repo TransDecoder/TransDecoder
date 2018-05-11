@@ -4,12 +4,11 @@ package main;
 our $SEE;
 
 
-package GFF3_utils;
+package GFF3_utils2; # removes DB_File requirement, no use of Gene_obj_indexer module.
 
 use strict;
 use warnings;
 use Gene_obj;
-use Gene_obj_indexer;
 use Carp;
 use URI::Escape;
 use Data::Dumper;
@@ -21,10 +20,8 @@ sub index_GFF3_gene_objs {
     my ($gff_filename, $gene_obj_indexer, $contig_id) = @_;
     # contig_id is optional.
     
-
-    my $hash_mode = 0;
-    if (ref $gene_obj_indexer eq 'HASH') {
-        $hash_mode = 1;
+    unless (ref $gene_obj_indexer eq 'HASH') {
+        confess "Error, \$gene_obj_indexer must be a hashref";
     }
     
     ## note can use either a gene_obj_indexer or a hash reference.
@@ -231,13 +228,9 @@ sub index_GFF3_gene_objs {
             
 			$template_gene_obj->refine_gene_object();
 			
-            if ($hash_mode) {
-                $gene_obj_indexer->{$gene_id} = $template_gene_obj;
-            }
-            else {
-                $gene_obj_indexer->store_gene($gene_id, $template_gene_obj);
-            }
-            
+
+            $gene_obj_indexer->{$gene_id} = $template_gene_obj;
+                        
             print "GFF3_utils: stored $gene_id\n" if $SEE;
             
             # add to gene list for asmbl_id
