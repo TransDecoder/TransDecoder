@@ -6,7 +6,7 @@ use FindBin;
 use lib ("$FindBin::Bin/../PerlLib");
 use Gene_obj;
 use Fasta_reader;
-use GFF3_utils;
+use GFF3_utils2;
 use Carp;
 use Nuc_translator;
 use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
@@ -75,7 +75,7 @@ my %genome = $fasta_reader->retrieve_all_seqs_hash();
 my $gene_obj_indexer_href = {};
 
 ## associate gene identifiers with contig id's.
-my $contig_to_gene_list_href = &GFF3_utils::index_GFF3_gene_objs($gff3_file, $gene_obj_indexer_href);
+my $contig_to_gene_list_href = &GFF3_utils2::index_GFF3_gene_objs($gff3_file, $gene_obj_indexer_href);
 
 foreach my $asmbl_id (sort keys %$contig_to_gene_list_href) {
     

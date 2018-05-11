@@ -6,8 +6,7 @@ use FindBin;
 use lib ("$FindBin::Bin/../PerlLib");
 use Gene_obj;
 use Fasta_retriever;
-use GFF3_utils;
-use GTF_utils;
+use GFF3_utils2;
 use Carp;
 
 
@@ -24,7 +23,7 @@ main: {
     my $inx_file = "$gff3_file.tmp.inx";
     my $gene_obj_indexer = new Gene_obj_indexer( { "create" => $inx_file } );
     
-    my $asmbl_id_to_gene_list_href = &GFF3_utils::index_GFF3_gene_objs($gff3_file, $gene_obj_indexer);
+    my $asmbl_id_to_gene_list_href = &GFF3_utils2::index_GFF3_gene_objs($gff3_file, $gene_obj_indexer);
 
     foreach my $asmbl_id (sort keys %$asmbl_id_to_gene_list_href) {
         

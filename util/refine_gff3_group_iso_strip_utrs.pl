@@ -5,8 +5,7 @@ use warnings;
 use FindBin;
 use lib ("$FindBin::Bin/../PerlLib");
 use Gene_obj;
-use Gene_obj_indexer;
-use GFF3_utils;
+use GFF3_utils2;
 use Carp;
 
 my $usage = "usage: $0  transdecoder.gff3\n\n";
@@ -17,7 +16,7 @@ my $gff3_file = $ARGV[0] or die $usage;
 main: {
 
     my $indexer = {};
-    my $asmbl_id_to_gene_list_href = &GFF3_utils::index_GFF3_gene_objs($gff3_file, $indexer);
+    my $asmbl_id_to_gene_list_href = &GFF3_utils2::index_GFF3_gene_objs($gff3_file, $indexer);
 
     
     

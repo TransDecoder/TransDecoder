@@ -5,7 +5,7 @@ use warnings;
 use FindBin;
 use lib ("$FindBin::Bin/../PerlLib");
 use Gene_obj;
-use GFF3_utils;
+use GFF3_utils2;
 use Carp;
 use Nuc_translator;
 use File::Basename;
@@ -17,7 +17,7 @@ my $gff3_file = $ARGV[0] or die $usage;
 my $gene_obj_indexer_href = {};
 
 ## associate gene identifiers with contig id's.
-my $contig_to_gene_list_href = &GFF3_utils::index_GFF3_gene_objs($gff3_file, $gene_obj_indexer_href);
+my $contig_to_gene_list_href = &GFF3_utils2::index_GFF3_gene_objs($gff3_file, $gene_obj_indexer_href);
 
 print "track name=\'" . basename($gff3_file) . "\'\n";
 
