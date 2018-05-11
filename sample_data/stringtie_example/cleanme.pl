@@ -33,5 +33,6 @@ foreach my $file (<*>) {
 
 `rm -rf ./stringtie_merged.transcripts.fasta.transdecoder_dir`;
 `rm -rf ./stringtie_merged.transcripts.fasta.transdecoder_dir.__checkpoints`;
+`rm -rf ./stringtie_merged.transcripts.fasta.transdecoder_dir.__checkpoints_longorfs`;
 
 exit(0);
