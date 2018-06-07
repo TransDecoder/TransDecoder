@@ -3582,13 +3582,10 @@ sub to_GFF3_format {
     my $asmbl_id = $preferences{seqid} || $gene_obj->{asmbl_id};
     my $source = $preferences{source} || $gene_obj->{source} || ".";
     
-    unless ($asmbl_id) {
-        if ($gene_id =~ /^(\d+)/) {
-            $asmbl_id = $1;
-        } else {
-            die "Error, no asmbl_id from gene_obj\n";
-        }
+    unless (defined $asmbl_id) {
+        confess "Error, no asmbl_id from gene_obj\n";
     }
+    
     
     my ($gene_lend, $gene_rend) = sort {$a<=>$b} $gene_obj->get_gene_span();
     my $com_name = $gene_obj->{com_name};
