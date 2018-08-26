@@ -72,7 +72,7 @@ my $usage = <<__EOUSAGE__;
 #
 ##  Advanced options
 #
-#    -T <int>                               If no --train, top longest ORFs to train Markov Model (hexamer stats) (default: 500)
+#    -T <int>                            Top longest ORFs to train Markov Model (hexamer stats) (default: 500)
 #                                        Note, 10x this value are first selected for removing redundancies,
 #                                        and then this -T value of longest ORFs are selected from the non-redundant set.
 #  Genetic Codes
