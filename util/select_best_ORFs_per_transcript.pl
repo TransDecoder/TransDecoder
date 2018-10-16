@@ -249,7 +249,7 @@ sub parse_pfam_hits_file {
         die "Error, cannot find pfam hits file: $pfam_hits_file";
     }
 
-    print "PFAM output found and processing...\n";
+    print STDERR "PFAM output found ($pfam_hits_file) and processing...\n";
     # capture those proteins having pfam hits
     open (my $fh, $pfam_hits_file) or die "Error, cannot open file: $pfam_hits_file";
     while (my $ln=<$fh>) {
@@ -275,7 +275,7 @@ sub parse_blastp_hits_file {
     unless (-e $blastp_file) {
         die "Error, cannot find file $blastp_file";
     }
-
+    print STDERR "blastp output found ($blastp_file) and processing...\n";
     my %blastp_hits;
 
     open (my $fh, $blastp_file) or die "Error, cannot open file $blastp_file";

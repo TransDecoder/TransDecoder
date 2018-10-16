@@ -1,0 +1,536 @@
+CUFF.1.1	transdecoder	gene	1	503	.	+	.	ID=GENE.CUFF.1.1~~CUFF.1.1.p1;Name=ORF%20type%3A5prime_partial%20len%3A122%20%28%2B%29%2Cscore%3D38.72%2CMAOX_SCHPO%7C98.15%7C7e-72%2Cmalic%7CPF00390.18%7C3e-20
+CUFF.1.1	transdecoder	mRNA	1	503	.	+	.	ID=CUFF.1.1.p1;Parent=GENE.CUFF.1.1~~CUFF.1.1.p1;Name=ORF%20type%3A5prime_partial%20len%3A122%20%28%2B%29%2Cscore%3D38.72%2CMAOX_SCHPO%7C98.15%7C7e-72%2Cmalic%7CPF00390.18%7C3e-20
+CUFF.1.1	transdecoder	exon	1	503	.	+	.	ID=CUFF.1.1.p1.exon1;Parent=CUFF.1.1.p1
+CUFF.1.1	transdecoder	CDS	3	368	.	+	0	ID=cds.CUFF.1.1.p1;Parent=CUFF.1.1.p1
+CUFF.1.1	transdecoder	three_prime_UTR	369	503	.	+	.	ID=CUFF.1.1.p1.utr3p1;Parent=CUFF.1.1.p1
+
+CUFF.11.1	transdecoder	gene	1	938	.	+	.	ID=GENE.CUFF.11.1~~CUFF.11.1.p1;Name=ORF%20type%3A5prime_partial%20len%3A294%20%28%2B%29%2Cscore%3D97.23%2CYI48_SCHPO%7C100.00%7C0.0%2CGLEYA%7CPF10528.8%7C1.1e%2B02%2CGLEYA%7CPF10528.8%7C3.6e-20%2COrthopox_A5L%7CPF06193.10%7C0.0099
+CUFF.11.1	transdecoder	mRNA	1	938	.	+	.	ID=CUFF.11.1.p1;Parent=GENE.CUFF.11.1~~CUFF.11.1.p1;Name=ORF%20type%3A5prime_partial%20len%3A294%20%28%2B%29%2Cscore%3D97.23%2CYI48_SCHPO%7C100.00%7C0.0%2CGLEYA%7CPF10528.8%7C1.1e%2B02%2CGLEYA%7CPF10528.8%7C3.6e-20%2COrthopox_A5L%7CPF06193.10%7C0.0099
+CUFF.11.1	transdecoder	exon	1	938	.	+	.	ID=CUFF.11.1.p1.exon1;Parent=CUFF.11.1.p1
+CUFF.11.1	transdecoder	CDS	3	884	.	+	0	ID=cds.CUFF.11.1.p1;Parent=CUFF.11.1.p1
+CUFF.11.1	transdecoder	three_prime_UTR	885	938	.	+	.	ID=CUFF.11.1.p1.utr3p1;Parent=CUFF.11.1.p1
+
+CUFF.12.1	transdecoder	gene	1	2733	.	+	.	ID=GENE.CUFF.12.1~~CUFF.12.1.p1;Name=ORF%20type%3Acomplete%20len%3A674%20%28%2B%29%2Cscore%3D213.14%2CPLB7_SCHPO%7C100.00%7C0.0%2CPLA2_B%7CPF01735.17%7C5.2e-206%2CIBR%7CPF01485.20%7C0.0015
+CUFF.12.1	transdecoder	mRNA	1	2733	.	+	.	ID=CUFF.12.1.p1;Parent=GENE.CUFF.12.1~~CUFF.12.1.p1;Name=ORF%20type%3Acomplete%20len%3A674%20%28%2B%29%2Cscore%3D213.14%2CPLB7_SCHPO%7C100.00%7C0.0%2CPLA2_B%7CPF01735.17%7C5.2e-206%2CIBR%7CPF01485.20%7C0.0015
+CUFF.12.1	transdecoder	five_prime_UTR	1	227	.	+	.	ID=CUFF.12.1.p1.utr5p1;Parent=CUFF.12.1.p1
+CUFF.12.1	transdecoder	exon	1	2733	.	+	.	ID=CUFF.12.1.p1.exon1;Parent=CUFF.12.1.p1
+CUFF.12.1	transdecoder	CDS	228	2249	.	+	0	ID=cds.CUFF.12.1.p1;Parent=CUFF.12.1.p1
+CUFF.12.1	transdecoder	three_prime_UTR	2250	2733	.	+	.	ID=CUFF.12.1.p1.utr3p1;Parent=CUFF.12.1.p1
+
+CUFF.13.1	transdecoder	gene	1	1770	.	+	.	ID=GENE.CUFF.13.1~~CUFF.13.1.p2;Name=ORF%20type%3A3prime_partial%20len%3A120%20%28%2B%29%2Cscore%3D34.75%2CNAH_SCHPO%7C100.00%7C2e-80%2CNa_H_Exchanger%7CPF00999.20%7C5.1e-27
+CUFF.13.1	transdecoder	mRNA	1	1770	.	+	.	ID=CUFF.13.1.p2;Parent=GENE.CUFF.13.1~~CUFF.13.1.p2;Name=ORF%20type%3A3prime_partial%20len%3A120%20%28%2B%29%2Cscore%3D34.75%2CNAH_SCHPO%7C100.00%7C2e-80%2CNa_H_Exchanger%7CPF00999.20%7C5.1e-27
+CUFF.13.1	transdecoder	five_prime_UTR	1	1413	.	+	.	ID=CUFF.13.1.p2.utr5p1;Parent=CUFF.13.1.p2
+CUFF.13.1	transdecoder	exon	1	1770	.	+	.	ID=CUFF.13.1.p2.exon1;Parent=CUFF.13.1.p2
+CUFF.13.1	transdecoder	CDS	1414	1770	.	+	0	ID=cds.CUFF.13.1.p2;Parent=CUFF.13.1.p2
+
+CUFF.13.1	transdecoder	gene	1	1770	.	+	.	ID=GENE.CUFF.13.1~~CUFF.13.1.p1;Name=ORF%20type%3Acomplete%20len%3A130%20%28%2B%29%2Cscore%3D18.26%2CNAH_SCHPO%7C100.00%7C2e-23
+CUFF.13.1	transdecoder	mRNA	1	1770	.	+	.	ID=CUFF.13.1.p1;Parent=GENE.CUFF.13.1~~CUFF.13.1.p1;Name=ORF%20type%3Acomplete%20len%3A130%20%28%2B%29%2Cscore%3D18.26%2CNAH_SCHPO%7C100.00%7C2e-23
+CUFF.13.1	transdecoder	five_prime_UTR	1	796	.	+	.	ID=CUFF.13.1.p1.utr5p1;Parent=CUFF.13.1.p1
+CUFF.13.1	transdecoder	exon	1	1770	.	+	.	ID=CUFF.13.1.p1.exon1;Parent=CUFF.13.1.p1
+CUFF.13.1	transdecoder	CDS	797	1186	.	+	0	ID=cds.CUFF.13.1.p1;Parent=CUFF.13.1.p1
+CUFF.13.1	transdecoder	three_prime_UTR	1187	1770	.	+	.	ID=CUFF.13.1.p1.utr3p1;Parent=CUFF.13.1.p1
+
+CUFF.13.2	transdecoder	gene	1	875	.	+	.	ID=GENE.CUFF.13.2~~CUFF.13.2.p1;Name=ORF%20type%3Ainternal%20len%3A292%20%28%2B%29%2Cscore%3D76.96%2CNAH_SCHPO%7C100.00%7C9e-162%2CNa_H_Exchanger%7CPF00999.20%7C1.6e-42%2CPsbN%7CPF02468.14%7C0.00093
+CUFF.13.2	transdecoder	mRNA	1	875	.	+	.	ID=CUFF.13.2.p1;Parent=GENE.CUFF.13.2~~CUFF.13.2.p1;Name=ORF%20type%3Ainternal%20len%3A292%20%28%2B%29%2Cscore%3D76.96%2CNAH_SCHPO%7C100.00%7C9e-162%2CNa_H_Exchanger%7CPF00999.20%7C1.6e-42%2CPsbN%7CPF02468.14%7C0.00093
+CUFF.13.2	transdecoder	exon	1	875	.	+	.	ID=CUFF.13.2.p1.exon1;Parent=CUFF.13.2.p1
+CUFF.13.2	transdecoder	CDS	3	875	.	+	0	ID=cds.CUFF.13.2.p1;Parent=CUFF.13.2.p1
+
+CUFF.13.3	transdecoder	gene	1	822	.	+	.	ID=GENE.CUFF.13.3~~CUFF.13.3.p1;Name=ORF%20type%3A5prime_partial%20len%3A194%20%28%2B%29%2Cscore%3D45.87%2CNAH_SCHPO%7C92.06%7C6e-79%2CNa_H_Exchanger%7CPF00999.20%7C1.4e-15%2CPsbN%7CPF02468.14%7C0.00053
+CUFF.13.3	transdecoder	mRNA	1	822	.	+	.	ID=CUFF.13.3.p1;Parent=GENE.CUFF.13.3~~CUFF.13.3.p1;Name=ORF%20type%3A5prime_partial%20len%3A194%20%28%2B%29%2Cscore%3D45.87%2CNAH_SCHPO%7C92.06%7C6e-79%2CNa_H_Exchanger%7CPF00999.20%7C1.4e-15%2CPsbN%7CPF02468.14%7C0.00053
+CUFF.13.3	transdecoder	exon	1	822	.	+	.	ID=CUFF.13.3.p1.exon1;Parent=CUFF.13.3.p1
+CUFF.13.3	transdecoder	CDS	3	584	.	+	0	ID=cds.CUFF.13.3.p1;Parent=CUFF.13.3.p1
+CUFF.13.3	transdecoder	three_prime_UTR	585	822	.	+	.	ID=CUFF.13.3.p1.utr3p1;Parent=CUFF.13.3.p1
+
+CUFF.14.1	transdecoder	gene	1	1275	.	+	.	ID=GENE.CUFF.14.1~~CUFF.14.1.p1;Name=ORF%20type%3Acomplete%20len%3A312%20%28%2B%29%2Cscore%3D104.06%2CFEX2_SCHPO%7C100.00%7C0.0%2CCRCB%7CPF02537.14%7C1.5e-17%2CCRCB%7CPF02537.14%7C39%2CCRCB%7CPF02537.14%7C5.9e-18%2CDUF2157%7CPF09925.8%7C6.4%2CDUF2157%7CPF09925.8%7C0.0036
+CUFF.14.1	transdecoder	mRNA	1	1275	.	+	.	ID=CUFF.14.1.p1;Parent=GENE.CUFF.14.1~~CUFF.14.1.p1;Name=ORF%20type%3Acomplete%20len%3A312%20%28%2B%29%2Cscore%3D104.06%2CFEX2_SCHPO%7C100.00%7C0.0%2CCRCB%7CPF02537.14%7C1.5e-17%2CCRCB%7CPF02537.14%7C39%2CCRCB%7CPF02537.14%7C5.9e-18%2CDUF2157%7CPF09925.8%7C6.4%2CDUF2157%7CPF09925.8%7C0.0036
+CUFF.14.1	transdecoder	five_prime_UTR	1	320	.	+	.	ID=CUFF.14.1.p1.utr5p1;Parent=CUFF.14.1.p1
+CUFF.14.1	transdecoder	exon	1	1275	.	+	.	ID=CUFF.14.1.p1.exon1;Parent=CUFF.14.1.p1
+CUFF.14.1	transdecoder	CDS	321	1256	.	+	0	ID=cds.CUFF.14.1.p1;Parent=CUFF.14.1.p1
+CUFF.14.1	transdecoder	three_prime_UTR	1257	1275	.	+	.	ID=CUFF.14.1.p1.utr3p1;Parent=CUFF.14.1.p1
+
+CUFF.15.1	transdecoder	gene	1	1449	.	+	.	ID=GENE.CUFF.15.1~~CUFF.15.1.p1;Name=ORF%20type%3A5prime_partial%20len%3A367%20%28%2B%29%2Cscore%3D107.03%2CASPG2_SCHPO%7C100.00%7C0.0%2CAsparaginase%7CPF00710.19%7C3.6e-54
+CUFF.15.1	transdecoder	mRNA	1	1449	.	+	.	ID=CUFF.15.1.p1;Parent=GENE.CUFF.15.1~~CUFF.15.1.p1;Name=ORF%20type%3A5prime_partial%20len%3A367%20%28%2B%29%2Cscore%3D107.03%2CASPG2_SCHPO%7C100.00%7C0.0%2CAsparaginase%7CPF00710.19%7C3.6e-54
+CUFF.15.1	transdecoder	exon	1	1449	.	+	.	ID=CUFF.15.1.p1.exon1;Parent=CUFF.15.1.p1
+CUFF.15.1	transdecoder	CDS	3	1103	.	+	0	ID=cds.CUFF.15.1.p1;Parent=CUFF.15.1.p1
+CUFF.15.1	transdecoder	three_prime_UTR	1104	1449	.	+	.	ID=CUFF.15.1.p1.utr3p1;Parent=CUFF.15.1.p1
+
+CUFF.16.1	transdecoder	gene	1	1374	.	+	.	ID=GENE.CUFF.16.1~~CUFF.16.1.p1;Name=ORF%20type%3Acomplete%20len%3A102%20%28%2B%29%2Cscore%3D28.32
+CUFF.16.1	transdecoder	mRNA	1	1374	.	+	.	ID=CUFF.16.1.p1;Parent=GENE.CUFF.16.1~~CUFF.16.1.p1;Name=ORF%20type%3Acomplete%20len%3A102%20%28%2B%29%2Cscore%3D28.32
+CUFF.16.1	transdecoder	five_prime_UTR	1	654	.	+	.	ID=CUFF.16.1.p1.utr5p1;Parent=CUFF.16.1.p1
+CUFF.16.1	transdecoder	exon	1	1374	.	+	.	ID=CUFF.16.1.p1.exon1;Parent=CUFF.16.1.p1
+CUFF.16.1	transdecoder	CDS	655	960	.	+	0	ID=cds.CUFF.16.1.p1;Parent=CUFF.16.1.p1
+CUFF.16.1	transdecoder	three_prime_UTR	961	1374	.	+	.	ID=CUFF.16.1.p1.utr3p1;Parent=CUFF.16.1.p1
+
+CUFF.17.1	transdecoder	gene	1	1368	.	+	.	ID=GENE.CUFF.17.1~~CUFF.17.1.p1;Name=ORF%20type%3Acomplete%20len%3A352%20%28%2B%29%2Cscore%3D96.09%2CYI7E_SCHPO%7C100.00%7C0.0%2CAldo_ket_red%7CPF00248.20%7C5.7e-69%2CHTH_29%7CPF13551.5%7C0.13%2CHTH_29%7CPF13551.5%7C0.32%2CDsrD%7CPF08679.10%7C1.2e%2B02%2CDsrD%7CPF08679.10%7C0.0028%2CHTH_psq%7CPF05225.15%7C0.31%2CHTH_psq%7CPF05225.15%7C19%2CHTH_psq%7CPF05225.15%7C0.25
+CUFF.17.1	transdecoder	mRNA	1	1368	.	+	.	ID=CUFF.17.1.p1;Parent=GENE.CUFF.17.1~~CUFF.17.1.p1;Name=ORF%20type%3Acomplete%20len%3A352%20%28%2B%29%2Cscore%3D96.09%2CYI7E_SCHPO%7C100.00%7C0.0%2CAldo_ket_red%7CPF00248.20%7C5.7e-69%2CHTH_29%7CPF13551.5%7C0.13%2CHTH_29%7CPF13551.5%7C0.32%2CDsrD%7CPF08679.10%7C1.2e%2B02%2CDsrD%7CPF08679.10%7C0.0028%2CHTH_psq%7CPF05225.15%7C0.31%2CHTH_psq%7CPF05225.15%7C19%2CHTH_psq%7CPF05225.15%7C0.25
+CUFF.17.1	transdecoder	five_prime_UTR	1	230	.	+	.	ID=CUFF.17.1.p1.utr5p1;Parent=CUFF.17.1.p1
+CUFF.17.1	transdecoder	exon	1	1368	.	+	.	ID=CUFF.17.1.p1.exon1;Parent=CUFF.17.1.p1
+CUFF.17.1	transdecoder	CDS	231	1286	.	+	0	ID=cds.CUFF.17.1.p1;Parent=CUFF.17.1.p1
+CUFF.17.1	transdecoder	three_prime_UTR	1287	1368	.	+	.	ID=CUFF.17.1.p1.utr3p1;Parent=CUFF.17.1.p1
+
+CUFF.18.1	transdecoder	gene	1	897	.	+	.	ID=GENE.CUFF.18.1~~CUFF.18.1.p1;Name=ORF%20type%3A5prime_partial%20len%3A257%20%28%2B%29%2Cscore%3D81.60%2CYI7F_SCHPO%7C100.00%7C0.0%2CDLH%7CPF01738.17%7C6e-11
+CUFF.18.1	transdecoder	mRNA	1	897	.	+	.	ID=CUFF.18.1.p1;Parent=GENE.CUFF.18.1~~CUFF.18.1.p1;Name=ORF%20type%3A5prime_partial%20len%3A257%20%28%2B%29%2Cscore%3D81.60%2CYI7F_SCHPO%7C100.00%7C0.0%2CDLH%7CPF01738.17%7C6e-11
+CUFF.18.1	transdecoder	exon	1	897	.	+	.	ID=CUFF.18.1.p1.exon1;Parent=CUFF.18.1.p1
+CUFF.18.1	transdecoder	CDS	1	771	.	+	0	ID=cds.CUFF.18.1.p1;Parent=CUFF.18.1.p1
+CUFF.18.1	transdecoder	three_prime_UTR	772	897	.	+	.	ID=CUFF.18.1.p1.utr3p1;Parent=CUFF.18.1.p1
+
+CUFF.19.1	transdecoder	gene	1	2667	.	+	.	ID=GENE.CUFF.19.1~~CUFF.19.1.p1;Name=ORF%20type%3Acomplete%20len%3A648%20%28%2B%29%2Cscore%3D256.22%2CDAK2_SCHPO%7C100.00%7C0.0%2CDak1%7CPF02733.16%7C7.6e-110%2CDak2%7CPF02734.16%7C26%2CDak2%7CPF02734.16%7C6.1e-45%2CHpt%7CPF01627.22%7C0.0013
+CUFF.19.1	transdecoder	mRNA	1	2667	.	+	.	ID=CUFF.19.1.p1;Parent=GENE.CUFF.19.1~~CUFF.19.1.p1;Name=ORF%20type%3Acomplete%20len%3A648%20%28%2B%29%2Cscore%3D256.22%2CDAK2_SCHPO%7C100.00%7C0.0%2CDak1%7CPF02733.16%7C7.6e-110%2CDak2%7CPF02734.16%7C26%2CDak2%7CPF02734.16%7C6.1e-45%2CHpt%7CPF01627.22%7C0.0013
+CUFF.19.1	transdecoder	five_prime_UTR	1	523	.	+	.	ID=CUFF.19.1.p1.utr5p1;Parent=CUFF.19.1.p1
+CUFF.19.1	transdecoder	exon	1	2667	.	+	.	ID=CUFF.19.1.p1.exon1;Parent=CUFF.19.1.p1
+CUFF.19.1	transdecoder	CDS	524	2467	.	+	0	ID=cds.CUFF.19.1.p1;Parent=CUFF.19.1.p1
+CUFF.19.1	transdecoder	three_prime_UTR	2468	2667	.	+	.	ID=CUFF.19.1.p1.utr3p1;Parent=CUFF.19.1.p1
+
+CUFF.2.1	transdecoder	gene	1	1060	.	+	.	ID=GENE.CUFF.2.1~~CUFF.2.1.p1;Name=ORF%20type%3Acomplete%20len%3A124%20%28%2B%29%2Cscore%3D34.34%2CYM0C_SCHPO%7C100.00%7C1e-86%2CTransferase%7CPF02458.14%7C0.00037
+CUFF.2.1	transdecoder	mRNA	1	1060	.	+	.	ID=CUFF.2.1.p1;Parent=GENE.CUFF.2.1~~CUFF.2.1.p1;Name=ORF%20type%3Acomplete%20len%3A124%20%28%2B%29%2Cscore%3D34.34%2CYM0C_SCHPO%7C100.00%7C1e-86%2CTransferase%7CPF02458.14%7C0.00037
+CUFF.2.1	transdecoder	five_prime_UTR	1	576	.	+	.	ID=CUFF.2.1.p1.utr5p1;Parent=CUFF.2.1.p1
+CUFF.2.1	transdecoder	exon	1	1060	.	+	.	ID=CUFF.2.1.p1.exon1;Parent=CUFF.2.1.p1
+CUFF.2.1	transdecoder	CDS	577	948	.	+	0	ID=cds.CUFF.2.1.p1;Parent=CUFF.2.1.p1
+CUFF.2.1	transdecoder	three_prime_UTR	949	1060	.	+	.	ID=CUFF.2.1.p1.utr3p1;Parent=CUFF.2.1.p1
+
+CUFF.20.1	transdecoder	gene	1	3527	.	+	.	ID=GENE.CUFF.20.1~~CUFF.20.1.p1;Name=ORF%20type%3Acomplete%20len%3A599%20%28%2B%29%2Cscore%3D237.55%2CYI7H_SCHPO%7C100.00%7C0.0%2CMIP%7CPF00230.19%7C2.9e-51%2CMDM31_MDM32%7CPF08118.10%7C0.002
+CUFF.20.1	transdecoder	mRNA	1	3527	.	+	.	ID=CUFF.20.1.p1;Parent=GENE.CUFF.20.1~~CUFF.20.1.p1;Name=ORF%20type%3Acomplete%20len%3A599%20%28%2B%29%2Cscore%3D237.55%2CYI7H_SCHPO%7C100.00%7C0.0%2CMIP%7CPF00230.19%7C2.9e-51%2CMDM31_MDM32%7CPF08118.10%7C0.002
+CUFF.20.1	transdecoder	five_prime_UTR	1	907	.	+	.	ID=CUFF.20.1.p1.utr5p1;Parent=CUFF.20.1.p1
+CUFF.20.1	transdecoder	exon	1	3527	.	+	.	ID=CUFF.20.1.p1.exon1;Parent=CUFF.20.1.p1
+CUFF.20.1	transdecoder	CDS	908	2704	.	+	0	ID=cds.CUFF.20.1.p1;Parent=CUFF.20.1.p1
+CUFF.20.1	transdecoder	three_prime_UTR	2705	3527	.	+	.	ID=CUFF.20.1.p1.utr3p1;Parent=CUFF.20.1.p1
+
+CUFF.20.1	transdecoder	gene	1	3527	.	-	.	ID=GENE.CUFF.20.1~~CUFF.20.1.p2;Name=ORF%20type%3A3prime_partial%20len%3A205%20%28-%29%2Cscore%3D77.31%2CDAK2_SCHPO%7C100.00%7C7e-101%2CDak1%7CPF02733.16%7C2.1e-52%2CUsher%7CPF00577.19%7C0.00085
+CUFF.20.1	transdecoder	mRNA	1	3527	.	-	.	ID=CUFF.20.1.p2;Parent=GENE.CUFF.20.1~~CUFF.20.1.p2;Name=ORF%20type%3A3prime_partial%20len%3A205%20%28-%29%2Cscore%3D77.31%2CDAK2_SCHPO%7C100.00%7C7e-101%2CDak1%7CPF02733.16%7C2.1e-52%2CUsher%7CPF00577.19%7C0.00085
+CUFF.20.1	transdecoder	five_prime_UTR	613	3527	.	-	.	ID=CUFF.20.1.p2.utr5p1;Parent=CUFF.20.1.p2
+CUFF.20.1	transdecoder	exon	1	3527	.	-	.	ID=CUFF.20.1.p2.exon1;Parent=CUFF.20.1.p2
+CUFF.20.1	transdecoder	CDS	1	612	.	-	0	ID=cds.CUFF.20.1.p2;Parent=CUFF.20.1.p2
+
+CUFF.24.1	transdecoder	gene	1	2538	.	+	.	ID=GENE.CUFF.24.1~~CUFF.24.1.p1;Name=ORF%20type%3Acomplete%20len%3A556%20%28%2B%29%2Cscore%3D176.20%2CGHT3_SCHPO%7C100.00%7C0.0%2CSugar_tr%7CPF00083.23%7C8.3e-113%2CMFS_1%7CPF07690.15%7C1.6e-16%2CMFS_1%7CPF07690.15%7C1.6e-08%2CMFS_3%7CPF05977.12%7C0.0041
+CUFF.24.1	transdecoder	mRNA	1	2538	.	+	.	ID=CUFF.24.1.p1;Parent=GENE.CUFF.24.1~~CUFF.24.1.p1;Name=ORF%20type%3Acomplete%20len%3A556%20%28%2B%29%2Cscore%3D176.20%2CGHT3_SCHPO%7C100.00%7C0.0%2CSugar_tr%7CPF00083.23%7C8.3e-113%2CMFS_1%7CPF07690.15%7C1.6e-16%2CMFS_1%7CPF07690.15%7C1.6e-08%2CMFS_3%7CPF05977.12%7C0.0041
+CUFF.24.1	transdecoder	five_prime_UTR	1	688	.	+	.	ID=CUFF.24.1.p1.utr5p1;Parent=CUFF.24.1.p1
+CUFF.24.1	transdecoder	exon	1	2538	.	+	.	ID=CUFF.24.1.p1.exon1;Parent=CUFF.24.1.p1
+CUFF.24.1	transdecoder	CDS	689	2356	.	+	0	ID=cds.CUFF.24.1.p1;Parent=CUFF.24.1.p1
+CUFF.24.1	transdecoder	three_prime_UTR	2357	2538	.	+	.	ID=CUFF.24.1.p1.utr3p1;Parent=CUFF.24.1.p1
+
+CUFF.25.1	transdecoder	gene	1	2059	.	+	.	ID=GENE.CUFF.25.1~~CUFF.25.1.p1;Name=ORF%20type%3Acomplete%20len%3A631%20%28%2B%29%2Cscore%3D190.16%2CSTR3_SCHPO%7C100.00%7C0.0%2CMFS_1%7CPF07690.15%7C4.4e-17%2CMFS_1%7CPF07690.15%7C1.6e-08%2CTRI12%7CPF06609.12%7C1.5e-09%2CDUF2976%7CPF11190.7%7C0.00072%2CDUF2976%7CPF11190.7%7C0.97%2CDUF2976%7CPF11190.7%7C16
+CUFF.25.1	transdecoder	mRNA	1	2059	.	+	.	ID=CUFF.25.1.p1;Parent=GENE.CUFF.25.1~~CUFF.25.1.p1;Name=ORF%20type%3Acomplete%20len%3A631%20%28%2B%29%2Cscore%3D190.16%2CSTR3_SCHPO%7C100.00%7C0.0%2CMFS_1%7CPF07690.15%7C4.4e-17%2CMFS_1%7CPF07690.15%7C1.6e-08%2CTRI12%7CPF06609.12%7C1.5e-09%2CDUF2976%7CPF11190.7%7C0.00072%2CDUF2976%7CPF11190.7%7C0.97%2CDUF2976%7CPF11190.7%7C16
+CUFF.25.1	transdecoder	five_prime_UTR	1	23	.	+	.	ID=CUFF.25.1.p1.utr5p1;Parent=CUFF.25.1.p1
+CUFF.25.1	transdecoder	exon	1	2059	.	+	.	ID=CUFF.25.1.p1.exon1;Parent=CUFF.25.1.p1
+CUFF.25.1	transdecoder	CDS	24	1916	.	+	0	ID=cds.CUFF.25.1.p1;Parent=CUFF.25.1.p1
+CUFF.25.1	transdecoder	three_prime_UTR	1917	2059	.	+	.	ID=CUFF.25.1.p1.utr3p1;Parent=CUFF.25.1.p1
+
+CUFF.26.1	transdecoder	gene	1	1468	.	+	.	ID=GENE.CUFF.26.1~~CUFF.26.1.p1;Name=ORF%20type%3A5prime_partial%20len%3A462%20%28%2B%29%2Cscore%3D136.97%2CYDI4_SCHPO%7C100.00%7C0.0%2CAmidohydro_1%7CPF01979.19%7C6.6e-82%2CAmidohydro_3%7CPF07969.10%7C0.0029%2CAmidohydro_3%7CPF07969.10%7C2e-13
+CUFF.26.1	transdecoder	mRNA	1	1468	.	+	.	ID=CUFF.26.1.p1;Parent=GENE.CUFF.26.1~~CUFF.26.1.p1;Name=ORF%20type%3A5prime_partial%20len%3A462%20%28%2B%29%2Cscore%3D136.97%2CYDI4_SCHPO%7C100.00%7C0.0%2CAmidohydro_1%7CPF01979.19%7C6.6e-82%2CAmidohydro_3%7CPF07969.10%7C0.0029%2CAmidohydro_3%7CPF07969.10%7C2e-13
+CUFF.26.1	transdecoder	exon	1	1468	.	+	.	ID=CUFF.26.1.p1.exon1;Parent=CUFF.26.1.p1
+CUFF.26.1	transdecoder	CDS	3	1388	.	+	0	ID=cds.CUFF.26.1.p1;Parent=CUFF.26.1.p1
+CUFF.26.1	transdecoder	three_prime_UTR	1389	1468	.	+	.	ID=CUFF.26.1.p1.utr3p1;Parent=CUFF.26.1.p1
+
+CUFF.27.1	transdecoder	gene	1	2930	.	-	.	ID=GENE.CUFF.27.1~~CUFF.27.1.p1;Name=ORF%20type%3Acomplete%20len%3A464%20%28-%29%2Cscore%3D138.54%2CYDI4_SCHPO%7C100.00%7C0.0%2CAmidohydro_1%7CPF01979.19%7C6.7e-82%2CAmidohydro_3%7CPF07969.10%7C0.0029%2CAmidohydro_3%7CPF07969.10%7C2e-13
+CUFF.27.1	transdecoder	mRNA	1	2930	.	-	.	ID=CUFF.27.1.p1;Parent=GENE.CUFF.27.1~~CUFF.27.1.p1;Name=ORF%20type%3Acomplete%20len%3A464%20%28-%29%2Cscore%3D138.54%2CYDI4_SCHPO%7C100.00%7C0.0%2CAmidohydro_1%7CPF01979.19%7C6.7e-82%2CAmidohydro_3%7CPF07969.10%7C0.0029%2CAmidohydro_3%7CPF07969.10%7C2e-13
+CUFF.27.1	transdecoder	five_prime_UTR	2863	2930	.	-	.	ID=CUFF.27.1.p1.utr5p1;Parent=CUFF.27.1.p1
+CUFF.27.1	transdecoder	exon	1	2930	.	-	.	ID=CUFF.27.1.p1.exon1;Parent=CUFF.27.1.p1
+CUFF.27.1	transdecoder	CDS	1471	2862	.	-	0	ID=cds.CUFF.27.1.p1;Parent=CUFF.27.1.p1
+CUFF.27.1	transdecoder	three_prime_UTR	1	1470	.	-	.	ID=CUFF.27.1.p1.utr3p1;Parent=CUFF.27.1.p1
+
+CUFF.28.1	transdecoder	gene	1	1584	.	-	.	ID=GENE.CUFF.28.1~~CUFF.28.1.p1;Name=ORF%20type%3Acomplete%20len%3A183%20%28-%29%2Cscore%3D96.78%2CISP3_SCHPO%7C100.00%7C1e-136
+CUFF.28.1	transdecoder	mRNA	1	1584	.	-	.	ID=CUFF.28.1.p1;Parent=GENE.CUFF.28.1~~CUFF.28.1.p1;Name=ORF%20type%3Acomplete%20len%3A183%20%28-%29%2Cscore%3D96.78%2CISP3_SCHPO%7C100.00%7C1e-136
+CUFF.28.1	transdecoder	five_prime_UTR	784	1584	.	-	.	ID=CUFF.28.1.p1.utr5p1;Parent=CUFF.28.1.p1
+CUFF.28.1	transdecoder	exon	1	1584	.	-	.	ID=CUFF.28.1.p1.exon1;Parent=CUFF.28.1.p1
+CUFF.28.1	transdecoder	CDS	235	783	.	-	0	ID=cds.CUFF.28.1.p1;Parent=CUFF.28.1.p1
+CUFF.28.1	transdecoder	three_prime_UTR	1	234	.	-	.	ID=CUFF.28.1.p1.utr3p1;Parent=CUFF.28.1.p1
+
+CUFF.29.1	transdecoder	gene	1	1173	.	+	.	ID=GENE.CUFF.29.1~~CUFF.29.1.p1;Name=ORF%20type%3Acomplete%20len%3A183%20%28%2B%29%2Cscore%3D96.78%2CISP3_SCHPO%7C100.00%7C1e-136
+CUFF.29.1	transdecoder	mRNA	1	1173	.	+	.	ID=CUFF.29.1.p1;Parent=GENE.CUFF.29.1~~CUFF.29.1.p1;Name=ORF%20type%3Acomplete%20len%3A183%20%28%2B%29%2Cscore%3D96.78%2CISP3_SCHPO%7C100.00%7C1e-136
+CUFF.29.1	transdecoder	five_prime_UTR	1	199	.	+	.	ID=CUFF.29.1.p1.utr5p1;Parent=CUFF.29.1.p1
+CUFF.29.1	transdecoder	exon	1	1173	.	+	.	ID=CUFF.29.1.p1.exon1;Parent=CUFF.29.1.p1
+CUFF.29.1	transdecoder	CDS	200	748	.	+	0	ID=cds.CUFF.29.1.p1;Parent=CUFF.29.1.p1
+CUFF.29.1	transdecoder	three_prime_UTR	749	1173	.	+	.	ID=CUFF.29.1.p1.utr3p1;Parent=CUFF.29.1.p1
+
+CUFF.3.1	transdecoder	gene	1	1353	.	+	.	ID=GENE.CUFF.3.1~~CUFF.3.1.p1;Name=ORF%20type%3Acomplete%20len%3A289%20%28%2B%29%2Cscore%3D105.34%2CYM04_SCHPO%7C100.00%7C0.0%2CDUF999%7CPF06198.10%7C1.9e-90
+CUFF.3.1	transdecoder	mRNA	1	1353	.	+	.	ID=CUFF.3.1.p1;Parent=GENE.CUFF.3.1~~CUFF.3.1.p1;Name=ORF%20type%3Acomplete%20len%3A289%20%28%2B%29%2Cscore%3D105.34%2CYM04_SCHPO%7C100.00%7C0.0%2CDUF999%7CPF06198.10%7C1.9e-90
+CUFF.3.1	transdecoder	five_prime_UTR	1	206	.	+	.	ID=CUFF.3.1.p1.utr5p1;Parent=CUFF.3.1.p1
+CUFF.3.1	transdecoder	exon	1	1353	.	+	.	ID=CUFF.3.1.p1.exon1;Parent=CUFF.3.1.p1
+CUFF.3.1	transdecoder	CDS	207	1073	.	+	0	ID=cds.CUFF.3.1.p1;Parent=CUFF.3.1.p1
+CUFF.3.1	transdecoder	three_prime_UTR	1074	1353	.	+	.	ID=CUFF.3.1.p1.utr3p1;Parent=CUFF.3.1.p1
+
+CUFF.30.1	transdecoder	gene	1	1680	.	-	.	ID=GENE.CUFF.30.1~~CUFF.30.1.p1;Name=ORF%20type%3A3prime_partial%20len%3A336%20%28-%29%2Cscore%3D102.74%2CFTA5_SCHPO%7C100.00%7C0.0%2CGLEYA%7CPF10528.8%7C2e-18
+CUFF.30.1	transdecoder	mRNA	1	1680	.	-	.	ID=CUFF.30.1.p1;Parent=GENE.CUFF.30.1~~CUFF.30.1.p1;Name=ORF%20type%3A3prime_partial%20len%3A336%20%28-%29%2Cscore%3D102.74%2CFTA5_SCHPO%7C100.00%7C0.0%2CGLEYA%7CPF10528.8%7C2e-18
+CUFF.30.1	transdecoder	five_prime_UTR	1008	1680	.	-	.	ID=CUFF.30.1.p1.utr5p1;Parent=CUFF.30.1.p1
+CUFF.30.1	transdecoder	exon	1	1680	.	-	.	ID=CUFF.30.1.p1.exon1;Parent=CUFF.30.1.p1
+CUFF.30.1	transdecoder	CDS	3	1007	.	-	0	ID=cds.CUFF.30.1.p1;Parent=CUFF.30.1.p1
+
+CUFF.30.2	transdecoder	gene	1	1422	.	-	.	ID=GENE.CUFF.30.2~~CUFF.30.2.p1;Name=ORF%20type%3A3prime_partial%20len%3A250%20%28-%29%2Cscore%3D79.35%2CFTA5_SCHPO%7C99.35%7C2e-114%2CGLEYA%7CPF10528.8%7C69%2CGLEYA%7CPF10528.8%7C32%2CGLEYA%7CPF10528.8%7C1.2e-18
+CUFF.30.2	transdecoder	mRNA	1	1422	.	-	.	ID=CUFF.30.2.p1;Parent=GENE.CUFF.30.2~~CUFF.30.2.p1;Name=ORF%20type%3A3prime_partial%20len%3A250%20%28-%29%2Cscore%3D79.35%2CFTA5_SCHPO%7C99.35%7C2e-114%2CGLEYA%7CPF10528.8%7C69%2CGLEYA%7CPF10528.8%7C32%2CGLEYA%7CPF10528.8%7C1.2e-18
+CUFF.30.2	transdecoder	five_prime_UTR	750	1422	.	-	.	ID=CUFF.30.2.p1.utr5p1;Parent=CUFF.30.2.p1
+CUFF.30.2	transdecoder	exon	1	1422	.	-	.	ID=CUFF.30.2.p1.exon1;Parent=CUFF.30.2.p1
+CUFF.30.2	transdecoder	CDS	3	749	.	-	0	ID=cds.CUFF.30.2.p1;Parent=CUFF.30.2.p1
+
+CUFF.31.1	transdecoder	gene	1	1623	.	+	.	ID=GENE.CUFF.31.1~~CUFF.31.1.p1;Name=ORF%20type%3Acomplete%20len%3A386%20%28%2B%29%2Cscore%3D121.18%2CFTA5_SCHPO%7C100.00%7C0.0%2CGLEYA%7CPF10528.8%7C2.1e-20
+CUFF.31.1	transdecoder	mRNA	1	1623	.	+	.	ID=CUFF.31.1.p1;Parent=GENE.CUFF.31.1~~CUFF.31.1.p1;Name=ORF%20type%3Acomplete%20len%3A386%20%28%2B%29%2Cscore%3D121.18%2CFTA5_SCHPO%7C100.00%7C0.0%2CGLEYA%7CPF10528.8%7C2.1e-20
+CUFF.31.1	transdecoder	five_prime_UTR	1	243	.	+	.	ID=CUFF.31.1.p1.utr5p1;Parent=CUFF.31.1.p1
+CUFF.31.1	transdecoder	exon	1	1623	.	+	.	ID=CUFF.31.1.p1.exon1;Parent=CUFF.31.1.p1
+CUFF.31.1	transdecoder	CDS	244	1401	.	+	0	ID=cds.CUFF.31.1.p1;Parent=CUFF.31.1.p1
+CUFF.31.1	transdecoder	three_prime_UTR	1402	1623	.	+	.	ID=CUFF.31.1.p1.utr3p1;Parent=CUFF.31.1.p1
+
+CUFF.32.1	transdecoder	gene	1	3144	.	+	.	ID=GENE.CUFF.32.1~~CUFF.32.1.p1;Name=ORF%20type%3Acomplete%20len%3A595%20%28%2B%29%2Cscore%3D276.17%2CPDC2_SCHPO%7C98.94%7C0.0%2CTPP_enzyme_N%7CPF02776.17%7C1.6e-37%2CTPP_enzyme_N%7CPF02776.17%7C0.59%2CTPP_enzyme_C%7CPF02775.20%7C0.9%2CTPP_enzyme_C%7CPF02775.20%7C55%2CTPP_enzyme_C%7CPF02775.20%7C2.8e-25%2CTPP_enzyme_M%7CPF00205.21%7C8.6e-24%2CCO_dh%7CPF02552.15%7C11%2CCO_dh%7CPF02552.15%7C2.9e-06
+CUFF.32.1	transdecoder	mRNA	1	3144	.	+	.	ID=CUFF.32.1.p1;Parent=GENE.CUFF.32.1~~CUFF.32.1.p1;Name=ORF%20type%3Acomplete%20len%3A595%20%28%2B%29%2Cscore%3D276.17%2CPDC2_SCHPO%7C98.94%7C0.0%2CTPP_enzyme_N%7CPF02776.17%7C1.6e-37%2CTPP_enzyme_N%7CPF02776.17%7C0.59%2CTPP_enzyme_C%7CPF02775.20%7C0.9%2CTPP_enzyme_C%7CPF02775.20%7C55%2CTPP_enzyme_C%7CPF02775.20%7C2.8e-25%2CTPP_enzyme_M%7CPF00205.21%7C8.6e-24%2CCO_dh%7CPF02552.15%7C11%2CCO_dh%7CPF02552.15%7C2.9e-06
+CUFF.32.1	transdecoder	five_prime_UTR	1	1307	.	+	.	ID=CUFF.32.1.p1.utr5p1;Parent=CUFF.32.1.p1
+CUFF.32.1	transdecoder	exon	1	3144	.	+	.	ID=CUFF.32.1.p1.exon1;Parent=CUFF.32.1.p1
+CUFF.32.1	transdecoder	CDS	1308	3092	.	+	0	ID=cds.CUFF.32.1.p1;Parent=CUFF.32.1.p1
+CUFF.32.1	transdecoder	three_prime_UTR	3093	3144	.	+	.	ID=CUFF.32.1.p1.utr3p1;Parent=CUFF.32.1.p1
+
+CUFF.32.1	transdecoder	gene	1	3144	.	-	.	ID=GENE.CUFF.32.1~~CUFF.32.1.p3;Name=ORF%20type%3Acomplete%20len%3A121%20%28-%29%2Cscore%3D33.11%2CYDI8_SCHPO%7C100.00%7C4e-86%2CDUF3288%7CPF11691.7%7C0.00016
+CUFF.32.1	transdecoder	mRNA	1	3144	.	-	.	ID=CUFF.32.1.p3;Parent=GENE.CUFF.32.1~~CUFF.32.1.p3;Name=ORF%20type%3Acomplete%20len%3A121%20%28-%29%2Cscore%3D33.11%2CYDI8_SCHPO%7C100.00%7C4e-86%2CDUF3288%7CPF11691.7%7C0.00016
+CUFF.32.1	transdecoder	five_prime_UTR	912	3144	.	-	.	ID=CUFF.32.1.p3.utr5p1;Parent=CUFF.32.1.p3
+CUFF.32.1	transdecoder	exon	1	3144	.	-	.	ID=CUFF.32.1.p3.exon1;Parent=CUFF.32.1.p3
+CUFF.32.1	transdecoder	CDS	549	911	.	-	0	ID=cds.CUFF.32.1.p3;Parent=CUFF.32.1.p3
+CUFF.32.1	transdecoder	three_prime_UTR	1	548	.	-	.	ID=CUFF.32.1.p3.utr3p1;Parent=CUFF.32.1.p3
+
+CUFF.34.1	transdecoder	gene	1	2536	.	-	.	ID=GENE.CUFF.34.1~~CUFF.34.1.p1;Name=ORF%20type%3Acomplete%20len%3A303%20%28-%29%2Cscore%3D84.74%2CYAO3_SCHPO%7C100.00%7C0.0%2CDUF1989%7CPF09347.9%7C2.5e-57
+CUFF.34.1	transdecoder	mRNA	1	2536	.	-	.	ID=CUFF.34.1.p1;Parent=GENE.CUFF.34.1~~CUFF.34.1.p1;Name=ORF%20type%3Acomplete%20len%3A303%20%28-%29%2Cscore%3D84.74%2CYAO3_SCHPO%7C100.00%7C0.0%2CDUF1989%7CPF09347.9%7C2.5e-57
+CUFF.34.1	transdecoder	five_prime_UTR	2073	2536	.	-	.	ID=CUFF.34.1.p1.utr5p1;Parent=CUFF.34.1.p1
+CUFF.34.1	transdecoder	exon	1	2536	.	-	.	ID=CUFF.34.1.p1.exon1;Parent=CUFF.34.1.p1
+CUFF.34.1	transdecoder	CDS	1164	2072	.	-	0	ID=cds.CUFF.34.1.p1;Parent=CUFF.34.1.p1
+CUFF.34.1	transdecoder	three_prime_UTR	1	1163	.	-	.	ID=CUFF.34.1.p1.utr3p1;Parent=CUFF.34.1.p1
+
+CUFF.34.1	transdecoder	gene	1	2536	.	-	.	ID=GENE.CUFF.34.1~~CUFF.34.1.p2;Name=ORF%20type%3A3prime_partial%20len%3A147%20%28-%29%2Cscore%3D44.27%2CYAO2_SCHPO%7C100.00%7C4e-108%2CAcetyltransf_10%7CPF13673.6%7C2.4e-20%2CAcetyltransf_1%7CPF00583.24%7C6.9e-15%2CAcetyltransf_7%7CPF13508.6%7C7e-13%2CAcetyltransf_9%7CPF13527.6%7C1e-06%2CAcetyltransf_5%7CPF13444.5%7C1.2e-06%2CAcetyltransf_15%7CPF17013.4%7C1.5e-05%2CFR47%7CPF08445.9%7C1.1e-05%2CAcetyltransf_CG%7CPF14542.5%7C2.8e-05%2CGNAT_acetyltr_2%7CPF13718.5%7C0.00051
+CUFF.34.1	transdecoder	mRNA	1	2536	.	-	.	ID=CUFF.34.1.p2;Parent=GENE.CUFF.34.1~~CUFF.34.1.p2;Name=ORF%20type%3A3prime_partial%20len%3A147%20%28-%29%2Cscore%3D44.27%2CYAO2_SCHPO%7C100.00%7C4e-108%2CAcetyltransf_10%7CPF13673.6%7C2.4e-20%2CAcetyltransf_1%7CPF00583.24%7C6.9e-15%2CAcetyltransf_7%7CPF13508.6%7C7e-13%2CAcetyltransf_9%7CPF13527.6%7C1e-06%2CAcetyltransf_5%7CPF13444.5%7C1.2e-06%2CAcetyltransf_15%7CPF17013.4%7C1.5e-05%2CFR47%7CPF08445.9%7C1.1e-05%2CAcetyltransf_CG%7CPF14542.5%7C2.8e-05%2CGNAT_acetyltr_2%7CPF13718.5%7C0.00051
+CUFF.34.1	transdecoder	five_prime_UTR	441	2536	.	-	.	ID=CUFF.34.1.p2.utr5p1;Parent=CUFF.34.1.p2
+CUFF.34.1	transdecoder	exon	1	2536	.	-	.	ID=CUFF.34.1.p2.exon1;Parent=CUFF.34.1.p2
+CUFF.34.1	transdecoder	CDS	3	440	.	-	0	ID=cds.CUFF.34.1.p2;Parent=CUFF.34.1.p2
+
+CUFF.35.1	transdecoder	gene	1	1885	.	+	.	ID=GENE.CUFF.35.1~~CUFF.35.1.p1;Name=ORF%20type%3Acomplete%20len%3A151%20%28%2B%29%2Cscore%3D43.82%2CYAO2_SCHPO%7C100.00%7C6e-111%2CAcetyltransf_10%7CPF13673.6%7C6.5e-22%2CAcetyltransf_1%7CPF00583.24%7C7.7e-15%2CAcetyltransf_7%7CPF13508.6%7C7.7e-13%2CAcetyltransf_9%7CPF13527.6%7C1.1e-06%2CAcetyltransf_5%7CPF13444.5%7C1.6e-06%2CAcetyltransf_15%7CPF17013.4%7C3.7e-06%2CFR47%7CPF08445.9%7C1.2e-05%2CAcetyltransf_CG%7CPF14542.5%7C3.1e-05%2CGNAT_acetyltr_2%7CPF13718.5%7C0.00053
+CUFF.35.1	transdecoder	mRNA	1	1885	.	+	.	ID=CUFF.35.1.p1;Parent=GENE.CUFF.35.1~~CUFF.35.1.p1;Name=ORF%20type%3Acomplete%20len%3A151%20%28%2B%29%2Cscore%3D43.82%2CYAO2_SCHPO%7C100.00%7C6e-111%2CAcetyltransf_10%7CPF13673.6%7C6.5e-22%2CAcetyltransf_1%7CPF00583.24%7C7.7e-15%2CAcetyltransf_7%7CPF13508.6%7C7.7e-13%2CAcetyltransf_9%7CPF13527.6%7C1.1e-06%2CAcetyltransf_5%7CPF13444.5%7C1.6e-06%2CAcetyltransf_15%7CPF17013.4%7C3.7e-06%2CFR47%7CPF08445.9%7C1.2e-05%2CAcetyltransf_CG%7CPF14542.5%7C3.1e-05%2CGNAT_acetyltr_2%7CPF13718.5%7C0.00053
+CUFF.35.1	transdecoder	five_prime_UTR	1	541	.	+	.	ID=CUFF.35.1.p1.utr5p1;Parent=CUFF.35.1.p1
+CUFF.35.1	transdecoder	exon	1	1885	.	+	.	ID=CUFF.35.1.p1.exon1;Parent=CUFF.35.1.p1
+CUFF.35.1	transdecoder	CDS	542	994	.	+	0	ID=cds.CUFF.35.1.p1;Parent=CUFF.35.1.p1
+CUFF.35.1	transdecoder	three_prime_UTR	995	1885	.	+	.	ID=CUFF.35.1.p1.utr3p1;Parent=CUFF.35.1.p1
+
+CUFF.36.1	transdecoder	gene	1	1498	.	+	.	ID=GENE.CUFF.36.1~~CUFF.36.1.p1;Name=ORF%20type%3Acomplete%20len%3A131%20%28%2B%29%2Cscore%3D39.07%2CYAO4_SCHPO%7C100.00%7C1e-93%2CSnoaL_2%7CPF12680.6%7C1e-11%2CSnoaL%7CPF07366.11%7C0.077%2CSnoaL%7CPF07366.11%7C5.1e-07
+CUFF.36.1	transdecoder	mRNA	1	1498	.	+	.	ID=CUFF.36.1.p1;Parent=GENE.CUFF.36.1~~CUFF.36.1.p1;Name=ORF%20type%3Acomplete%20len%3A131%20%28%2B%29%2Cscore%3D39.07%2CYAO4_SCHPO%7C100.00%7C1e-93%2CSnoaL_2%7CPF12680.6%7C1e-11%2CSnoaL%7CPF07366.11%7C0.077%2CSnoaL%7CPF07366.11%7C5.1e-07
+CUFF.36.1	transdecoder	five_prime_UTR	1	894	.	+	.	ID=CUFF.36.1.p1.utr5p1;Parent=CUFF.36.1.p1
+CUFF.36.1	transdecoder	exon	1	1498	.	+	.	ID=CUFF.36.1.p1.exon1;Parent=CUFF.36.1.p1
+CUFF.36.1	transdecoder	CDS	895	1287	.	+	0	ID=cds.CUFF.36.1.p1;Parent=CUFF.36.1.p1
+CUFF.36.1	transdecoder	three_prime_UTR	1288	1498	.	+	.	ID=CUFF.36.1.p1.utr3p1;Parent=CUFF.36.1.p1
+
+CUFF.37.1	transdecoder	gene	1	1971	.	+	.	ID=GENE.CUFF.37.1~~CUFF.37.1.p1;Name=ORF%20type%3Acomplete%20len%3A547%20%28%2B%29%2Cscore%3D181.37%2CMFS2_SCHPO%7C100.00%7C0.0%2CMFS_1%7CPF07690.15%7C1.7e-41%2CMFS_1%7CPF07690.15%7C5.9%2CSugar_tr%7CPF00083.23%7C1.6e-09%2CMFS_4%7CPF06779.13%7C6.3%2CMFS_4%7CPF06779.13%7C2e-05%2CMFS_4%7CPF06779.13%7C0.14
+CUFF.37.1	transdecoder	mRNA	1	1971	.	+	.	ID=CUFF.37.1.p1;Parent=GENE.CUFF.37.1~~CUFF.37.1.p1;Name=ORF%20type%3Acomplete%20len%3A547%20%28%2B%29%2Cscore%3D181.37%2CMFS2_SCHPO%7C100.00%7C0.0%2CMFS_1%7CPF07690.15%7C1.7e-41%2CMFS_1%7CPF07690.15%7C5.9%2CSugar_tr%7CPF00083.23%7C1.6e-09%2CMFS_4%7CPF06779.13%7C6.3%2CMFS_4%7CPF06779.13%7C2e-05%2CMFS_4%7CPF06779.13%7C0.14
+CUFF.37.1	transdecoder	five_prime_UTR	1	194	.	+	.	ID=CUFF.37.1.p1.utr5p1;Parent=CUFF.37.1.p1
+CUFF.37.1	transdecoder	exon	1	1971	.	+	.	ID=CUFF.37.1.p1.exon1;Parent=CUFF.37.1.p1
+CUFF.37.1	transdecoder	CDS	195	1835	.	+	0	ID=cds.CUFF.37.1.p1;Parent=CUFF.37.1.p1
+CUFF.37.1	transdecoder	three_prime_UTR	1836	1971	.	+	.	ID=CUFF.37.1.p1.utr3p1;Parent=CUFF.37.1.p1
+
+CUFF.38.1	transdecoder	gene	1	7903	.	+	.	ID=GENE.CUFF.38.1~~CUFF.38.1.p2;Name=ORF%20type%3Acomplete%20len%3A551%20%28%2B%29%2Cscore%3D186.72%2CYAO8_SCHPO%7C100.00%7C0.0%2CAA_permease_2%7CPF13520.5%7C3.2e-56%2CAA_permease%7CPF00324.20%7C9.1e-25
+CUFF.38.1	transdecoder	mRNA	1	7903	.	+	.	ID=CUFF.38.1.p2;Parent=GENE.CUFF.38.1~~CUFF.38.1.p2;Name=ORF%20type%3Acomplete%20len%3A551%20%28%2B%29%2Cscore%3D186.72%2CYAO8_SCHPO%7C100.00%7C0.0%2CAA_permease_2%7CPF13520.5%7C3.2e-56%2CAA_permease%7CPF00324.20%7C9.1e-25
+CUFF.38.1	transdecoder	five_prime_UTR	1	1758	.	+	.	ID=CUFF.38.1.p2.utr5p1;Parent=CUFF.38.1.p2
+CUFF.38.1	transdecoder	exon	1	7903	.	+	.	ID=CUFF.38.1.p2.exon1;Parent=CUFF.38.1.p2
+CUFF.38.1	transdecoder	CDS	1759	3411	.	+	0	ID=cds.CUFF.38.1.p2;Parent=CUFF.38.1.p2
+CUFF.38.1	transdecoder	three_prime_UTR	3412	7903	.	+	.	ID=CUFF.38.1.p2.utr3p1;Parent=CUFF.38.1.p2
+
+CUFF.38.1	transdecoder	gene	1	7903	.	+	.	ID=GENE.CUFF.38.1~~CUFF.38.1.p1;Name=ORF%20type%3Acomplete%20len%3A638%20%28%2B%29%2Cscore%3D186.05%2CYAO7_SCHPO%7C100.00%7C0.0%2CFungal_trans%7CPF04082.17%7C5.6e-27%2CFungal_trans%7CPF04082.17%7C1%2CZn_clus%7CPF00172.17%7C1.5e-09
+CUFF.38.1	transdecoder	mRNA	1	7903	.	+	.	ID=CUFF.38.1.p1;Parent=GENE.CUFF.38.1~~CUFF.38.1.p1;Name=ORF%20type%3Acomplete%20len%3A638%20%28%2B%29%2Cscore%3D186.05%2CYAO7_SCHPO%7C100.00%7C0.0%2CFungal_trans%7CPF04082.17%7C5.6e-27%2CFungal_trans%7CPF04082.17%7C1%2CZn_clus%7CPF00172.17%7C1.5e-09
+CUFF.38.1	transdecoder	five_prime_UTR	1	3858	.	+	.	ID=CUFF.38.1.p1.utr5p1;Parent=CUFF.38.1.p1
+CUFF.38.1	transdecoder	exon	1	7903	.	+	.	ID=CUFF.38.1.p1.exon1;Parent=CUFF.38.1.p1
+CUFF.38.1	transdecoder	CDS	3859	5772	.	+	0	ID=cds.CUFF.38.1.p1;Parent=CUFF.38.1.p1
+CUFF.38.1	transdecoder	three_prime_UTR	5773	7903	.	+	.	ID=CUFF.38.1.p1.utr3p1;Parent=CUFF.38.1.p1
+
+CUFF.38.1	transdecoder	gene	1	7903	.	-	.	ID=GENE.CUFF.38.1~~CUFF.38.1.p4;Name=ORF%20type%3A3prime_partial%20len%3A375%20%28-%29%2Cscore%3D139.90%2CSPEB1_SCHPO%7C100.00%7C0.0%2CArginase%7CPF00491.20%7C4.2e-91%2CUPF0489%7CPF12640.6%7C0.0012
+CUFF.38.1	transdecoder	mRNA	1	7903	.	-	.	ID=CUFF.38.1.p4;Parent=GENE.CUFF.38.1~~CUFF.38.1.p4;Name=ORF%20type%3A3prime_partial%20len%3A375%20%28-%29%2Cscore%3D139.90%2CSPEB1_SCHPO%7C100.00%7C0.0%2CArginase%7CPF00491.20%7C4.2e-91%2CUPF0489%7CPF12640.6%7C0.0012
+CUFF.38.1	transdecoder	five_prime_UTR	1123	7903	.	-	.	ID=CUFF.38.1.p4.utr5p1;Parent=CUFF.38.1.p4
+CUFF.38.1	transdecoder	exon	1	7903	.	-	.	ID=CUFF.38.1.p4.exon1;Parent=CUFF.38.1.p4
+CUFF.38.1	transdecoder	CDS	1	1122	.	-	0	ID=cds.CUFF.38.1.p4;Parent=CUFF.38.1.p4
+
+CUFF.38.1	transdecoder	gene	1	7903	.	-	.	ID=GENE.CUFF.38.1~~CUFF.38.1.p3;Name=ORF%20type%3Acomplete%20len%3A456%20%28-%29%2Cscore%3D135.99%2CYAO6_SCHPO%7C100.00%7C0.0%2CMatE%7CPF01554.17%7C9.2e-38%2CMatE%7CPF01554.17%7C8.6e-28%2CPolysacc_synt_C%7CPF14667.5%7C20%2CPolysacc_synt_C%7CPF14667.5%7C2.1e-09%2CPolysacc_synt_C%7CPF14667.5%7C8.5%2CPolysacc_synt_C%7CPF14667.5%7C0.075
+CUFF.38.1	transdecoder	mRNA	1	7903	.	-	.	ID=CUFF.38.1.p3;Parent=GENE.CUFF.38.1~~CUFF.38.1.p3;Name=ORF%20type%3Acomplete%20len%3A456%20%28-%29%2Cscore%3D135.99%2CYAO6_SCHPO%7C100.00%7C0.0%2CMatE%7CPF01554.17%7C9.2e-38%2CMatE%7CPF01554.17%7C8.6e-28%2CPolysacc_synt_C%7CPF14667.5%7C20%2CPolysacc_synt_C%7CPF14667.5%7C2.1e-09%2CPolysacc_synt_C%7CPF14667.5%7C8.5%2CPolysacc_synt_C%7CPF14667.5%7C0.075
+CUFF.38.1	transdecoder	five_prime_UTR	7275	7903	.	-	.	ID=CUFF.38.1.p3.utr5p1;Parent=CUFF.38.1.p3
+CUFF.38.1	transdecoder	exon	1	7903	.	-	.	ID=CUFF.38.1.p3.exon1;Parent=CUFF.38.1.p3
+CUFF.38.1	transdecoder	CDS	5907	7274	.	-	0	ID=cds.CUFF.38.1.p3;Parent=CUFF.38.1.p3
+CUFF.38.1	transdecoder	three_prime_UTR	1	5906	.	-	.	ID=CUFF.38.1.p3.utr3p1;Parent=CUFF.38.1.p3
+
+CUFF.39.1	transdecoder	gene	1	1829	.	+	.	ID=GENE.CUFF.39.1~~CUFF.39.1.p1;Name=ORF%20type%3Acomplete%20len%3A456%20%28%2B%29%2Cscore%3D135.99%2CYAO6_SCHPO%7C100.00%7C0.0%2CMatE%7CPF01554.17%7C9.2e-38%2CMatE%7CPF01554.17%7C8.6e-28%2CPolysacc_synt_C%7CPF14667.5%7C20%2CPolysacc_synt_C%7CPF14667.5%7C2.1e-09%2CPolysacc_synt_C%7CPF14667.5%7C8.5%2CPolysacc_synt_C%7CPF14667.5%7C0.075
+CUFF.39.1	transdecoder	mRNA	1	1829	.	+	.	ID=CUFF.39.1.p1;Parent=GENE.CUFF.39.1~~CUFF.39.1.p1;Name=ORF%20type%3Acomplete%20len%3A456%20%28%2B%29%2Cscore%3D135.99%2CYAO6_SCHPO%7C100.00%7C0.0%2CMatE%7CPF01554.17%7C9.2e-38%2CMatE%7CPF01554.17%7C8.6e-28%2CPolysacc_synt_C%7CPF14667.5%7C20%2CPolysacc_synt_C%7CPF14667.5%7C2.1e-09%2CPolysacc_synt_C%7CPF14667.5%7C8.5%2CPolysacc_synt_C%7CPF14667.5%7C0.075
+CUFF.39.1	transdecoder	five_prime_UTR	1	341	.	+	.	ID=CUFF.39.1.p1.utr5p1;Parent=CUFF.39.1.p1
+CUFF.39.1	transdecoder	exon	1	1829	.	+	.	ID=CUFF.39.1.p1.exon1;Parent=CUFF.39.1.p1
+CUFF.39.1	transdecoder	CDS	342	1709	.	+	0	ID=cds.CUFF.39.1.p1;Parent=CUFF.39.1.p1
+CUFF.39.1	transdecoder	three_prime_UTR	1710	1829	.	+	.	ID=CUFF.39.1.p1.utr3p1;Parent=CUFF.39.1.p1
+
+CUFF.4.1	transdecoder	gene	1	555	.	+	.	ID=GENE.CUFF.4.1~~CUFF.4.1.p1;Name=ORF%20type%3A3prime_partial%20len%3A120%20%28%2B%29%2Cscore%3D38.56%2CYP42_SCHPO%7C100.00%7C3e-85
+CUFF.4.1	transdecoder	mRNA	1	555	.	+	.	ID=CUFF.4.1.p1;Parent=GENE.CUFF.4.1~~CUFF.4.1.p1;Name=ORF%20type%3A3prime_partial%20len%3A120%20%28%2B%29%2Cscore%3D38.56%2CYP42_SCHPO%7C100.00%7C3e-85
+CUFF.4.1	transdecoder	five_prime_UTR	1	198	.	+	.	ID=CUFF.4.1.p1.utr5p1;Parent=CUFF.4.1.p1
+CUFF.4.1	transdecoder	exon	1	555	.	+	.	ID=CUFF.4.1.p1.exon1;Parent=CUFF.4.1.p1
+CUFF.4.1	transdecoder	CDS	199	555	.	+	0	ID=cds.CUFF.4.1.p1;Parent=CUFF.4.1.p1
+
+CUFF.40.1	transdecoder	gene	1	3847	.	+	.	ID=GENE.CUFF.40.1~~CUFF.40.1.p1;Name=ORF%20type%3Acomplete%20len%3A435%20%28%2B%29%2Cscore%3D139.45%2CYAOA_SCHPO%7C100.00%7C0.0%2CAminotran_5%7CPF00266.18%7C1.1e-46%2CAminotran_1_2%7CPF00155.20%7C9e-06
+CUFF.40.1	transdecoder	mRNA	1	3847	.	+	.	ID=CUFF.40.1.p1;Parent=GENE.CUFF.40.1~~CUFF.40.1.p1;Name=ORF%20type%3Acomplete%20len%3A435%20%28%2B%29%2Cscore%3D139.45%2CYAOA_SCHPO%7C100.00%7C0.0%2CAminotran_5%7CPF00266.18%7C1.1e-46%2CAminotran_1_2%7CPF00155.20%7C9e-06
+CUFF.40.1	transdecoder	five_prime_UTR	1	315	.	+	.	ID=CUFF.40.1.p1.utr5p1;Parent=CUFF.40.1.p1
+CUFF.40.1	transdecoder	exon	1	3847	.	+	.	ID=CUFF.40.1.p1.exon1;Parent=CUFF.40.1.p1
+CUFF.40.1	transdecoder	CDS	316	1620	.	+	0	ID=cds.CUFF.40.1.p1;Parent=CUFF.40.1.p1
+CUFF.40.1	transdecoder	three_prime_UTR	1621	3847	.	+	.	ID=CUFF.40.1.p1.utr3p1;Parent=CUFF.40.1.p1
+
+CUFF.40.1	transdecoder	gene	1	3847	.	-	.	ID=GENE.CUFF.40.1~~CUFF.40.1.p2;Name=ORF%20type%3Acomplete%20len%3A326%20%28-%29%2Cscore%3D101.39%2CYAOB_SCHPO%7C100.00%7C0.0%2CFungal_trans%7CPF04082.17%7C2.8e-42
+CUFF.40.1	transdecoder	mRNA	1	3847	.	-	.	ID=CUFF.40.1.p2;Parent=GENE.CUFF.40.1~~CUFF.40.1.p2;Name=ORF%20type%3Acomplete%20len%3A326%20%28-%29%2Cscore%3D101.39%2CYAOB_SCHPO%7C100.00%7C0.0%2CFungal_trans%7CPF04082.17%7C2.8e-42
+CUFF.40.1	transdecoder	five_prime_UTR	3737	3847	.	-	.	ID=CUFF.40.1.p2.utr5p1;Parent=CUFF.40.1.p2
+CUFF.40.1	transdecoder	exon	1	3847	.	-	.	ID=CUFF.40.1.p2.exon1;Parent=CUFF.40.1.p2
+CUFF.40.1	transdecoder	CDS	2759	3736	.	-	0	ID=cds.CUFF.40.1.p2;Parent=CUFF.40.1.p2
+CUFF.40.1	transdecoder	three_prime_UTR	1	2758	.	-	.	ID=CUFF.40.1.p2.utr3p1;Parent=CUFF.40.1.p2
+
+CUFF.40.1	transdecoder	gene	1	3847	.	-	.	ID=GENE.CUFF.40.1~~CUFF.40.1.p3;Name=ORF%20type%3Acomplete%20len%3A295%20%28-%29%2Cscore%3D62.23%2CYCV2_SCHPO%7C46.88%7C4e-68%2CREPA_OB_2%7CPF16900.4%7C0.0011
+CUFF.40.1	transdecoder	mRNA	1	3847	.	-	.	ID=CUFF.40.1.p3;Parent=GENE.CUFF.40.1~~CUFF.40.1.p3;Name=ORF%20type%3Acomplete%20len%3A295%20%28-%29%2Cscore%3D62.23%2CYCV2_SCHPO%7C46.88%7C4e-68%2CREPA_OB_2%7CPF16900.4%7C0.0011
+CUFF.40.1	transdecoder	five_prime_UTR	2784	3847	.	-	.	ID=CUFF.40.1.p3.utr5p1;Parent=CUFF.40.1.p3
+CUFF.40.1	transdecoder	exon	1	3847	.	-	.	ID=CUFF.40.1.p3.exon1;Parent=CUFF.40.1.p3
+CUFF.40.1	transdecoder	CDS	1899	2783	.	-	0	ID=cds.CUFF.40.1.p3;Parent=CUFF.40.1.p3
+CUFF.40.1	transdecoder	three_prime_UTR	1	1898	.	-	.	ID=CUFF.40.1.p3.utr3p1;Parent=CUFF.40.1.p3
+
+CUFF.41.1	transdecoder	gene	1	2779	.	+	.	ID=GENE.CUFF.41.1~~CUFF.41.1.p1;Name=ORF%20type%3Acomplete%20len%3A326%20%28%2B%29%2Cscore%3D101.39%2CYAOB_SCHPO%7C100.00%7C0.0%2CFungal_trans%7CPF04082.17%7C2.8e-42
+CUFF.41.1	transdecoder	mRNA	1	2779	.	+	.	ID=CUFF.41.1.p1;Parent=GENE.CUFF.41.1~~CUFF.41.1.p1;Name=ORF%20type%3Acomplete%20len%3A326%20%28%2B%29%2Cscore%3D101.39%2CYAOB_SCHPO%7C100.00%7C0.0%2CFungal_trans%7CPF04082.17%7C2.8e-42
+CUFF.41.1	transdecoder	five_prime_UTR	1	302	.	+	.	ID=CUFF.41.1.p1.utr5p1;Parent=CUFF.41.1.p1
+CUFF.41.1	transdecoder	exon	1	2779	.	+	.	ID=CUFF.41.1.p1.exon1;Parent=CUFF.41.1.p1
+CUFF.41.1	transdecoder	CDS	303	1280	.	+	0	ID=cds.CUFF.41.1.p1;Parent=CUFF.41.1.p1
+CUFF.41.1	transdecoder	three_prime_UTR	1281	2779	.	+	.	ID=CUFF.41.1.p1.utr3p1;Parent=CUFF.41.1.p1
+
+CUFF.41.1	transdecoder	gene	1	2779	.	+	.	ID=GENE.CUFF.41.1~~CUFF.41.1.p2;Name=ORF%20type%3Acomplete%20len%3A295%20%28%2B%29%2Cscore%3D62.23%2CYCV2_SCHPO%7C46.88%7C4e-68%2CREPA_OB_2%7CPF16900.4%7C0.0011
+CUFF.41.1	transdecoder	mRNA	1	2779	.	+	.	ID=CUFF.41.1.p2;Parent=GENE.CUFF.41.1~~CUFF.41.1.p2;Name=ORF%20type%3Acomplete%20len%3A295%20%28%2B%29%2Cscore%3D62.23%2CYCV2_SCHPO%7C46.88%7C4e-68%2CREPA_OB_2%7CPF16900.4%7C0.0011
+CUFF.41.1	transdecoder	five_prime_UTR	1	1255	.	+	.	ID=CUFF.41.1.p2.utr5p1;Parent=CUFF.41.1.p2
+CUFF.41.1	transdecoder	exon	1	2779	.	+	.	ID=CUFF.41.1.p2.exon1;Parent=CUFF.41.1.p2
+CUFF.41.1	transdecoder	CDS	1256	2140	.	+	0	ID=cds.CUFF.41.1.p2;Parent=CUFF.41.1.p2
+CUFF.41.1	transdecoder	three_prime_UTR	2141	2779	.	+	.	ID=CUFF.41.1.p2.utr3p1;Parent=CUFF.41.1.p2
+
+CUFF.41.1	transdecoder	gene	1	2779	.	-	.	ID=GENE.CUFF.41.1~~CUFF.41.1.p3;Name=ORF%20type%3A5prime_partial%20len%3A120%20%28-%29%2Cscore%3D29.29%2CYAOA_SCHPO%7C100.00%7C4e-82
+CUFF.41.1	transdecoder	mRNA	1	2779	.	-	.	ID=CUFF.41.1.p3;Parent=GENE.CUFF.41.1~~CUFF.41.1.p3;Name=ORF%20type%3A5prime_partial%20len%3A120%20%28-%29%2Cscore%3D29.29%2CYAOA_SCHPO%7C100.00%7C4e-82
+CUFF.41.1	transdecoder	exon	1	2779	.	-	.	ID=CUFF.41.1.p3.exon1;Parent=CUFF.41.1.p3
+CUFF.41.1	transdecoder	CDS	2419	2778	.	-	0	ID=cds.CUFF.41.1.p3;Parent=CUFF.41.1.p3
+CUFF.41.1	transdecoder	three_prime_UTR	1	2418	.	-	.	ID=CUFF.41.1.p3.utr3p1;Parent=CUFF.41.1.p3
+
+CUFF.42.1	transdecoder	gene	1	4113	.	-	.	ID=GENE.CUFF.42.1~~CUFF.42.1.p1;Name=ORF%20type%3A5prime_partial%20len%3A990%20%28-%29%2Cscore%3D357.29%2CYAOE_SCHPO%7C100.00%7C0.0%2CHydantoinase_B%7CPF02538.13%7C3.5e-213%2CHydantoinase_A%7CPF01968.17%7C1.6e-90
+CUFF.42.1	transdecoder	mRNA	1	4113	.	-	.	ID=CUFF.42.1.p1;Parent=GENE.CUFF.42.1~~CUFF.42.1.p1;Name=ORF%20type%3A5prime_partial%20len%3A990%20%28-%29%2Cscore%3D357.29%2CYAOE_SCHPO%7C100.00%7C0.0%2CHydantoinase_B%7CPF02538.13%7C3.5e-213%2CHydantoinase_A%7CPF01968.17%7C1.6e-90
+CUFF.42.1	transdecoder	exon	1	4113	.	-	.	ID=CUFF.42.1.p1.exon1;Parent=CUFF.42.1.p1
+CUFF.42.1	transdecoder	CDS	1142	4111	.	-	0	ID=cds.CUFF.42.1.p1;Parent=CUFF.42.1.p1
+CUFF.42.1	transdecoder	three_prime_UTR	1	1141	.	-	.	ID=CUFF.42.1.p1.utr3p1;Parent=CUFF.42.1.p1
+
+CUFF.42.1	transdecoder	gene	1	4113	.	+	.	ID=GENE.CUFF.42.1~~CUFF.42.1.p2;Name=ORF%20type%3Acomplete%20len%3A223%20%28%2B%29%2Cscore%3D69.01%2CHSP34_SCHPO%7C100.00%7C9e-167%2CDJ-1_PfpI%7CPF01965.23%7C8.4e-10%2CThiJ_like%7CPF17124.4%7C0.0018
+CUFF.42.1	transdecoder	mRNA	1	4113	.	+	.	ID=CUFF.42.1.p2;Parent=GENE.CUFF.42.1~~CUFF.42.1.p2;Name=ORF%20type%3Acomplete%20len%3A223%20%28%2B%29%2Cscore%3D69.01%2CHSP34_SCHPO%7C100.00%7C9e-167%2CDJ-1_PfpI%7CPF01965.23%7C8.4e-10%2CThiJ_like%7CPF17124.4%7C0.0018
+CUFF.42.1	transdecoder	five_prime_UTR	1	151	.	+	.	ID=CUFF.42.1.p2.utr5p1;Parent=CUFF.42.1.p2
+CUFF.42.1	transdecoder	exon	1	4113	.	+	.	ID=CUFF.42.1.p2.exon1;Parent=CUFF.42.1.p2
+CUFF.42.1	transdecoder	CDS	152	820	.	+	0	ID=cds.CUFF.42.1.p2;Parent=CUFF.42.1.p2
+CUFF.42.1	transdecoder	three_prime_UTR	821	4113	.	+	.	ID=CUFF.42.1.p2.utr3p1;Parent=CUFF.42.1.p2
+
+CUFF.43.1	transdecoder	gene	1	1402	.	+	.	ID=GENE.CUFF.43.1~~CUFF.43.1.p1;Name=ORF%20type%3Acomplete%20len%3A132%20%28%2B%29%2Cscore%3D44.78%2CYAOG_SCHPO%7C100.00%7C2e-96
+CUFF.43.1	transdecoder	mRNA	1	1402	.	+	.	ID=CUFF.43.1.p1;Parent=GENE.CUFF.43.1~~CUFF.43.1.p1;Name=ORF%20type%3Acomplete%20len%3A132%20%28%2B%29%2Cscore%3D44.78%2CYAOG_SCHPO%7C100.00%7C2e-96
+CUFF.43.1	transdecoder	five_prime_UTR	1	601	.	+	.	ID=CUFF.43.1.p1.utr5p1;Parent=CUFF.43.1.p1
+CUFF.43.1	transdecoder	exon	1	1402	.	+	.	ID=CUFF.43.1.p1.exon1;Parent=CUFF.43.1.p1
+CUFF.43.1	transdecoder	CDS	602	997	.	+	0	ID=cds.CUFF.43.1.p1;Parent=CUFF.43.1.p1
+CUFF.43.1	transdecoder	three_prime_UTR	998	1402	.	+	.	ID=CUFF.43.1.p1.utr3p1;Parent=CUFF.43.1.p1
+
+CUFF.44.1	transdecoder	gene	1	4312	.	+	.	ID=GENE.CUFF.44.1~~CUFF.44.1.p1;Name=ORF%20type%3Acomplete%20len%3A1318%20%28%2B%29%2Cscore%3D471.45%2CYAOF_SCHPO%7C100.00%7C0.0%2CHydantoinase_B%7CPF02538.13%7C3.3e-215%2CHydantoinase_A%7CPF01968.17%7C32%2CHydantoinase_A%7CPF01968.17%7C8.1e-107%2CHydant_A_N%7CPF05378.12%7C1.3e-64%2CHydant_A_N%7CPF05378.12%7C0.73
+CUFF.44.1	transdecoder	mRNA	1	4312	.	+	.	ID=CUFF.44.1.p1;Parent=GENE.CUFF.44.1~~CUFF.44.1.p1;Name=ORF%20type%3Acomplete%20len%3A1318%20%28%2B%29%2Cscore%3D471.45%2CYAOF_SCHPO%7C100.00%7C0.0%2CHydantoinase_B%7CPF02538.13%7C3.3e-215%2CHydantoinase_A%7CPF01968.17%7C32%2CHydantoinase_A%7CPF01968.17%7C8.1e-107%2CHydant_A_N%7CPF05378.12%7C1.3e-64%2CHydant_A_N%7CPF05378.12%7C0.73
+CUFF.44.1	transdecoder	five_prime_UTR	1	231	.	+	.	ID=CUFF.44.1.p1.utr5p1;Parent=CUFF.44.1.p1
+CUFF.44.1	transdecoder	exon	1	4312	.	+	.	ID=CUFF.44.1.p1.exon1;Parent=CUFF.44.1.p1
+CUFF.44.1	transdecoder	CDS	232	4185	.	+	0	ID=cds.CUFF.44.1.p1;Parent=CUFF.44.1.p1
+CUFF.44.1	transdecoder	three_prime_UTR	4186	4312	.	+	.	ID=CUFF.44.1.p1.utr3p1;Parent=CUFF.44.1.p1
+
+CUFF.45.1	transdecoder	gene	1	4899	.	+	.	ID=GENE.CUFF.45.1~~CUFF.45.1.p1;Name=ORF%20type%3Acomplete%20len%3A586%20%28%2B%29%2Cscore%3D171.73%2CYAOH_SCHPO%7C100.00%7C0.0%2CFungal_trans%7CPF04082.17%7C1.3e-11%2Czf-C2H2%7CPF00096.25%7C6.9e-05%2Czf-C2H2%7CPF00096.25%7C5.5e-06%2Czf-C2H2_6%7CPF13912.5%7C3.2e-06%2Czf-C2H2_6%7CPF13912.5%7C73%2Czf-C2H2_4%7CPF13894.5%7C0.0092%2Czf-C2H2_4%7CPF13894.5%7C0.001%2Czf-H2C2_2%7CPF13465.5%7C0.035%2Czf-H2C2_2%7CPF13465.5%7C0.0058%2Czf-H2C2_2%7CPF13465.5%7C4.9%2Czf-C2H2_jaz%7CPF12171.7%7C0.021%2Czf-C2H2_jaz%7CPF12171.7%7C0.16%2Czf-C2H2_jaz%7CPF12171.7%7C1.2e%2B02%2Czf-Di19%7CPF05605.11%7C0.0023%2Czf-TRAF%7CPF02176.17%7C0.05%2Czf-TRAF%7CPF02176.17%7C39
+CUFF.45.1	transdecoder	mRNA	1	4899	.	+	.	ID=CUFF.45.1.p1;Parent=GENE.CUFF.45.1~~CUFF.45.1.p1;Name=ORF%20type%3Acomplete%20len%3A586%20%28%2B%29%2Cscore%3D171.73%2CYAOH_SCHPO%7C100.00%7C0.0%2CFungal_trans%7CPF04082.17%7C1.3e-11%2Czf-C2H2%7CPF00096.25%7C6.9e-05%2Czf-C2H2%7CPF00096.25%7C5.5e-06%2Czf-C2H2_6%7CPF13912.5%7C3.2e-06%2Czf-C2H2_6%7CPF13912.5%7C73%2Czf-C2H2_4%7CPF13894.5%7C0.0092%2Czf-C2H2_4%7CPF13894.5%7C0.001%2Czf-H2C2_2%7CPF13465.5%7C0.035%2Czf-H2C2_2%7CPF13465.5%7C0.0058%2Czf-H2C2_2%7CPF13465.5%7C4.9%2Czf-C2H2_jaz%7CPF12171.7%7C0.021%2Czf-C2H2_jaz%7CPF12171.7%7C0.16%2Czf-C2H2_jaz%7CPF12171.7%7C1.2e%2B02%2Czf-Di19%7CPF05605.11%7C0.0023%2Czf-TRAF%7CPF02176.17%7C0.05%2Czf-TRAF%7CPF02176.17%7C39
+CUFF.45.1	transdecoder	five_prime_UTR	1	1092	.	+	.	ID=CUFF.45.1.p1.utr5p1;Parent=CUFF.45.1.p1
+CUFF.45.1	transdecoder	exon	1	4899	.	+	.	ID=CUFF.45.1.p1.exon1;Parent=CUFF.45.1.p1
+CUFF.45.1	transdecoder	CDS	1093	2850	.	+	0	ID=cds.CUFF.45.1.p1;Parent=CUFF.45.1.p1
+CUFF.45.1	transdecoder	three_prime_UTR	2851	4899	.	+	.	ID=CUFF.45.1.p1.utr3p1;Parent=CUFF.45.1.p1
+
+CUFF.45.1	transdecoder	gene	1	4899	.	-	.	ID=GENE.CUFF.45.1~~CUFF.45.1.p2;Name=ORF%20type%3Acomplete%20len%3A499%20%28-%29%2Cscore%3D166.50%2CYAOI_SCHPO%7C100.00%7C0.0%2CMFS_1%7CPF07690.15%7C1.6e-39%2CMFS_1%7CPF07690.15%7C12%2CDUF1129%7CPF06570.10%7C0.0041%2CDUF1129%7CPF06570.10%7C9.8
+CUFF.45.1	transdecoder	mRNA	1	4899	.	-	.	ID=CUFF.45.1.p2;Parent=GENE.CUFF.45.1~~CUFF.45.1.p2;Name=ORF%20type%3Acomplete%20len%3A499%20%28-%29%2Cscore%3D166.50%2CYAOI_SCHPO%7C100.00%7C0.0%2CMFS_1%7CPF07690.15%7C1.6e-39%2CMFS_1%7CPF07690.15%7C12%2CDUF1129%7CPF06570.10%7C0.0041%2CDUF1129%7CPF06570.10%7C9.8
+CUFF.45.1	transdecoder	five_prime_UTR	4777	4899	.	-	.	ID=CUFF.45.1.p2.utr5p1;Parent=CUFF.45.1.p2
+CUFF.45.1	transdecoder	exon	1	4899	.	-	.	ID=CUFF.45.1.p2.exon1;Parent=CUFF.45.1.p2
+CUFF.45.1	transdecoder	CDS	3280	4776	.	-	0	ID=cds.CUFF.45.1.p2;Parent=CUFF.45.1.p2
+CUFF.45.1	transdecoder	three_prime_UTR	1	3279	.	-	.	ID=CUFF.45.1.p2.utr3p1;Parent=CUFF.45.1.p2
+
+CUFF.46.1	transdecoder	gene	1	2198	.	+	.	ID=GENE.CUFF.46.1~~CUFF.46.1.p1;Name=ORF%20type%3Acomplete%20len%3A241%20%28%2B%29%2Cscore%3D91.17%2CHSP32_SCHPO%7C100.00%7C1e-179%2CDJ-1_PfpI%7CPF01965.23%7C3.8e-15%2CThiJ_like%7CPF17124.4%7C4.8e-09
+CUFF.46.1	transdecoder	mRNA	1	2198	.	+	.	ID=CUFF.46.1.p1;Parent=GENE.CUFF.46.1~~CUFF.46.1.p1;Name=ORF%20type%3Acomplete%20len%3A241%20%28%2B%29%2Cscore%3D91.17%2CHSP32_SCHPO%7C100.00%7C1e-179%2CDJ-1_PfpI%7CPF01965.23%7C3.8e-15%2CThiJ_like%7CPF17124.4%7C4.8e-09
+CUFF.46.1	transdecoder	five_prime_UTR	1	1305	.	+	.	ID=CUFF.46.1.p1.utr5p1;Parent=CUFF.46.1.p1
+CUFF.46.1	transdecoder	exon	1	2198	.	+	.	ID=CUFF.46.1.p1.exon1;Parent=CUFF.46.1.p1
+CUFF.46.1	transdecoder	CDS	1306	2028	.	+	0	ID=cds.CUFF.46.1.p1;Parent=CUFF.46.1.p1
+CUFF.46.1	transdecoder	three_prime_UTR	2029	2198	.	+	.	ID=CUFF.46.1.p1.utr3p1;Parent=CUFF.46.1.p1
+
+CUFF.47.1	transdecoder	gene	1	599	.	-	.	ID=GENE.CUFF.47.1~~CUFF.47.1.p1;Name=ORF%20type%3Ainternal%20len%3A200%20%28-%29%2Cscore%3D63.89%2CHSP32_SCHPO%7C100.00%7C6e-132%2CDJ-1_PfpI%7CPF01965.23%7C5.6e-15%2CThiJ_like%7CPF17124.4%7C4.2e-09
+CUFF.47.1	transdecoder	mRNA	1	599	.	-	.	ID=CUFF.47.1.p1;Parent=GENE.CUFF.47.1~~CUFF.47.1.p1;Name=ORF%20type%3Ainternal%20len%3A200%20%28-%29%2Cscore%3D63.89%2CHSP32_SCHPO%7C100.00%7C6e-132%2CDJ-1_PfpI%7CPF01965.23%7C5.6e-15%2CThiJ_like%7CPF17124.4%7C4.2e-09
+CUFF.47.1	transdecoder	exon	1	599	.	-	.	ID=CUFF.47.1.p1.exon1;Parent=CUFF.47.1.p1
+CUFF.47.1	transdecoder	CDS	1	597	.	-	0	ID=cds.CUFF.47.1.p1;Parent=CUFF.47.1.p1
+
+CUFF.48.1	transdecoder	gene	1	4754	.	+	.	ID=GENE.CUFF.48.1~~CUFF.48.1.p1;Name=ORF%20type%3Acomplete%20len%3A383%20%28%2B%29%2Cscore%3D139.17%2COYEA_SCHPO%7C100.00%7C0.0%2COxidored_FMN%7CPF00724.19%7C1.4e-136
+CUFF.48.1	transdecoder	mRNA	1	4754	.	+	.	ID=CUFF.48.1.p1;Parent=GENE.CUFF.48.1~~CUFF.48.1.p1;Name=ORF%20type%3Acomplete%20len%3A383%20%28%2B%29%2Cscore%3D139.17%2COYEA_SCHPO%7C100.00%7C0.0%2COxidored_FMN%7CPF00724.19%7C1.4e-136
+CUFF.48.1	transdecoder	five_prime_UTR	1	2694	.	+	.	ID=CUFF.48.1.p1.utr5p1;Parent=CUFF.48.1.p1
+CUFF.48.1	transdecoder	exon	1	4754	.	+	.	ID=CUFF.48.1.p1.exon1;Parent=CUFF.48.1.p1
+CUFF.48.1	transdecoder	CDS	2695	3843	.	+	0	ID=cds.CUFF.48.1.p1;Parent=CUFF.48.1.p1
+CUFF.48.1	transdecoder	three_prime_UTR	3844	4754	.	+	.	ID=CUFF.48.1.p1.utr3p1;Parent=CUFF.48.1.p1
+
+CUFF.48.1	transdecoder	gene	1	4754	.	+	.	ID=GENE.CUFF.48.1~~CUFF.48.1.p2;Name=ORF%20type%3Acomplete%20len%3A220%20%28%2B%29%2Cscore%3D82.54%2CYA03_SCHPO%7C100.00%7C5e-165%2CHis_Phos_1%7CPF00300.21%7C8.2e-24
+CUFF.48.1	transdecoder	mRNA	1	4754	.	+	.	ID=CUFF.48.1.p2;Parent=GENE.CUFF.48.1~~CUFF.48.1.p2;Name=ORF%20type%3Acomplete%20len%3A220%20%28%2B%29%2Cscore%3D82.54%2CYA03_SCHPO%7C100.00%7C5e-165%2CHis_Phos_1%7CPF00300.21%7C8.2e-24
+CUFF.48.1	transdecoder	five_prime_UTR	1	1220	.	+	.	ID=CUFF.48.1.p2.utr5p1;Parent=CUFF.48.1.p2
+CUFF.48.1	transdecoder	exon	1	4754	.	+	.	ID=CUFF.48.1.p2.exon1;Parent=CUFF.48.1.p2
+CUFF.48.1	transdecoder	CDS	1221	1880	.	+	0	ID=cds.CUFF.48.1.p2;Parent=CUFF.48.1.p2
+CUFF.48.1	transdecoder	three_prime_UTR	1881	4754	.	+	.	ID=CUFF.48.1.p2.utr3p1;Parent=CUFF.48.1.p2
+
+CUFF.48.1	transdecoder	gene	1	4754	.	-	.	ID=GENE.CUFF.48.1~~CUFF.48.1.p3;Name=ORF%20type%3Acomplete%20len%3A197%20%28-%29%2Cscore%3D63.22%2CYA05_SCHPO%7C100.00%7C1e-149%2CFlavodoxin_2%7CPF02525.16%7C3.8e-36%2CFMN_red%7CPF03358.14%7C0.0036%2CDUF4208%7CPF13907.5%7C0.0015
+CUFF.48.1	transdecoder	mRNA	1	4754	.	-	.	ID=CUFF.48.1.p3;Parent=GENE.CUFF.48.1~~CUFF.48.1.p3;Name=ORF%20type%3Acomplete%20len%3A197%20%28-%29%2Cscore%3D63.22%2CYA05_SCHPO%7C100.00%7C1e-149%2CFlavodoxin_2%7CPF02525.16%7C3.8e-36%2CFMN_red%7CPF03358.14%7C0.0036%2CDUF4208%7CPF13907.5%7C0.0015
+CUFF.48.1	transdecoder	five_prime_UTR	4706	4754	.	-	.	ID=CUFF.48.1.p3.utr5p1;Parent=CUFF.48.1.p3
+CUFF.48.1	transdecoder	exon	1	4754	.	-	.	ID=CUFF.48.1.p3.exon1;Parent=CUFF.48.1.p3
+CUFF.48.1	transdecoder	CDS	4115	4705	.	-	0	ID=cds.CUFF.48.1.p3;Parent=CUFF.48.1.p3
+CUFF.48.1	transdecoder	three_prime_UTR	1	4114	.	-	.	ID=CUFF.48.1.p3.utr3p1;Parent=CUFF.48.1.p3
+
+CUFF.49.1	transdecoder	gene	1	2422	.	-	.	ID=GENE.CUFF.49.1~~CUFF.49.1.p1;Name=ORF%20type%3Acomplete%20len%3A383%20%28-%29%2Cscore%3D139.17%2COYEA_SCHPO%7C100.00%7C0.0%2COxidored_FMN%7CPF00724.19%7C1.4e-136
+CUFF.49.1	transdecoder	mRNA	1	2422	.	-	.	ID=CUFF.49.1.p1;Parent=GENE.CUFF.49.1~~CUFF.49.1.p1;Name=ORF%20type%3Acomplete%20len%3A383%20%28-%29%2Cscore%3D139.17%2COYEA_SCHPO%7C100.00%7C0.0%2COxidored_FMN%7CPF00724.19%7C1.4e-136
+CUFF.49.1	transdecoder	five_prime_UTR	2225	2422	.	-	.	ID=CUFF.49.1.p1.utr5p1;Parent=CUFF.49.1.p1
+CUFF.49.1	transdecoder	exon	1	2422	.	-	.	ID=CUFF.49.1.p1.exon1;Parent=CUFF.49.1.p1
+CUFF.49.1	transdecoder	CDS	1076	2224	.	-	0	ID=cds.CUFF.49.1.p1;Parent=CUFF.49.1.p1
+CUFF.49.1	transdecoder	three_prime_UTR	1	1075	.	-	.	ID=CUFF.49.1.p1.utr3p1;Parent=CUFF.49.1.p1
+
+CUFF.49.1	transdecoder	gene	1	2422	.	+	.	ID=GENE.CUFF.49.1~~CUFF.49.1.p2;Name=ORF%20type%3Acomplete%20len%3A197%20%28%2B%29%2Cscore%3D63.22%2CYA05_SCHPO%7C100.00%7C1e-149%2CFlavodoxin_2%7CPF02525.16%7C3.8e-36%2CFMN_red%7CPF03358.14%7C0.0036%2CDUF4208%7CPF13907.5%7C0.0015
+CUFF.49.1	transdecoder	mRNA	1	2422	.	+	.	ID=CUFF.49.1.p2;Parent=GENE.CUFF.49.1~~CUFF.49.1.p2;Name=ORF%20type%3Acomplete%20len%3A197%20%28%2B%29%2Cscore%3D63.22%2CYA05_SCHPO%7C100.00%7C1e-149%2CFlavodoxin_2%7CPF02525.16%7C3.8e-36%2CFMN_red%7CPF03358.14%7C0.0036%2CDUF4208%7CPF13907.5%7C0.0015
+CUFF.49.1	transdecoder	five_prime_UTR	1	213	.	+	.	ID=CUFF.49.1.p2.utr5p1;Parent=CUFF.49.1.p2
+CUFF.49.1	transdecoder	exon	1	2422	.	+	.	ID=CUFF.49.1.p2.exon1;Parent=CUFF.49.1.p2
+CUFF.49.1	transdecoder	CDS	214	804	.	+	0	ID=cds.CUFF.49.1.p2;Parent=CUFF.49.1.p2
+CUFF.49.1	transdecoder	three_prime_UTR	805	2422	.	+	.	ID=CUFF.49.1.p2.utr3p1;Parent=CUFF.49.1.p2
+
+CUFF.5.1	transdecoder	gene	1	771	.	+	.	ID=GENE.CUFF.5.1~~CUFF.5.1.p1;Name=ORF%20type%3Acomplete%20len%3A169%20%28%2B%29%2Cscore%3D66.94%2CYP44_SCHPO%7C100.00%7C4e-120%2CDUF999%7CPF06198.10%7C3e-94%2COleosin%7CPF01277.16%7C24%2COleosin%7CPF01277.16%7C5.4%2COleosin%7CPF01277.16%7C0.0087
+CUFF.5.1	transdecoder	mRNA	1	771	.	+	.	ID=CUFF.5.1.p1;Parent=GENE.CUFF.5.1~~CUFF.5.1.p1;Name=ORF%20type%3Acomplete%20len%3A169%20%28%2B%29%2Cscore%3D66.94%2CYP44_SCHPO%7C100.00%7C4e-120%2CDUF999%7CPF06198.10%7C3e-94%2COleosin%7CPF01277.16%7C24%2COleosin%7CPF01277.16%7C5.4%2COleosin%7CPF01277.16%7C0.0087
+CUFF.5.1	transdecoder	five_prime_UTR	1	206	.	+	.	ID=CUFF.5.1.p1.utr5p1;Parent=CUFF.5.1.p1
+CUFF.5.1	transdecoder	exon	1	771	.	+	.	ID=CUFF.5.1.p1.exon1;Parent=CUFF.5.1.p1
+CUFF.5.1	transdecoder	CDS	207	713	.	+	0	ID=cds.CUFF.5.1.p1;Parent=CUFF.5.1.p1
+CUFF.5.1	transdecoder	three_prime_UTR	714	771	.	+	.	ID=CUFF.5.1.p1.utr3p1;Parent=CUFF.5.1.p1
+
+CUFF.50.1	transdecoder	gene	1	5404	.	+	.	ID=GENE.CUFF.50.1~~CUFF.50.1.p1;Name=ORF%20type%3Acomplete%20len%3A423%20%28%2B%29%2Cscore%3D172.45%2CADH4_SCHPO%7C100.00%7C0.0%2CFe-ADH%7CPF00465.18%7C9.4e-127%2CFe-ADH_2%7CPF13685.5%7C2.9e-20%2CFe-ADH_2%7CPF13685.5%7C47
+CUFF.50.1	transdecoder	mRNA	1	5404	.	+	.	ID=CUFF.50.1.p1;Parent=GENE.CUFF.50.1~~CUFF.50.1.p1;Name=ORF%20type%3Acomplete%20len%3A423%20%28%2B%29%2Cscore%3D172.45%2CADH4_SCHPO%7C100.00%7C0.0%2CFe-ADH%7CPF00465.18%7C9.4e-127%2CFe-ADH_2%7CPF13685.5%7C2.9e-20%2CFe-ADH_2%7CPF13685.5%7C47
+CUFF.50.1	transdecoder	five_prime_UTR	1	3998	.	+	.	ID=CUFF.50.1.p1.utr5p1;Parent=CUFF.50.1.p1
+CUFF.50.1	transdecoder	exon	1	5404	.	+	.	ID=CUFF.50.1.p1.exon1;Parent=CUFF.50.1.p1
+CUFF.50.1	transdecoder	CDS	3999	5267	.	+	0	ID=cds.CUFF.50.1.p1;Parent=CUFF.50.1.p1
+CUFF.50.1	transdecoder	three_prime_UTR	5268	5404	.	+	.	ID=CUFF.50.1.p1.utr3p1;Parent=CUFF.50.1.p1
+
+CUFF.50.1	transdecoder	gene	1	5404	.	+	.	ID=GENE.CUFF.50.1~~CUFF.50.1.p3;Name=ORF%20type%3Acomplete%20len%3A268%20%28%2B%29%2Cscore%3D93.64%2CPANB_SCHPO%7C100.00%7C0.0%2CPantoate_transf%7CPF02548.14%7C1.7e-104%2CAsp_Glu_race%7CPF01177.21%7C8.5e-06
+CUFF.50.1	transdecoder	mRNA	1	5404	.	+	.	ID=CUFF.50.1.p3;Parent=GENE.CUFF.50.1~~CUFF.50.1.p3;Name=ORF%20type%3Acomplete%20len%3A268%20%28%2B%29%2Cscore%3D93.64%2CPANB_SCHPO%7C100.00%7C0.0%2CPantoate_transf%7CPF02548.14%7C1.7e-104%2CAsp_Glu_race%7CPF01177.21%7C8.5e-06
+CUFF.50.1	transdecoder	five_prime_UTR	1	34	.	+	.	ID=CUFF.50.1.p3.utr5p1;Parent=CUFF.50.1.p3
+CUFF.50.1	transdecoder	exon	1	5404	.	+	.	ID=CUFF.50.1.p3.exon1;Parent=CUFF.50.1.p3
+CUFF.50.1	transdecoder	CDS	35	838	.	+	0	ID=cds.CUFF.50.1.p3;Parent=CUFF.50.1.p3
+CUFF.50.1	transdecoder	three_prime_UTR	839	5404	.	+	.	ID=CUFF.50.1.p3.utr3p1;Parent=CUFF.50.1.p3
+
+CUFF.50.1	transdecoder	gene	1	5404	.	+	.	ID=GENE.CUFF.50.1~~CUFF.50.1.p2;Name=ORF%20type%3Acomplete%20len%3A284%20%28%2B%29%2Cscore%3D84.85%2CPANC_SCHPO%7C100.00%7C0.0%2CPantoate_ligase%7CPF02569.14%7C1.7e-104%2CFAD_syn%7CPF06574.11%7C0.00081%2CFAD_syn%7CPF06574.11%7C12%2CCTP_transf_like%7CPF01467.25%7C0.00086
+CUFF.50.1	transdecoder	mRNA	1	5404	.	+	.	ID=CUFF.50.1.p2;Parent=GENE.CUFF.50.1~~CUFF.50.1.p2;Name=ORF%20type%3Acomplete%20len%3A284%20%28%2B%29%2Cscore%3D84.85%2CPANC_SCHPO%7C100.00%7C0.0%2CPantoate_ligase%7CPF02569.14%7C1.7e-104%2CFAD_syn%7CPF06574.11%7C0.00081%2CFAD_syn%7CPF06574.11%7C12%2CCTP_transf_like%7CPF01467.25%7C0.00086
+CUFF.50.1	transdecoder	five_prime_UTR	1	869	.	+	.	ID=CUFF.50.1.p2.utr5p1;Parent=CUFF.50.1.p2
+CUFF.50.1	transdecoder	exon	1	5404	.	+	.	ID=CUFF.50.1.p2.exon1;Parent=CUFF.50.1.p2
+CUFF.50.1	transdecoder	CDS	870	1721	.	+	0	ID=cds.CUFF.50.1.p2;Parent=CUFF.50.1.p2
+CUFF.50.1	transdecoder	three_prime_UTR	1722	5404	.	+	.	ID=CUFF.50.1.p2.utr3p1;Parent=CUFF.50.1.p2
+
+CUFF.51.1	transdecoder	gene	1	4342	.	+	.	ID=GENE.CUFF.51.1~~CUFF.51.1.p2;Name=ORF%20type%3Acomplete%20len%3A347%20%28%2B%29%2Cscore%3D122.42%2CGMH2_SCHPO%7C100.00%7C0.0%2CGlyco_transf_34%7CPF05637.11%7C8.1e-87%2CNucleotid_trans%7CPF03407.15%7C0.00012
+CUFF.51.1	transdecoder	mRNA	1	4342	.	+	.	ID=CUFF.51.1.p2;Parent=GENE.CUFF.51.1~~CUFF.51.1.p2;Name=ORF%20type%3Acomplete%20len%3A347%20%28%2B%29%2Cscore%3D122.42%2CGMH2_SCHPO%7C100.00%7C0.0%2CGlyco_transf_34%7CPF05637.11%7C8.1e-87%2CNucleotid_trans%7CPF03407.15%7C0.00012
+CUFF.51.1	transdecoder	five_prime_UTR	1	316	.	+	.	ID=CUFF.51.1.p2.utr5p1;Parent=CUFF.51.1.p2
+CUFF.51.1	transdecoder	exon	1	4342	.	+	.	ID=CUFF.51.1.p2.exon1;Parent=CUFF.51.1.p2
+CUFF.51.1	transdecoder	CDS	317	1357	.	+	0	ID=cds.CUFF.51.1.p2;Parent=CUFF.51.1.p2
+CUFF.51.1	transdecoder	three_prime_UTR	1358	4342	.	+	.	ID=CUFF.51.1.p2.utr3p1;Parent=CUFF.51.1.p2
+
+CUFF.51.1	transdecoder	gene	1	4342	.	+	.	ID=GENE.CUFF.51.1~~CUFF.51.1.p1;Name=ORF%20type%3Acomplete%20len%3A372%20%28%2B%29%2Cscore%3D108.67%2CYA0C_SCHPO%7C100.00%7C0.0%2CGlyco_transf_8%7CPF01501.19%7C1.2e-11%2CMannosyl_trans3%7CPF11051.7%7C0.00048%2CSmim3%7CPF17307.1%7C0.32%2CSmim3%7CPF17307.1%7C0.085
+CUFF.51.1	transdecoder	mRNA	1	4342	.	+	.	ID=CUFF.51.1.p1;Parent=GENE.CUFF.51.1~~CUFF.51.1.p1;Name=ORF%20type%3Acomplete%20len%3A372%20%28%2B%29%2Cscore%3D108.67%2CYA0C_SCHPO%7C100.00%7C0.0%2CGlyco_transf_8%7CPF01501.19%7C1.2e-11%2CMannosyl_trans3%7CPF11051.7%7C0.00048%2CSmim3%7CPF17307.1%7C0.32%2CSmim3%7CPF17307.1%7C0.085
+CUFF.51.1	transdecoder	five_prime_UTR	1	2631	.	+	.	ID=CUFF.51.1.p1.utr5p1;Parent=CUFF.51.1.p1
+CUFF.51.1	transdecoder	exon	1	4342	.	+	.	ID=CUFF.51.1.p1.exon1;Parent=CUFF.51.1.p1
+CUFF.51.1	transdecoder	CDS	2632	3747	.	+	0	ID=cds.CUFF.51.1.p1;Parent=CUFF.51.1.p1
+CUFF.51.1	transdecoder	three_prime_UTR	3748	4342	.	+	.	ID=CUFF.51.1.p1.utr3p1;Parent=CUFF.51.1.p1
+
+CUFF.52.1	transdecoder	gene	1	5136	.	+	.	ID=GENE.CUFF.52.1~~CUFF.52.1.p1;Name=ORF%20type%3Acomplete%20len%3A393%20%28%2B%29%2Cscore%3D143.50%2COYEB_SCHPO%7C100.00%7C0.0%2COxidored_FMN%7CPF00724.19%7C4.5e-138
+CUFF.52.1	transdecoder	mRNA	1	5136	.	+	.	ID=CUFF.52.1.p1;Parent=GENE.CUFF.52.1~~CUFF.52.1.p1;Name=ORF%20type%3Acomplete%20len%3A393%20%28%2B%29%2Cscore%3D143.50%2COYEB_SCHPO%7C100.00%7C0.0%2COxidored_FMN%7CPF00724.19%7C4.5e-138
+CUFF.52.1	transdecoder	five_prime_UTR	1	1901	.	+	.	ID=CUFF.52.1.p1.utr5p1;Parent=CUFF.52.1.p1
+CUFF.52.1	transdecoder	exon	1	5136	.	+	.	ID=CUFF.52.1.p1.exon1;Parent=CUFF.52.1.p1
+CUFF.52.1	transdecoder	CDS	1902	3080	.	+	0	ID=cds.CUFF.52.1.p1;Parent=CUFF.52.1.p1
+CUFF.52.1	transdecoder	three_prime_UTR	3081	5136	.	+	.	ID=CUFF.52.1.p1.utr3p1;Parent=CUFF.52.1.p1
+
+CUFF.52.1	transdecoder	gene	1	5136	.	+	.	ID=GENE.CUFF.52.1~~CUFF.52.1.p2;Name=ORF%20type%3Acomplete%20len%3A330%20%28%2B%29%2Cscore%3D92.48%2CGMH1_SCHPO%7C100.00%7C0.0%2CGlyco_transf_34%7CPF05637.11%7C4.2e-86%2CDUF705%7CPF05152.11%7C0.00095%2CFig1%7CPF12351.7%7C0.0015
+CUFF.52.1	transdecoder	mRNA	1	5136	.	+	.	ID=CUFF.52.1.p2;Parent=GENE.CUFF.52.1~~CUFF.52.1.p2;Name=ORF%20type%3Acomplete%20len%3A330%20%28%2B%29%2Cscore%3D92.48%2CGMH1_SCHPO%7C100.00%7C0.0%2CGlyco_transf_34%7CPF05637.11%7C4.2e-86%2CDUF705%7CPF05152.11%7C0.00095%2CFig1%7CPF12351.7%7C0.0015
+CUFF.52.1	transdecoder	five_prime_UTR	1	3669	.	+	.	ID=CUFF.52.1.p2.utr5p1;Parent=CUFF.52.1.p2
+CUFF.52.1	transdecoder	exon	1	5136	.	+	.	ID=CUFF.52.1.p2.exon1;Parent=CUFF.52.1.p2
+CUFF.52.1	transdecoder	CDS	3670	4659	.	+	0	ID=cds.CUFF.52.1.p2;Parent=CUFF.52.1.p2
+CUFF.52.1	transdecoder	three_prime_UTR	4660	5136	.	+	.	ID=CUFF.52.1.p2.utr3p1;Parent=CUFF.52.1.p2
+
+CUFF.52.1	transdecoder	gene	1	5136	.	-	.	ID=GENE.CUFF.52.1~~CUFF.52.1.p3;Name=ORF%20type%3A3prime_partial%20len%3A241%20%28-%29%2Cscore%3D81.28%2CPANB_SCHPO%7C100.00%7C0.0%2CPantoate_transf%7CPF02548.14%7C1e-97%2CAsp_Glu_race%7CPF01177.21%7C7.2e-06
+CUFF.52.1	transdecoder	mRNA	1	5136	.	-	.	ID=CUFF.52.1.p3;Parent=GENE.CUFF.52.1~~CUFF.52.1.p3;Name=ORF%20type%3A3prime_partial%20len%3A241%20%28-%29%2Cscore%3D81.28%2CPANB_SCHPO%7C100.00%7C0.0%2CPantoate_transf%7CPF02548.14%7C1e-97%2CAsp_Glu_race%7CPF01177.21%7C7.2e-06
+CUFF.52.1	transdecoder	five_prime_UTR	723	5136	.	-	.	ID=CUFF.52.1.p3.utr5p1;Parent=CUFF.52.1.p3
+CUFF.52.1	transdecoder	exon	1	5136	.	-	.	ID=CUFF.52.1.p3.exon1;Parent=CUFF.52.1.p3
+CUFF.52.1	transdecoder	CDS	3	722	.	-	0	ID=cds.CUFF.52.1.p3;Parent=CUFF.52.1.p3
+
+CUFF.53.1	transdecoder	gene	1	4150	.	+	.	ID=GENE.CUFF.53.1~~CUFF.53.1.p1;Name=ORF%20type%3Acomplete%20len%3A759%20%28%2B%29%2Cscore%3D220.87%2CGPI7_SCHPO%7C100.00%7C0.0%2CPhosphodiest%7CPF01663.21%7C0.00024%2CPhosphodiest%7CPF01663.21%7C1.9e-12%2CSulfatase%7CPF00884.22%7C0.00086%2CSulfatase%7CPF00884.22%7C0.0009
+CUFF.53.1	transdecoder	mRNA	1	4150	.	+	.	ID=CUFF.53.1.p1;Parent=GENE.CUFF.53.1~~CUFF.53.1.p1;Name=ORF%20type%3Acomplete%20len%3A759%20%28%2B%29%2Cscore%3D220.87%2CGPI7_SCHPO%7C100.00%7C0.0%2CPhosphodiest%7CPF01663.21%7C0.00024%2CPhosphodiest%7CPF01663.21%7C1.9e-12%2CSulfatase%7CPF00884.22%7C0.00086%2CSulfatase%7CPF00884.22%7C0.0009
+CUFF.53.1	transdecoder	five_prime_UTR	1	1398	.	+	.	ID=CUFF.53.1.p1.utr5p1;Parent=CUFF.53.1.p1
+CUFF.53.1	transdecoder	exon	1	4150	.	+	.	ID=CUFF.53.1.p1.exon1;Parent=CUFF.53.1.p1
+CUFF.53.1	transdecoder	CDS	1399	3675	.	+	0	ID=cds.CUFF.53.1.p1;Parent=CUFF.53.1.p1
+CUFF.53.1	transdecoder	three_prime_UTR	3676	4150	.	+	.	ID=CUFF.53.1.p1.utr3p1;Parent=CUFF.53.1.p1
+
+CUFF.54.1	transdecoder	gene	1	1646	.	+	.	ID=GENE.CUFF.54.1~~CUFF.54.1.p1;Name=ORF%20type%3Acomplete%20len%3A253%20%28%2B%29%2Cscore%3D111.97%2CRS3A1_SCHPO%7C100.00%7C0.0%2CRibosomal_S3Ae%7CPF01015.17%7C5.9e-93%2CSUI1%7CPF01253.21%7C5.9e-05%2CSUI1%7CPF01253.21%7C30%2CDUF2997%7CPF11211.7%7C0.0013%2CNEMO%7CPF11577.7%7C0.0018
+CUFF.54.1	transdecoder	mRNA	1	1646	.	+	.	ID=CUFF.54.1.p1;Parent=GENE.CUFF.54.1~~CUFF.54.1.p1;Name=ORF%20type%3Acomplete%20len%3A253%20%28%2B%29%2Cscore%3D111.97%2CRS3A1_SCHPO%7C100.00%7C0.0%2CRibosomal_S3Ae%7CPF01015.17%7C5.9e-93%2CSUI1%7CPF01253.21%7C5.9e-05%2CSUI1%7CPF01253.21%7C30%2CDUF2997%7CPF11211.7%7C0.0013%2CNEMO%7CPF11577.7%7C0.0018
+CUFF.54.1	transdecoder	five_prime_UTR	1	773	.	+	.	ID=CUFF.54.1.p1.utr5p1;Parent=CUFF.54.1.p1
+CUFF.54.1	transdecoder	exon	1	1646	.	+	.	ID=CUFF.54.1.p1.exon1;Parent=CUFF.54.1.p1
+CUFF.54.1	transdecoder	CDS	774	1532	.	+	0	ID=cds.CUFF.54.1.p1;Parent=CUFF.54.1.p1
+CUFF.54.1	transdecoder	three_prime_UTR	1533	1646	.	+	.	ID=CUFF.54.1.p1.utr3p1;Parent=CUFF.54.1.p1
+
+CUFF.55.1	transdecoder	gene	1	910	.	+	.	ID=GENE.CUFF.55.1~~CUFF.55.1.p1;Name=ORF%20type%3A5prime_partial%20len%3A168%20%28%2B%29%2Cscore%3D40.26%2CYA95_SCHPO%7C92.62%7C5e-89%2CTRAPP%7CPF04051.15%7C1e-25
+CUFF.55.1	transdecoder	mRNA	1	910	.	+	.	ID=CUFF.55.1.p1;Parent=GENE.CUFF.55.1~~CUFF.55.1.p1;Name=ORF%20type%3A5prime_partial%20len%3A168%20%28%2B%29%2Cscore%3D40.26%2CYA95_SCHPO%7C92.62%7C5e-89%2CTRAPP%7CPF04051.15%7C1e-25
+CUFF.55.1	transdecoder	exon	1	910	.	+	.	ID=CUFF.55.1.p1.exon1;Parent=CUFF.55.1.p1
+CUFF.55.1	transdecoder	CDS	2	505	.	+	0	ID=cds.CUFF.55.1.p1;Parent=CUFF.55.1.p1
+CUFF.55.1	transdecoder	three_prime_UTR	506	910	.	+	.	ID=CUFF.55.1.p1.utr3p1;Parent=CUFF.55.1.p1
+
+CUFF.57.1	transdecoder	gene	1	3853	.	+	.	ID=GENE.CUFF.57.1~~CUFF.57.1.p1;Name=ORF%20type%3Acomplete%20len%3A1032%20%28%2B%29%2Cscore%3D349.47%2CGCSP_SCHPO%7C100.00%7C0.0%2CGDC-P%7CPF02347.15%7C2e-202%2CGDC-P%7CPF02347.15%7C1.4e-11%2CGDC-P%7CPF02347.15%7C1.2%2CBeta_elim_lyase%7CPF01212.20%7C5.2e-06
+CUFF.57.1	transdecoder	mRNA	1	3853	.	+	.	ID=CUFF.57.1.p1;Parent=GENE.CUFF.57.1~~CUFF.57.1.p1;Name=ORF%20type%3Acomplete%20len%3A1032%20%28%2B%29%2Cscore%3D349.47%2CGCSP_SCHPO%7C100.00%7C0.0%2CGDC-P%7CPF02347.15%7C2e-202%2CGDC-P%7CPF02347.15%7C1.4e-11%2CGDC-P%7CPF02347.15%7C1.2%2CBeta_elim_lyase%7CPF01212.20%7C5.2e-06
+CUFF.57.1	transdecoder	five_prime_UTR	1	188	.	+	.	ID=CUFF.57.1.p1.utr5p1;Parent=CUFF.57.1.p1
+CUFF.57.1	transdecoder	exon	1	3853	.	+	.	ID=CUFF.57.1.p1.exon1;Parent=CUFF.57.1.p1
+CUFF.57.1	transdecoder	CDS	189	3284	.	+	0	ID=cds.CUFF.57.1.p1;Parent=CUFF.57.1.p1
+CUFF.57.1	transdecoder	three_prime_UTR	3285	3853	.	+	.	ID=CUFF.57.1.p1.utr3p1;Parent=CUFF.57.1.p1
+
+CUFF.58.1	transdecoder	gene	1	605	.	+	.	ID=GENE.CUFF.58.1~~CUFF.58.1.p1;Name=ORF%20type%3Ainternal%20len%3A202%20%28%2B%29%2Cscore%3D87.10%2CRS6A_SCHPO%7C100.00%7C3e-140%2CRibosomal_S6e%7CPF01092.18%7C7.7e-62
+CUFF.58.1	transdecoder	mRNA	1	605	.	+	.	ID=CUFF.58.1.p1;Parent=GENE.CUFF.58.1~~CUFF.58.1.p1;Name=ORF%20type%3Ainternal%20len%3A202%20%28%2B%29%2Cscore%3D87.10%2CRS6A_SCHPO%7C100.00%7C3e-140%2CRibosomal_S6e%7CPF01092.18%7C7.7e-62
+CUFF.58.1	transdecoder	exon	1	605	.	+	.	ID=CUFF.58.1.p1.exon1;Parent=CUFF.58.1.p1
+CUFF.58.1	transdecoder	CDS	1	603	.	+	0	ID=cds.CUFF.58.1.p1;Parent=CUFF.58.1.p1
+
+CUFF.59.1	transdecoder	gene	1	2472	.	+	.	ID=GENE.CUFF.59.1~~CUFF.59.1.p1;Name=ORF%20type%3Acomplete%20len%3A531%20%28%2B%29%2Cscore%3D225.75%2CASL1_SCHPO%7C100.00%7C0.0%2CGlyco_hydro_cc%7CPF11790.7%7C5.3e-61
+CUFF.59.1	transdecoder	mRNA	1	2472	.	+	.	ID=CUFF.59.1.p1;Parent=GENE.CUFF.59.1~~CUFF.59.1.p1;Name=ORF%20type%3Acomplete%20len%3A531%20%28%2B%29%2Cscore%3D225.75%2CASL1_SCHPO%7C100.00%7C0.0%2CGlyco_hydro_cc%7CPF11790.7%7C5.3e-61
+CUFF.59.1	transdecoder	five_prime_UTR	1	157	.	+	.	ID=CUFF.59.1.p1.utr5p1;Parent=CUFF.59.1.p1
+CUFF.59.1	transdecoder	exon	1	2472	.	+	.	ID=CUFF.59.1.p1.exon1;Parent=CUFF.59.1.p1
+CUFF.59.1	transdecoder	CDS	158	1750	.	+	0	ID=cds.CUFF.59.1.p1;Parent=CUFF.59.1.p1
+CUFF.59.1	transdecoder	three_prime_UTR	1751	2472	.	+	.	ID=CUFF.59.1.p1.utr3p1;Parent=CUFF.59.1.p1
+
+CUFF.6.1	transdecoder	gene	1	1717	.	+	.	ID=GENE.CUFF.6.1~~CUFF.6.1.p1;Name=ORF%20type%3A5prime_partial%20len%3A317%20%28%2B%29%2Cscore%3D66.57%2CYI71_SCHPO%7C100.00%7C0.0%2CPombe_5TM%7CPF09437.9%7C1.1e-157%2CLung_7-TM_R%7CPF06814.12%7C9.9e-08
+CUFF.6.1	transdecoder	mRNA	1	1717	.	+	.	ID=CUFF.6.1.p1;Parent=GENE.CUFF.6.1~~CUFF.6.1.p1;Name=ORF%20type%3A5prime_partial%20len%3A317%20%28%2B%29%2Cscore%3D66.57%2CYI71_SCHPO%7C100.00%7C0.0%2CPombe_5TM%7CPF09437.9%7C1.1e-157%2CLung_7-TM_R%7CPF06814.12%7C9.9e-08
+CUFF.6.1	transdecoder	exon	1	1717	.	+	.	ID=CUFF.6.1.p1.exon1;Parent=CUFF.6.1.p1
+CUFF.6.1	transdecoder	CDS	3	953	.	+	0	ID=cds.CUFF.6.1.p1;Parent=CUFF.6.1.p1
+CUFF.6.1	transdecoder	three_prime_UTR	954	1717	.	+	.	ID=CUFF.6.1.p1.utr3p1;Parent=CUFF.6.1.p1
+
+CUFF.60.1	transdecoder	gene	1	4914	.	+	.	ID=GENE.CUFF.60.1~~CUFF.60.1.p1;Name=ORF%20type%3Acomplete%20len%3A844%20%28%2B%29%2Cscore%3D213.47%2CCHS1_SCHPO%7C100.00%7C0.0%2CChitin_synth_1%7CPF01644.16%7C4.2e-83%2CChitin_synth_1N%7CPF08407.10%7C1.5e-28%2CChitin_synth_2%7CPF03142.14%7C20%2CChitin_synth_2%7CPF03142.14%7C16%2CChitin_synth_2%7CPF03142.14%7C3.4e-21%2CChitin_synth_2%7CPF03142.14%7C0.00033%2CGlyco_trans_2_3%7CPF13632.5%7C1.9e-10%2CGlyco_tranf_2_3%7CPF13641.5%7C11%2CGlyco_tranf_2_3%7CPF13641.5%7C0.00056%2CMVP_shoulder%7CPF11978.7%7C0.0022
+CUFF.60.1	transdecoder	mRNA	1	4914	.	+	.	ID=CUFF.60.1.p1;Parent=GENE.CUFF.60.1~~CUFF.60.1.p1;Name=ORF%20type%3Acomplete%20len%3A844%20%28%2B%29%2Cscore%3D213.47%2CCHS1_SCHPO%7C100.00%7C0.0%2CChitin_synth_1%7CPF01644.16%7C4.2e-83%2CChitin_synth_1N%7CPF08407.10%7C1.5e-28%2CChitin_synth_2%7CPF03142.14%7C20%2CChitin_synth_2%7CPF03142.14%7C16%2CChitin_synth_2%7CPF03142.14%7C3.4e-21%2CChitin_synth_2%7CPF03142.14%7C0.00033%2CGlyco_trans_2_3%7CPF13632.5%7C1.9e-10%2CGlyco_tranf_2_3%7CPF13641.5%7C11%2CGlyco_tranf_2_3%7CPF13641.5%7C0.00056%2CMVP_shoulder%7CPF11978.7%7C0.0022
+CUFF.60.1	transdecoder	five_prime_UTR	1	310	.	+	.	ID=CUFF.60.1.p1.utr5p1;Parent=CUFF.60.1.p1
+CUFF.60.1	transdecoder	exon	1	4914	.	+	.	ID=CUFF.60.1.p1.exon1;Parent=CUFF.60.1.p1
+CUFF.60.1	transdecoder	CDS	311	2842	.	+	0	ID=cds.CUFF.60.1.p1;Parent=CUFF.60.1.p1
+CUFF.60.1	transdecoder	three_prime_UTR	2843	4914	.	+	.	ID=CUFF.60.1.p1.utr3p1;Parent=CUFF.60.1.p1
+
+CUFF.60.1	transdecoder	gene	1	4914	.	+	.	ID=GENE.CUFF.60.1~~CUFF.60.1.p2;Name=ORF%20type%3Acomplete%20len%3A354%20%28%2B%29%2Cscore%3D104.04%2CKIME_SCHPO%7C100.00%7C0.0%2CGHMP_kinases_N%7CPF00288.25%7C1.1e-17%2CGHMP_kinases_C%7CPF08544.12%7C6.2e-08%2CFPP%7CPF05911.10%7C0.0012
+CUFF.60.1	transdecoder	mRNA	1	4914	.	+	.	ID=CUFF.60.1.p2;Parent=GENE.CUFF.60.1~~CUFF.60.1.p2;Name=ORF%20type%3Acomplete%20len%3A354%20%28%2B%29%2Cscore%3D104.04%2CKIME_SCHPO%7C100.00%7C0.0%2CGHMP_kinases_N%7CPF00288.25%7C1.1e-17%2CGHMP_kinases_C%7CPF08544.12%7C6.2e-08%2CFPP%7CPF05911.10%7C0.0012
+CUFF.60.1	transdecoder	five_prime_UTR	1	3845	.	+	.	ID=CUFF.60.1.p2.utr5p1;Parent=CUFF.60.1.p2
+CUFF.60.1	transdecoder	exon	1	4914	.	+	.	ID=CUFF.60.1.p2.exon1;Parent=CUFF.60.1.p2
+CUFF.60.1	transdecoder	CDS	3846	4907	.	+	0	ID=cds.CUFF.60.1.p2;Parent=CUFF.60.1.p2
+CUFF.60.1	transdecoder	three_prime_UTR	4908	4914	.	+	.	ID=CUFF.60.1.p2.utr3p1;Parent=CUFF.60.1.p2
+
+CUFF.60.2	transdecoder	gene	1	4665	.	+	.	ID=GENE.CUFF.60.2~~CUFF.60.2.p1;Name=ORF%20type%3Acomplete%20len%3A844%20%28%2B%29%2Cscore%3D213.47%2CCHS1_SCHPO%7C100.00%7C0.0%2CChitin_synth_1%7CPF01644.16%7C4.2e-83%2CChitin_synth_1N%7CPF08407.10%7C1.5e-28%2CChitin_synth_2%7CPF03142.14%7C20%2CChitin_synth_2%7CPF03142.14%7C16%2CChitin_synth_2%7CPF03142.14%7C3.4e-21%2CChitin_synth_2%7CPF03142.14%7C0.00033%2CGlyco_trans_2_3%7CPF13632.5%7C1.9e-10%2CGlyco_tranf_2_3%7CPF13641.5%7C11%2CGlyco_tranf_2_3%7CPF13641.5%7C0.00056%2CMVP_shoulder%7CPF11978.7%7C0.0022
+CUFF.60.2	transdecoder	mRNA	1	4665	.	+	.	ID=CUFF.60.2.p1;Parent=GENE.CUFF.60.2~~CUFF.60.2.p1;Name=ORF%20type%3Acomplete%20len%3A844%20%28%2B%29%2Cscore%3D213.47%2CCHS1_SCHPO%7C100.00%7C0.0%2CChitin_synth_1%7CPF01644.16%7C4.2e-83%2CChitin_synth_1N%7CPF08407.10%7C1.5e-28%2CChitin_synth_2%7CPF03142.14%7C20%2CChitin_synth_2%7CPF03142.14%7C16%2CChitin_synth_2%7CPF03142.14%7C3.4e-21%2CChitin_synth_2%7CPF03142.14%7C0.00033%2CGlyco_trans_2_3%7CPF13632.5%7C1.9e-10%2CGlyco_tranf_2_3%7CPF13641.5%7C11%2CGlyco_tranf_2_3%7CPF13641.5%7C0.00056%2CMVP_shoulder%7CPF11978.7%7C0.0022
+CUFF.60.2	transdecoder	five_prime_UTR	1	310	.	+	.	ID=CUFF.60.2.p1.utr5p1;Parent=CUFF.60.2.p1
+CUFF.60.2	transdecoder	exon	1	4665	.	+	.	ID=CUFF.60.2.p1.exon1;Parent=CUFF.60.2.p1
+CUFF.60.2	transdecoder	CDS	311	2842	.	+	0	ID=cds.CUFF.60.2.p1;Parent=CUFF.60.2.p1
+CUFF.60.2	transdecoder	three_prime_UTR	2843	4665	.	+	.	ID=CUFF.60.2.p1.utr3p1;Parent=CUFF.60.2.p1
+
+CUFF.60.2	transdecoder	gene	1	4665	.	+	.	ID=GENE.CUFF.60.2~~CUFF.60.2.p2;Name=ORF%20type%3Acomplete%20len%3A405%20%28%2B%29%2Cscore%3D124.40%2CKIME_SCHPO%7C100.00%7C0.0%2CGHMP_kinases_N%7CPF00288.25%7C6.5%2CGHMP_kinases_N%7CPF00288.25%7C1.4e-17%2CGHMP_kinases_C%7CPF08544.12%7C7.7e-08%2CGalKase_gal_bdg%7CPF10509.8%7C0.0003%2CFPP%7CPF05911.10%7C0.0016
+CUFF.60.2	transdecoder	mRNA	1	4665	.	+	.	ID=CUFF.60.2.p2;Parent=GENE.CUFF.60.2~~CUFF.60.2.p2;Name=ORF%20type%3Acomplete%20len%3A405%20%28%2B%29%2Cscore%3D124.40%2CKIME_SCHPO%7C100.00%7C0.0%2CGHMP_kinases_N%7CPF00288.25%7C6.5%2CGHMP_kinases_N%7CPF00288.25%7C1.4e-17%2CGHMP_kinases_C%7CPF08544.12%7C7.7e-08%2CGalKase_gal_bdg%7CPF10509.8%7C0.0003%2CFPP%7CPF05911.10%7C0.0016
+CUFF.60.2	transdecoder	five_prime_UTR	1	3443	.	+	.	ID=CUFF.60.2.p2.utr5p1;Parent=CUFF.60.2.p2
+CUFF.60.2	transdecoder	exon	1	4665	.	+	.	ID=CUFF.60.2.p2.exon1;Parent=CUFF.60.2.p2
+CUFF.60.2	transdecoder	CDS	3444	4658	.	+	0	ID=cds.CUFF.60.2.p2;Parent=CUFF.60.2.p2
+CUFF.60.2	transdecoder	three_prime_UTR	4659	4665	.	+	.	ID=CUFF.60.2.p2.utr3p1;Parent=CUFF.60.2.p2
+
+CUFF.7.1	transdecoder	gene	1	876	.	+	.	ID=GENE.CUFF.7.1~~CUFF.7.1.p1;Name=ORF%20type%3Acomplete%20len%3A134%20%28%2B%29%2Cscore%3D28.31%2CYI7I_SCHPO%7C100.00%7C5e-97%2CRNA_POL_M_15KD%7CPF02150.15%7C0.0053%2CRNA_POL_M_15KD%7CPF02150.15%7C0.3
+CUFF.7.1	transdecoder	mRNA	1	876	.	+	.	ID=CUFF.7.1.p1;Parent=GENE.CUFF.7.1~~CUFF.7.1.p1;Name=ORF%20type%3Acomplete%20len%3A134%20%28%2B%29%2Cscore%3D28.31%2CYI7I_SCHPO%7C100.00%7C5e-97%2CRNA_POL_M_15KD%7CPF02150.15%7C0.0053%2CRNA_POL_M_15KD%7CPF02150.15%7C0.3
+CUFF.7.1	transdecoder	five_prime_UTR	1	158	.	+	.	ID=CUFF.7.1.p1.utr5p1;Parent=CUFF.7.1.p1
+CUFF.7.1	transdecoder	exon	1	876	.	+	.	ID=CUFF.7.1.p1.exon1;Parent=CUFF.7.1.p1
+CUFF.7.1	transdecoder	CDS	159	560	.	+	0	ID=cds.CUFF.7.1.p1;Parent=CUFF.7.1.p1
+CUFF.7.1	transdecoder	three_prime_UTR	561	876	.	+	.	ID=CUFF.7.1.p1.utr3p1;Parent=CUFF.7.1.p1
+
+CUFF.9.1	transdecoder	gene	1	804	.	+	.	ID=GENE.CUFF.9.1~~CUFF.9.1.p1;Name=ORF%20type%3Acomplete%20len%3A156%20%28%2B%29%2Cscore%3D36.30%2CYI74_SCHPO%7C100.00%7C2e-111%2CDUF2868%7CPF11067.7%7C0.0013
+CUFF.9.1	transdecoder	mRNA	1	804	.	+	.	ID=CUFF.9.1.p1;Parent=GENE.CUFF.9.1~~CUFF.9.1.p1;Name=ORF%20type%3Acomplete%20len%3A156%20%28%2B%29%2Cscore%3D36.30%2CYI74_SCHPO%7C100.00%7C2e-111%2CDUF2868%7CPF11067.7%7C0.0013
+CUFF.9.1	transdecoder	five_prime_UTR	1	172	.	+	.	ID=CUFF.9.1.p1.utr5p1;Parent=CUFF.9.1.p1
+CUFF.9.1	transdecoder	exon	1	804	.	+	.	ID=CUFF.9.1.p1.exon1;Parent=CUFF.9.1.p1
+CUFF.9.1	transdecoder	CDS	173	640	.	+	0	ID=cds.CUFF.9.1.p1;Parent=CUFF.9.1.p1
+CUFF.9.1	transdecoder	three_prime_UTR	641	804	.	+	.	ID=CUFF.9.1.p1.utr3p1;Parent=CUFF.9.1.p1
+
