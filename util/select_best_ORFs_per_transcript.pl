@@ -13,6 +13,7 @@ use List::Util qw (max);
 use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
 require "overlapping_nucs.ph";
 
+srand(1234);
 
 my $min_length_auto_accept = 1000000; # infinity effectively
 
@@ -204,8 +205,7 @@ main: {
             
             @gene_entries = ($gene_entries[0]);
         }
-        
-        
+                
         foreach my $gene_entry (@gene_entries) {
             
             my $gene_obj = $gene_entry->{gene_obj};

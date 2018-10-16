@@ -138,7 +138,7 @@ sub index_GFF3_gene_objs {
         my $genes_href = $gene_coords{$asmbl_id};
         
 		foreach my $gene_id (keys %$genes_href) {
-            print STDERR "\r-indexing [$gene_id]  ";
+            #print STDERR "\r-indexing [$gene_id]  ";
             my $transcripts_href = $genes_href->{$gene_id};
             
             my @gene_objs;
