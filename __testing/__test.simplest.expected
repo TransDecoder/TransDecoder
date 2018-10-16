@@ -223,25 +223,12 @@ CUFF.38.1	transdecoder	exon	1	7903	.	+	.	ID=CUFF.38.1.p2.exon1;Parent=CUFF.38.1.
 CUFF.38.1	transdecoder	CDS	1759	3411	.	+	0	ID=cds.CUFF.38.1.p2;Parent=CUFF.38.1.p2
 CUFF.38.1	transdecoder	three_prime_UTR	3412	7903	.	+	.	ID=CUFF.38.1.p2.utr3p1;Parent=CUFF.38.1.p2
 
-CUFF.38.1	transdecoder	gene	1	7903	.	+	.	ID=GENE.CUFF.38.1~~CUFF.38.1.p1;Name=ORF%20type%3Acomplete%20len%3A638%20%28%2B%29%2Cscore%3D186.05
-CUFF.38.1	transdecoder	mRNA	1	7903	.	+	.	ID=CUFF.38.1.p1;Parent=GENE.CUFF.38.1~~CUFF.38.1.p1;Name=ORF%20type%3Acomplete%20len%3A638%20%28%2B%29%2Cscore%3D186.05
-CUFF.38.1	transdecoder	five_prime_UTR	1	3858	.	+	.	ID=CUFF.38.1.p1.utr5p1;Parent=CUFF.38.1.p1
-CUFF.38.1	transdecoder	exon	1	7903	.	+	.	ID=CUFF.38.1.p1.exon1;Parent=CUFF.38.1.p1
-CUFF.38.1	transdecoder	CDS	3859	5772	.	+	0	ID=cds.CUFF.38.1.p1;Parent=CUFF.38.1.p1
-CUFF.38.1	transdecoder	three_prime_UTR	5773	7903	.	+	.	ID=CUFF.38.1.p1.utr3p1;Parent=CUFF.38.1.p1
-
-CUFF.38.1	transdecoder	gene	1	7903	.	-	.	ID=GENE.CUFF.38.1~~CUFF.38.1.p4;Name=ORF%20type%3A3prime_partial%20len%3A375%20%28-%29%2Cscore%3D139.90
-CUFF.38.1	transdecoder	mRNA	1	7903	.	-	.	ID=CUFF.38.1.p4;Parent=GENE.CUFF.38.1~~CUFF.38.1.p4;Name=ORF%20type%3A3prime_partial%20len%3A375%20%28-%29%2Cscore%3D139.90
-CUFF.38.1	transdecoder	five_prime_UTR	1123	7903	.	-	.	ID=CUFF.38.1.p4.utr5p1;Parent=CUFF.38.1.p4
-CUFF.38.1	transdecoder	exon	1	7903	.	-	.	ID=CUFF.38.1.p4.exon1;Parent=CUFF.38.1.p4
-CUFF.38.1	transdecoder	CDS	1	1122	.	-	0	ID=cds.CUFF.38.1.p4;Parent=CUFF.38.1.p4
-
-CUFF.38.1	transdecoder	gene	1	7903	.	-	.	ID=GENE.CUFF.38.1~~CUFF.38.1.p3;Name=ORF%20type%3Acomplete%20len%3A456%20%28-%29%2Cscore%3D135.99
-CUFF.38.1	transdecoder	mRNA	1	7903	.	-	.	ID=CUFF.38.1.p3;Parent=GENE.CUFF.38.1~~CUFF.38.1.p3;Name=ORF%20type%3Acomplete%20len%3A456%20%28-%29%2Cscore%3D135.99
-CUFF.38.1	transdecoder	five_prime_UTR	7275	7903	.	-	.	ID=CUFF.38.1.p3.utr5p1;Parent=CUFF.38.1.p3
-CUFF.38.1	transdecoder	exon	1	7903	.	-	.	ID=CUFF.38.1.p3.exon1;Parent=CUFF.38.1.p3
-CUFF.38.1	transdecoder	CDS	5907	7274	.	-	0	ID=cds.CUFF.38.1.p3;Parent=CUFF.38.1.p3
-CUFF.38.1	transdecoder	three_prime_UTR	1	5906	.	-	.	ID=CUFF.38.1.p3.utr3p1;Parent=CUFF.38.1.p3
+CUFF.38.1	transdecoder	gene	1	7903	.	+	.	ID=GENE.CUFF.38.1~~CUFF.38.1.p5;Name=ORF%20type%3Acomplete%20len%3A130%20%28%2B%29%2Cscore%3D37.98
+CUFF.38.1	transdecoder	mRNA	1	7903	.	+	.	ID=CUFF.38.1.p5;Parent=GENE.CUFF.38.1~~CUFF.38.1.p5;Name=ORF%20type%3Acomplete%20len%3A130%20%28%2B%29%2Cscore%3D37.98
+CUFF.38.1	transdecoder	five_prime_UTR	1	6936	.	+	.	ID=CUFF.38.1.p5.utr5p1;Parent=CUFF.38.1.p5
+CUFF.38.1	transdecoder	exon	1	7903	.	+	.	ID=CUFF.38.1.p5.exon1;Parent=CUFF.38.1.p5
+CUFF.38.1	transdecoder	CDS	6937	7326	.	+	0	ID=cds.CUFF.38.1.p5;Parent=CUFF.38.1.p5
+CUFF.38.1	transdecoder	three_prime_UTR	7327	7903	.	+	.	ID=CUFF.38.1.p5.utr3p1;Parent=CUFF.38.1.p5
 
 CUFF.39.1	transdecoder	gene	1	1829	.	+	.	ID=GENE.CUFF.39.1~~CUFF.39.1.p1;Name=ORF%20type%3Acomplete%20len%3A456%20%28%2B%29%2Cscore%3D135.99
 CUFF.39.1	transdecoder	mRNA	1	1829	.	+	.	ID=CUFF.39.1.p1;Parent=GENE.CUFF.39.1~~CUFF.39.1.p1;Name=ORF%20type%3Acomplete%20len%3A456%20%28%2B%29%2Cscore%3D135.99
