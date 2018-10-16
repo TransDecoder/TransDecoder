@@ -348,12 +348,12 @@ sub has_sufficient_overlap {
 
 
     my $gene_obj = $gene_entry->{gene_obj};
-    my ($lend, $rend) = sort {$a<=>$b} $gene_obj->get_coords();
+    my ($lend, $rend) = sort {$a<=>$b} $gene_obj->get_model_span();
     my $gene_len = $rend - $lend + 1; 
     
     foreach my $other_entry (@$other_entries_aref) {
-        my ($other_lend, $other_rend) = sort {$a<=>$b} $other_entry->{gene_obj}->get_coords();
-
+        my ($other_lend, $other_rend) = sort {$a<=>$b} $other_entry->{gene_obj}->get_model_span();
+        
         my $other_len = $other_rend - $other_lend + 1;
 
         if (&coordsets_overlap([$lend, $rend], [$other_lend, $other_rend])) {
