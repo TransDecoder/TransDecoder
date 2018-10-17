@@ -1,3 +1,10 @@
+
+## v5.4.0, Oct 17, 2018
+bugfix - earlier version was inadvertently reporting a single best orf per transcript when --single_best_orf was not invoked.  Now fixed and behaves as advertised.
+Also, less verbose.
+Added tests for runmode validation.
+Other minor updates
+
 ## v5.3.0, May 11, 2018
 Removed DB_File requirement
 
