@@ -1,3 +1,6 @@
+## v5.5.0, Oct 22, 2018
+added option --output_dir | -O  to both TransDecoder.LongOrfs and TransDecoder.Predict, as per request, so users can point to specific output directories rather than relying on the default ( basename(target.fasta) + ".transdecoder_dir/").
+
 
 ## v5.4.0, Oct 17, 2018
 bugfix - earlier version was inadvertently reporting a single best orf per transcript when --single_best_orf was not invoked.  Now fixed and behaves as advertised.

@@ -21,7 +21,7 @@ use Pipeliner;
 
 
 #my $VERSION = "__BLEEDING_EDGE__";
-my $VERSION = "5.4.0";
+my $VERSION = "5.5.0";
 
 my $UTIL_DIR = "$FindBin::RealBin/util";
 $ENV{PATH} = "$UTIL_DIR/bin:$ENV{PATH}";
@@ -62,10 +62,11 @@ my $usage = <<__EOUSAGE__;
 #  
 #   -S                                     strand-specific (only analyzes top strand)
 #
+#   --output_dir | -O  <string>            path to intended output directory (default:  basename( -t val ) + ".transdecoder_dir")
+#
 #   --genetic_code <string>                Universal (default)
 #
 #        Genetic Codes (derived from: https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi)
-#
 #
 $genetic_code_options
 #
@@ -91,6 +92,7 @@ my $gene_trans_map_file;
 my $MPI_DEBUG = 1;
 
 my $show_version_flag;
+my $output_dir;
 
 &GetOptions( 't=s' => \$transcripts_file,
              'm=i' => \$MIN_PROT_LENGTH,
@@ -100,6 +102,7 @@ my $show_version_flag;
              'S' => \$TOP_STRAND_ONLY, 
              'gene_trans_map=s' => \$gene_trans_map_file,
              'version' => \$show_version_flag,
+             'output_dir|O=s' => \$output_dir,
     );
 
 
@@ -142,7 +145,10 @@ main: {
     }
 
 
-    my $workdir = &Pipeliner::ensure_full_path(basename($transcripts_file) . ".transdecoder_dir"); 
+    my $workdir = $output_dir;
+    unless ($workdir) {
+        $workdir = &Pipeliner::ensure_full_path(basename($transcripts_file) . ".transdecoder_dir");
+    }
     unless (-d $workdir) {
         mkdir($workdir) or die "Error, cannot mkdir $workdir.";
     }

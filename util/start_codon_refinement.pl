@@ -30,6 +30,8 @@ my $usage = <<__EOUSAGE__;
 #
 #  optional:
 #
+#  --workdir <string>       TransDecoder working dir (default: (--transcripts val) + ".transdecoder_dir")
+#
 #  --adj_dist <int>         distance allowed for start adjustment (default: $adj_dist)
 # 
 #  --adj_pct <int>          pecentage of orf length for examining start adjustment (default: $adj_pct)
@@ -50,6 +52,7 @@ __EOUSAGE__
 my $transcripts_file;
 my $gff3_file;
 my $DEBUG = 0;
+my $workdir;
 
 &GetOptions('transcripts=s' => \$transcripts_file,
             'gff3_file=s' => \$gff3_file,
@@ -57,6 +60,7 @@ my $DEBUG = 0;
             'atg_pos=i'=> \$atg_pwm_pos,
             'atg_pct=i' => \$adj_pct,
             'debug' => \$DEBUG,
+            'workdir=s' => \$workdir,
     );
 
 
@@ -73,7 +77,10 @@ main: {
     # should be in the output directory
     
     # get transdecoder start train files
-    my $transdecoder_dir = basename($transcripts_file) . ".transdecoder_dir";
+    my $transdecoder_dir = $workdir;
+    unless ($workdir) {
+        $workdir = basename($transcripts_file) . ".transdecoder_dir";
+    }
     unless (-d $transdecoder_dir) {
         die "Error, cannot locate transdecoder working directory as: $transdecoder_dir";
     }
