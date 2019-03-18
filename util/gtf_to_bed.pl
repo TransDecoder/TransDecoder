@@ -63,7 +63,7 @@ main: {
 
 	## Output genes in gff3 format:
 
-    print "track name=\'" . basename($cufflinks_gtf) . "\'\n";
+    #print "track name=\'" . basename($cufflinks_gtf) . "\'\n";
     
 	foreach my $scaff (sort keys %genome_trans_to_coords) {
 
