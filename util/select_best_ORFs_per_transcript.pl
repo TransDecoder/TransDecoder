@@ -341,11 +341,11 @@ sub remove_overlapping_orfs {
     my @selected_entries;
     
     foreach my $gene_entry (@gene_entries) {
-        if (! &has_sufficient_overlap($gene_entry, \@selected_entries)) {
+        if ($gene_entry->{homology_count} ||  ! &has_sufficient_overlap($gene_entry, \@selected_entries)) {
             push (@selected_entries, $gene_entry);
         }
     }
-
+    
     return(@selected_entries);
 }
 
