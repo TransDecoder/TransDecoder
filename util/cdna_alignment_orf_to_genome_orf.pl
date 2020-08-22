@@ -395,10 +395,10 @@ sub parse_cdna_seq_lengths {
         
         my $asmbl = $acc;
         
-        if ($acc =~ /(asmbl_\d+)/) {
+        #if ($acc =~ /(asmbl_\d+)/) {
             # pasa stuff
-            $asmbl = $1;
-        }
+        #    $asmbl = $1;
+        #}
         
         my $sequence = $seq_obj->get_sequence();
 
