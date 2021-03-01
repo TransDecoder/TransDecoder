@@ -24,12 +24,18 @@ main: {
 
         &count_bases($sequence, \%base_counter);
 
-        unless ($top_strand_only_flag) {
-            $sequence = &reverse_complement($sequence);
-            &count_bases($sequence, \%base_counter);
-        }
-        
     }
+
+    my @nucs = ("A", "C", "G", "T");
+    my %tmp_counter;
+    foreach my $nuc (@nucs) {
+
+        $tmp_counter{$nuc} = $base_counter{$nuc};
+        unless ($top_strand_only_flag) {
+            $tmp_counter{$nuc} += $base_counter{&reverse_complement($nuc)};
+        }
+    }
+    %base_counter = %tmp_counter;
 
     
     my $sum = 0;
@@ -55,12 +61,8 @@ sub count_bases {
     my ($sequence, $base_counter_href) = @_;
 
     my @chars = split(//, $sequence);
-    
-    foreach my $char (@chars) {
-        if ($char =~ /[GATC]/) {
-            $base_counter_href->{$char}++;
-        }
-    }
+
+    map { $base_counter_href->{$_}++; } @chars;
     
     return;
 }
