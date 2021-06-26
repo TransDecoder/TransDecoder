@@ -20,6 +20,7 @@ my $pep_file = $ARGV[0] or die $usage;
          my $header = $seq_obj->get_header();
 
          #  
+         #  len:365 (+) asmbl_104:2-1096(+)
          if ($header =~ /len:(\d+) .* (\S+):\d+-\d+\([+-]\)/) {
              my $len = $1;
              my $contig = $2;
