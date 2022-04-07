@@ -88,6 +88,12 @@ main: {
                         my ($isolated_gene_id, @rest) = split(/::/, $gene_id);
                         $use_gene_id = $isolated_gene_id;
                     }
+
+                    ## some annoying gene annotations are showing up with same ids but different locations or strands.
+                    ## going to address that by including the chr and orient info in the gene identifier.
+                    my $chr = $new_orf_gene->{asmbl_id};
+                    my $orient = $new_orf_gene->get_orientation(); # note, my have been reoriented
+                    $use_gene_id = "${use_gene_id}^$chr^$orient";
                                         
                     $new_orf_gene->{TU_feat_name} = $use_gene_id;
                     $new_orf_gene->{Model_feat_name} = $gene_obj_ref->{Model_feat_name};
@@ -251,52 +257,88 @@ sub place_orf_in_cdna_alignment_context {
 
     if ($orf_orient eq '+') {
 
-
+        
         if ($trans_orient eq '+') { 
 
-            $cds_genome_lend = &from_cdna_lend($cds_span_lend, \@exon_coords);
-            $cds_genome_rend = &from_cdna_lend($cds_span_rend, \@exon_coords);
+
+            
+            ##   ===========>......==========>..........===========>   exons
+            ##          ---->......---------->..........---->          CDS
+
+            $cds_genome_lend = &from_cdna_genome_lend($cds_span_lend, \@exon_coords);
+            $cds_genome_rend = &from_cdna_genome_lend($cds_span_rend, \@exon_coords);
             $transcribed_orient = '+';
 
         }
-    
+        
         elsif ($trans_orient eq '-') {
-            
-            $cds_genome_lend = &from_cdna_rend($cds_span_rend, \@exon_coords);
-            $cds_genome_rend = &from_cdna_rend($cds_span_lend, \@exon_coords);
-            $transcribed_orient = '-';
 
+
+            
+            ##   <===========......<==========..........<===========   exons
+            ##          <----......<----------..........<----          CDS
+
+                        
+            $cds_genome_lend = &from_cdna_genome_lend($trans_seq_length - $cds_span_rend + 1, \@exon_coords);
+            $cds_genome_rend = &from_cdna_genome_lend($trans_seq_length - $cds_span_lend + 1, \@exon_coords);
+            $transcribed_orient = '-';
+            
         }
         
     }
     
     else {
-        ## orf orient is '-'
+
+        
+        ####################
+        ## orf orient is '-' w/ respect to transcript orientation
+        ####################
+        
         if (scalar(@exon_coords) > 1) {
             # any correct ORF should be in the '+' orientation here.... must be a false positive orf or transcript structure is wrong
             $WARNING_COUNT++;
-            print STDERR "Warning [$WARNING_COUNT], shouldn't have a minus-strand ORF on a spliced transcript structure. Skipping entry $orf_gene_obj->{Model_feat_name}.\n";
+            print STDERR "-Warning [$WARNING_COUNT], shouldn't have a minus-strand ORF on a plus-strand spliced transcript structure. Skipping entry $orf_gene_obj->{Model_feat_name}.\n";
             
             return undef;
         }
         
+        
         if ($trans_orient eq '+') { 
+
+
+
+            ## broken
+            
+            ##   ===========>......==========>..........===========>   exons
+            ##          <----......<----------..........<----          CDS
+
+            $WARNING_COUNT++;
+            print STDERR "-Warning [$WARNING_COUNT], orf found on opposite strand of single-exon transcript. Reorienting transcribed direction accordingly to match orf orient on genome (-).\n";
+
+            print STDERR "CDS coords: $cds_span_lend, $cds_span_rend\n";
+            
+            $cds_genome_lend = &from_cdna_genome_lend($cds_span_lend, \@exon_coords);
+            $cds_genome_rend = &from_cdna_genome_lend($cds_span_rend, \@exon_coords);
             
             
-            $cds_genome_lend = &from_cdna_lend($cds_span_rend, \@exon_coords);
-            $cds_genome_rend = &from_cdna_lend($cds_span_lend, \@exon_coords);
             $transcribed_orient = '-';
             
         }
         
         elsif ($trans_orient eq '-') {
-            
-            $cds_genome_lend = &from_cdna_rend($cds_span_rend, \@exon_coords);
-            $cds_genome_rend = &from_cdna_rend($cds_span_lend, \@exon_coords);
+
+                        
+            ##   <===========......<==========..........<===========   exons
+            ##          ---->......---------->..........---->          CDS
+
+
+            $WARNING_COUNT++;
+            print STDERR "-Warning [$WARNING_COUNT], orf found on opposite strand of single-exon transcript. Reorienting transcribed direction accordingly to match orf orient on genome (+).\n";
+                        
+            $cds_genome_lend = &from_cdna_genome_lend($trans_seq_length - $cds_span_rend +1, \@exon_coords);
+            $cds_genome_rend = &from_cdna_genome_lend($trans_seq_length - $cds_span_lend +1, \@exon_coords);
             $transcribed_orient = '+';
         }
-        
-
         
     }
     
@@ -308,7 +350,7 @@ sub place_orf_in_cdna_alignment_context {
 
 
 ####
-sub from_cdna_lend {
+sub from_cdna_genome_lend {
     my ($pt, $coords_aref) = @_;
 
     my $lend_accrue = 0;
@@ -339,37 +381,6 @@ sub from_cdna_lend {
     return;
 }
 
-####
-sub from_cdna_rend {
-    my ($pt, $coords_aref) = @_;
-    
-    my $lend_accrue = 0;
-    
-    my @coords = reverse sort {$a->[0]<=>$b->[0]} @$coords_aref;
-    
-    foreach my $coordset (@coords) {
-        my ($lend, $rend) = @$coordset;
-        
-        my $seg_len = $rend - $lend + 1;
-        
-        my $rend_accrue = $lend_accrue + $seg_len;
-        $lend_accrue++;
-        
-        
-        if ($pt >= $lend_accrue && $pt <= $rend_accrue) {
-            
-            my $pos = $rend - ($pt - $lend_accrue);
-            return($pos);
-        }
-                
-        $lend_accrue = $rend_accrue;
-    }
-    
-    
-    die "Error, couldn't localize pt $pt within coordsets: " . Dumper($coords_aref);
-    
-    return;
-}
 
 ####
 sub parse_cdna_seq_lengths {
@@ -384,10 +395,10 @@ sub parse_cdna_seq_lengths {
         
         my $asmbl = $acc;
         
-        if ($acc =~ /(asmbl_\d+)/) {
+        #if ($acc =~ /(asmbl_\d+)/) {
             # pasa stuff
-            $asmbl = $1;
-        }
+        #    $asmbl = $1;
+        #}
         
         my $sequence = $seq_obj->get_sequence();
 

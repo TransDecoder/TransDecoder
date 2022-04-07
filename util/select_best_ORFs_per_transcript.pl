@@ -189,23 +189,30 @@ main: {
                                          "len: " . $entry->{length}) . "\n";
             }
         }
-        
-
-
-        @gene_entries = &remove_overlapping_orfs(@gene_entries);
-        
-        
+                
         if ($SINGLE_BEST_ORF_FLAG) {
             ## re-sort and take the longest one w/ homology info:
             @gene_entries = sort {
                 $b->{homology_count} <=> $a->{homology_count}
                 ||
-                    $b->{length} <=> $a->{length}
+                $b->{length} <=> $a->{length}
             } @gene_entries;
             
             @gene_entries = ($gene_entries[0]);
+
+            if ($verbose_flag) {
+                print STDERR "- ** selecting best orf, prioritized by homology then length:\n";
+                my $entry = $gene_entries[0];
+                print STDERR "\t" . join("\t", $entry->{gene_obj}->{Model_feat_name}, 
+                                         "homology_count: " . $entry->{homology_count},
+                                         "cds_score: " . $entry->{cds_scores}[0],
+                                         "len: " . $entry->{length}) . "\n";
+            }
         }
-                
+        else {
+            @gene_entries = &remove_overlapping_orfs(@gene_entries);
+        }
+        
         foreach my $gene_entry (@gene_entries) {
             
             my $gene_obj = $gene_entry->{gene_obj};
@@ -334,11 +341,11 @@ sub remove_overlapping_orfs {
     my @selected_entries;
     
     foreach my $gene_entry (@gene_entries) {
-        if (! &has_sufficient_overlap($gene_entry, \@selected_entries)) {
+        if ($gene_entry->{homology_count} ||  ! &has_sufficient_overlap($gene_entry, \@selected_entries)) {
             push (@selected_entries, $gene_entry);
         }
     }
-
+    
     return(@selected_entries);
 }
 

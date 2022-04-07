@@ -58,20 +58,15 @@ my $usage = <<__EOUSAGE__;
 #
 #   -m <int>                               minimum protein length (default: 100)
 # 
-#   -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia)
-#  
 #   -S                                     strand-specific (only analyzes top strand)
 #
 #   --output_dir | -O  <string>            path to intended output directory (default:  basename( -t val ) + ".transdecoder_dir")
 #
-#   --genetic_code <string>                Universal (default)
-#
-#        Genetic Codes (derived from: https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi)
-#
-$genetic_code_options
-#
-#
 #   --version                              show version tag ($VERSION)
+#
+#   --genetic_code | -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia)
+#                                              Genetic Codes (derived from: https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi)#  
+$genetic_code_options 
 #
 #########################################################################################
 
@@ -96,7 +91,7 @@ my $output_dir;
 
 &GetOptions( 't=s' => \$transcripts_file,
              'm=i' => \$MIN_PROT_LENGTH,
-             'G=s' => \$genetic_code,
+             'genetic_code|G=s' => \$genetic_code,
              'h' => \$help,
              'v' => \$verbose,
              'S' => \$TOP_STRAND_ONLY, 

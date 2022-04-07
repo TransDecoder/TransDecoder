@@ -68,8 +68,6 @@ my $usage = <<__EOUSAGE__;
 #
 #   --output_dir | -O  <string>            output directory from the TransDecoder.LongOrfs step (default: basename( -t val ) + ".transdecoder_dir")
 #
-#   -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia, ...)
-#
 #   --no_refine_starts                     start refinement identifies potential start codons for 5' partial ORFs using a PWM, process on by default.
 #
 ##  Advanced options
@@ -77,17 +75,12 @@ my $usage = <<__EOUSAGE__;
 #    -T <int>                            Top longest ORFs to train Markov Model (hexamer stats) (default: 500)
 #                                        Note, 10x this value are first selected for removing redundancies,
 #                                        and then this -T value of longest ORFs are selected from the non-redundant set.
-#  Genetic Codes
+#  --version                           show version ($VERSION)
 #
-#
-#   --genetic_code <string>                Universal (default)
-#
-#        Genetic Codes (derived from: https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi)
-#
-#
+#   --genetic_code | -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia, ...)
+#                                              Genetic Codes (derived from: https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi)
 $genetic_code_options
 #
-#  --version                           show version ($VERSION)
 #
 #########################################################################################
 
@@ -183,7 +176,7 @@ my $show_version_flag;
 
              'single_best_only' => \$single_best_flag,
              
-             'G=s' => \$genetic_code,
+             'genetic_code|G=s' => \$genetic_code,
 
              'no_refine_starts' => \$NO_REFINE_START_CODONS_FLAG,
 
