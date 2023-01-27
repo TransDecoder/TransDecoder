@@ -21,7 +21,6 @@ my $pep_file = $ARGV[0] or die $usage;
 
          #  
          #  len:365 (+) asmbl_104:2-1096(+)
-         #  
 
          if ($header =~ /len:(\d+) .* (\S+):\d+-\d+\([+-]\)/) {
              my $len = $1;

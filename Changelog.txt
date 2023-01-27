@@ -1,3 +1,15 @@
+## v5.6.0, Apr 07, 2022
+- genome propagation of orfs resets orientation for unspliced transcripts with opposite strand orfs.
+- speed update from Yanick Paco Hagemeijer
+- added option --output_dir | -O  to both TransDecoder.LongOrfs and TransDecoder.Predict, as per request, so users can point to specific output directories rather than relying on the default ( basename(target.fasta) + ".transdecoder_dir/").
+- removing track name from bed output
+- if select single best orf, do selection before removing overlapping preds
+- updated get_longest_ORF_per_transcript.pl to match current header formatting
+- really retain all blast hits, ignoring overlaps to prev selected entries, unless single_best_orf indicated
+- updated genetic code options in help menu
+
+
+
 ## v5.5.0, Oct 22, 2018
 added option --output_dir | -O  to both TransDecoder.LongOrfs and TransDecoder.Predict, as per request, so users can point to specific output directories rather than relying on the default ( basename(target.fasta) + ".transdecoder_dir/").
 
