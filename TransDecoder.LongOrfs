@@ -68,6 +68,8 @@ my $usage = <<__EOUSAGE__;
 #                                              Genetic Codes (derived from: https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi)#  
 $genetic_code_options 
 #
+#   --complete_orfs_only                   yields only complete ORFs (peps start with Met (M), end with stop (*))
+#
 #########################################################################################
 
 
@@ -88,6 +90,7 @@ my $MPI_DEBUG = 1;
 
 my $show_version_flag;
 my $output_dir;
+my $COMPLETE_ORFS_ONLY = 0;
 
 &GetOptions( 't=s' => \$transcripts_file,
              'm=i' => \$MIN_PROT_LENGTH,
@@ -98,6 +101,7 @@ my $output_dir;
              'gene_trans_map=s' => \$gene_trans_map_file,
              'version' => \$show_version_flag,
              'output_dir|O=s' => \$output_dir,
+             'complete_orfs_only' => \$COMPLETE_ORFS_ONLY,
     );
 
 
@@ -212,15 +216,18 @@ main: {
         $trans_counter++;
         my $percent_done = sprintf("%.2f", $trans_counter/$num_total_trans*100);
         print STDERR "\r[$trans_counter/$num_total_trans] = $percent_done\% done    " if $trans_counter % 100 == 0;
-                
-
+        
+        
 		my $acc = $seq_obj->get_accession();
 		my $sequence = $seq_obj->get_sequence();
 		
 		my $longest_orf_finder = new Longest_orf();
-		$longest_orf_finder->allow_5prime_partials();
-		$longest_orf_finder->allow_3prime_partials();
-		
+        
+        unless ($COMPLETE_ORFS_ONLY) {
+            $longest_orf_finder->allow_5prime_partials();
+            $longest_orf_finder->allow_3prime_partials();
+        }
+        
 	    if ($TOP_STRAND_ONLY) {
 			$longest_orf_finder->forward_strand_only();
 		}
