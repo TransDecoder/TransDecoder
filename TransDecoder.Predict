@@ -27,6 +27,7 @@ my $VERSION = "5.6.0";
 
 my $RETAIN_LONG_ORFS_MIN_LENGTH = 1000000; # so essentially, off by default
 
+srand(1234);
 
 my $genetic_code = "Universal";
 my $genetic_code_options = join("\n", &Nuc_translator::get_genetic_codes());
