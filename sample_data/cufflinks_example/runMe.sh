@@ -51,7 +51,7 @@ else
 
     #
     ## run pfam
-    #hmmscan --domtblout pfam.domtblout $PFAMDB transcripts.fasta.transdecoder_dir/longest_orfs.pep > pfam.log
+    #hmmsearch --domtblout pfam.domtblout $PFAMDB transcripts.fasta.transdecoder_dir/longest_orfs.pep > pfam.log
 
     hmmpress -f mini_Pfam-A.hmm
     hmmsearch --domtblout pfam.domtblout mini_Pfam-A.hmm transcripts.fasta.transdecoder_dir/longest_orfs.pep

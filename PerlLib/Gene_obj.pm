@@ -3594,10 +3594,17 @@ sub to_GFF3_format {
 	}
 	
 	if ($com_name) {
-		# uri escape it:
-		$com_name = uri_escape($com_name);
-	}
-
+        if ($preferences{uri_encode_name}) {
+            # uri escape it:
+            $com_name = uri_escape($com_name);
+        }
+        else {
+            unless (substr($com_name,0,1) =~ /\'|\"/ && substr($com_name, -1, 1) =~ /\'|\"/) {
+                $com_name = "\"$com_name\"";
+            }
+        }
+    }
+    
 	my $gene_alias = "";
 	if (my $pub_locus = $gene_obj->{pub_locus}) {
 		$gene_alias = "Alias=$pub_locus;";
@@ -4570,9 +4577,34 @@ sub set_CDS_phases {
         
         $start_pos = $self->_get_cds_start_pos($cds_sequence);
         
-    
-        my $first_phase = $start_pos - 1;
-        
+        ## must set phase based on codon start position:
+        ## my definition of phase here is the actual codon position of the first base in the CDS sequence.
+        ##  (note this differs from the GFF3 spec, and is adjusted for in the to_GFF3_format() method.
+        ##
+                
+        my $first_phase;
+        if ($start_pos == 0) {
+            # ATG XXX ...
+            # 012 012 012
+            
+            $first_phase = 0;  
+        }
+        elsif ($start_pos == 1) {
+            # XAT GXX ...
+            # 201 201 201
+            
+            $first_phase = 2;
+        }
+        elsif ($start_pos == 2) {
+            # XXA TGX ...
+            # 120 120 120 
+
+            $first_phase = 1
+        }
+        else {
+            confess "Error, start pos: $start_pos doesn't make sense here... must be a bug.";
+        }
+
         my @exons = $self->get_exons();
         my @cds_objs;
         foreach my $exon (@exons) {
@@ -4585,8 +4617,20 @@ sub set_CDS_phases {
         my $cds_obj = shift @cds_objs;
         $cds_obj->{phase} = $first_phase;
         my $cds_length = abs ($cds_obj->{end3} - $cds_obj->{end5}) + 1;
-        $cds_length -= $first_phase;
-        
+
+        if ($first_phase != 0) {
+            # and now I understand why the GFF3 phase definition differs from mine. :-)  
+            if ($first_phase == 1) {
+                $cds_length -= 2;
+            }
+            elsif ($first_phase == 2) {
+                $cds_length -= 1;
+            }
+            else {
+                confess "Error, first phase set to: $first_phase, which is nonsensical";
+            }
+        }
+                
         while (@cds_objs) {
             my $next_cds_obj = shift @cds_objs;
             $next_cds_obj->{phase} = $cds_length % 3;
@@ -4632,10 +4676,9 @@ sub _get_cds_start_pos {
 	unless (ref $longest_orf) {
 		die "No longest ORF found in sequence";
 	}
-	
+
 	## examine the first three ORFs, prefer long orf with stop codon.
     my $orfPos = $longest_orf->{start}; #init to first, longest orf.
-	
 	unless (defined $orfPos) {
 		die "Error, orfPos not defined! " . Dumper ($longest_orf);
 	}
@@ -4665,6 +4708,10 @@ sub _get_cds_start_pos {
         confess "Error, longest ORF is found at position $orfPos, and should be between 1 and 3.  What's wrong with your gene?" . $self->toString();
     }
     $codon_start = $orfPos;
+
+    #longest orf apparently using 1-based rather than 0-based coordinates.
+        
+    $codon_start -= 1;  
     
     return ($codon_start);
 }
