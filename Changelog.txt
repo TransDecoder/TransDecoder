@@ -1,3 +1,12 @@
+## v5.7.0
+- compatible with hmmsearch or hmmscan output
+- cleaner organization of outputs and checkpoints
+- TransDecoder.LongOrfs includes option for --complete_orfs_only (as requested)
+- GFF3 files no longer have the uri-encoding so easier to directly read.
+- misc bugfixes - corrected length in fasta header for start-refined orfs
+
+
+
 ## v5.6.0, Apr 07, 2022
 - genome propagation of orfs resets orientation for unspliced transcripts with opposite strand orfs.
 - speed update from Yanick Paco Hagemeijer
