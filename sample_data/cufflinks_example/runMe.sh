@@ -54,7 +54,7 @@ else
     #hmmscan --domtblout pfam.domtblout $PFAMDB transcripts.fasta.transdecoder_dir/longest_orfs.pep > pfam.log
 
     hmmpress -f mini_Pfam-A.hmm
-    hmmscan --domtblout pfam.domtblout mini_Pfam-A.hmm transcripts.fasta.transdecoder_dir/longest_orfs.pep
+    hmmsearch --domtblout pfam.domtblout mini_Pfam-A.hmm transcripts.fasta.transdecoder_dir/longest_orfs.pep
         
     ## use pfam and blast results:
     cmd="../../TransDecoder.Predict  -t transcripts.fasta --retain_pfam_hits pfam.domtblout --retain_blastp_hits blastp.outfmt6   -v"

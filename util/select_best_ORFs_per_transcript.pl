@@ -262,12 +262,44 @@ sub parse_pfam_hits_file {
     while (my $ln=<$fh>) {
         next if $ln=~/^\#/;
         my @x = split(/\s+/,$ln);
+
+        # hmmscan format:
+        #0       Fe-ADH_2
+        #1       PF13685.5
+        #2       250
+        #3       CUFF.50.1.p1
+        #4       -
+
+        # hmmsearch format:
+        #0       CUFF.50.1.p1
+        #1       -
+        #2       423
+        #3       Fe-ADH_2
+        #4       PF13685.5
+        #5       250
+
+        
         next unless $x[3];  # domtbl
-        my $orf_acc = $x[3];
-        my $pfam_hit = $x[0];
-        my $pfam_acc = $x[1];
-        my $domain_evalue = $x[12];
-        $has_pfam_hit{$orf_acc} .= "," . join("|", $pfam_hit, $pfam_acc, $domain_evalue);
+
+        if ($x[1] =~ /^PF\d+/) {
+            # hmmscan formatting 
+            my $orf_acc = $x[3]; # CUFF.50.1.p1
+            my $pfam_hit = $x[0]; # Fe-ADH_2
+            my $pfam_acc = $x[1]; # PF13685.5
+            my $domain_evalue = $x[12];
+            $has_pfam_hit{$orf_acc} .= "," . join("|", $pfam_hit, $pfam_acc, $domain_evalue);
+        }
+        elsif ($x[4] =~ /^PF\d+/) {
+            # hmmsearch formatting:
+            my $orf_acc = $x[0]; # CUFF.50.1.p1
+            my $pfam_hit = $x[3]; # Fe-ADH_2
+            my $pfam_acc = $x[4]; # PF13685.5
+            my $domain_evalue = $x[12];
+            $has_pfam_hit{$orf_acc} .= "," . join("|", $pfam_hit, $pfam_acc, $domain_evalue);
+        }
+        else {
+            confess "Error, cannot decipher pfam hit formatting: $ln ";
+        }
     }
     close $fh;
 
