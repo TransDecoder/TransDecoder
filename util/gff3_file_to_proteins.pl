@@ -124,6 +124,13 @@ foreach my $asmbl_id (sort keys %$contig_to_gene_list_href) {
                 next;
             }
 
+            
+            my $seqlen = length($seq);
+            if ($seq =~ /\*$/) {
+                $seqlen -= 1; # dont count stop codon
+            }
+            
+            
             $seq =~ s/(\S{60})/$1\n/g; # make fasta format
             chomp $seq;
             
@@ -148,12 +155,7 @@ foreach my $asmbl_id (sort keys %$contig_to_gene_list_href) {
             #if ($seq_type eq 'prot' || $seq_type eq 'CDS') {  # this was a bad idea, just use the original id.
             #    $isoform_id = "cds.$isoform_id";
             #}
-
-            $seqlen = length($seq);
-            if ($seq =~ /\*$/) {
-                $seqlen -= 1; # dont count stop codon
-            }
-            
+                        
             print ">$isoform_id $gene_id $locus_string $com_name len:$seqlen $asmbl_id:$model_lend-$model_rend($orientation)\n$seq\n";
         }
     }
