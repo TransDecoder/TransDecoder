@@ -70,15 +70,15 @@ main: {
         mkdir($checkpoints_dir) or die $!;
     }
     
-    my $pipeliner = new Pipeliner(-verbose => 2);
-
+    my $pipeliner = new Pipeliner(-verbose => 2, -checkpoint_dir => $checkpoints_dir);
+    
     my $cmd = "$utildir/build_atgPWM_+-.pl "
         . " --transcripts $transcripts_file "
         . " --selected_orfs $selected_orfs_file "
         . " --out_prefix $out_prefix"
         . " --pwm_left $pwm_left --pwm_right $pwm_right ";
     
-    $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/built_init.ok"));
+    $pipeliner->add_commands(new Command($cmd, "built_init.ok"));
 
     $cmd = "$utildir/feature_scoring.+-.pl "
         . " --features_plus $out_prefix.+.features "
@@ -86,22 +86,22 @@ main: {
         . " --atg_position $pwm_left "
         . " > $out_prefix.feature.scores";
     
-    $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/score_features.ok"));
+    $pipeliner->add_commands(new Command($cmd, "score_features.ok"));
 
     $cmd = "$utildir/feature_scores_to_ROC.pl $out_prefix.feature.scores > $out_prefix.feature.scores.roc";
-    $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/roc_features.ok"));
+    $pipeliner->add_commands(new Command($cmd, "roc_features.ok"));
 
     $cmd = "$utildir/plot_ROC.Rscript $out_prefix.feature.scores.roc || :";
-    $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/rocplot.ok"));
+    $pipeliner->add_commands(new Command($cmd, "rocplot.ok"));
     
     $cmd = "$utildir/compute_AUC.pl $out_prefix.feature.scores.roc";
-    $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/aucplot.ok"));
+    $pipeliner->add_commands(new Command($cmd, "aucplot.ok"));
 
     $cmd = "$utildir/make_seqLogo.Rscript $out_prefix.+.pwm || :";
-    $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/seqlogo.+.ok"));
+    $pipeliner->add_commands(new Command($cmd, "seqlogo.+.ok"));
 
     $cmd = "$utildir/make_seqLogo.Rscript $out_prefix.-.pwm || :";
-    $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/seqlogo.-.ok"));
+    $pipeliner->add_commands(new Command($cmd, "seqlogo.-.ok"));
 
         
     #################
@@ -113,7 +113,7 @@ main: {
         . " --pwm_minus $out_prefix.-.pwm "
         . " --out_prefix $out_prefix.enhanced";
     
-    $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/enhance.ok"));
+    $pipeliner->add_commands(new Command($cmd, "enhance.ok"));
 
     
     $cmd = "$utildir/feature_scoring.+-.pl "
@@ -122,20 +122,20 @@ main: {
         . " --atg_position $pwm_left "
         . " > $out_prefix.enhanced.feature.scores";
     
-    $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/enhanced_score_features.ok"));
+    $pipeliner->add_commands(new Command($cmd, "enhanced_score_features.ok"));
 
     
     $cmd = "$utildir/feature_scores_to_ROC.pl $out_prefix.enhanced.feature.scores > $out_prefix.enhanced.feature.scores.roc";
-    $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/enhanced_roc_features.ok"));
+    $pipeliner->add_commands(new Command($cmd, "enhanced_roc_features.ok"));
 
     $cmd = "$utildir/plot_ROC.Rscript $out_prefix.enhanced.feature.scores.roc || :";
-    $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/enhanced_rocplot.ok"));
+    $pipeliner->add_commands(new Command($cmd, "enhanced_rocplot.ok"));
     
     $cmd = "$utildir/compute_AUC.pl $out_prefix.enhanced.feature.scores.roc";
-    $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/enhanced_aucplot.ok"));
+    $pipeliner->add_commands(new Command($cmd, "enhanced_aucplot.ok"));
     
     $cmd = "$utildir/make_seqLogo.Rscript $out_prefix.enhanced.+.pwm || :";
-    $pipeliner->add_commands(new Command($cmd, "$checkpoints_dir/seqlogo.enhanced.+.ok"));
+    $pipeliner->add_commands(new Command($cmd, "seqlogo.enhanced.+.ok"));
         
     
     $pipeliner->run();

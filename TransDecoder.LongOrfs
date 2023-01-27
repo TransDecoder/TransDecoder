@@ -153,7 +153,7 @@ main: {
         mkdir($checkpoints_dir);
     }
     
-    my $pipeliner = new Pipeliner('-verbose' => 2, -checkpoints_dir => $checkpoints_dir);
+    my $pipeliner = new Pipeliner('-verbose' => 2, -checkpoint_dir => $checkpoints_dir);
         
     my %gene_trans_map;
     if ($gene_trans_map_file) {
