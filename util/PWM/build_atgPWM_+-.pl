@@ -203,7 +203,7 @@ sub parse_starts {
     while (<$fh>) {
         chomp;
         if (/^>/) {
-            if (/len:\d+ (\S+):(\d+)-(\d+)\(([+-])\)/) {
+            if (/(\S+):(\d+)-(\d+)\(([+-])\)/) {
                 my $transcript = $1;
                 my $prime5 = $2;
                 my $prime3= $3;
