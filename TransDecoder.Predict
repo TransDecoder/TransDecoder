@@ -241,7 +241,7 @@ main: {
         mkdir($checkpoints_dir);
     }
     
-    my $pipeliner = new Pipeliner('-verbose' => 2, -checkpoints_dir -> $checkpoints_dir);
+    my $pipeliner = new Pipeliner('-verbose' => 2, -checkpoints_dir => $checkpoints_dir);
     
     my $prefix = "$workdir/longest_orfs";
     my $cds_file = "$prefix.cds";

@@ -1,4 +1,4 @@
-AA#!/usr/local/bin/perl
+#!/usr/local/bin/perl
 
 package main;
 our $SEE; 
