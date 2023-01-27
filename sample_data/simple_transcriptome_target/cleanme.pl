@@ -34,5 +34,6 @@ foreach my $file (<*>) {
 
 `rm -rf ./Trinity.fasta.transdecoder_dir/`;
 `rm -rf ./Trinity.fasta.transdecoder_dir.__checkpoints`;
+`rm -rf ./Trinity.fasta.transdecoder_dir.__checkpoints_longorfs`;
 
 exit(0);

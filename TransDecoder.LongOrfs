@@ -148,13 +148,12 @@ main: {
         mkdir($workdir) or die "Error, cannot mkdir $workdir.";
     }
     
-    my $checkpoints_dir = "$workdir.__checkpoints_longorfs";
+    my $checkpoints_dir = "$workdir/__checkpoints_longorfs";
     if (! -d $checkpoints_dir) {
         mkdir($checkpoints_dir);
     }
     
-    my $pipeliner = new Pipeliner('-verbose' => 2);
-    $pipeliner->set_checkpoint_dir($checkpoints_dir);
+    my $pipeliner = new Pipeliner('-verbose' => 2, -checkpoints_dir => $checkpoints_dir);
         
     my %gene_trans_map;
     if ($gene_trans_map_file) {

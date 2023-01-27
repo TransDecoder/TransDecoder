@@ -236,13 +236,12 @@ main: {
         die "Error, cannot find directory: $workdir,  be sure to first run TransDecoder.LongOrfs before TransDecoder.Predict\n\n";
     }
 
-    my $checkpoints_dir = "$workdir.__checkpoints";
+    my $checkpoints_dir = "$workdir/__checkpoints_TDpredict";
     if (! -d $checkpoints_dir) {
         mkdir($checkpoints_dir);
     }
     
-    my $pipeliner = new Pipeliner('-verbose' => 2);
-    $pipeliner->set_checkpoint_dir($checkpoints_dir);
+    my $pipeliner = new Pipeliner('-verbose' => 2, -checkpoints_dir -> $checkpoints_dir);
     
     my $prefix = "$workdir/longest_orfs";
     my $cds_file = "$prefix.cds";

@@ -9,7 +9,6 @@ use Cwd;
 ## Verbose levels:
 ## 1: see CMD string
 ## 2: see stderr during process
-my $VERBOSE = 0;
 ################################
 
 
@@ -53,7 +52,8 @@ sub process_cmd {
 sub new {
     my $packagename = shift;
     my %params = @_;
-    
+
+    my $VERBOSE = 0;
     if ($params{-verbose}) {
         $VERBOSE = $params{-verbose};
     }
@@ -64,7 +64,7 @@ sub new {
         cmd_objs => [],
         checkpoint_dir => undef,
         cmds_log_ofh => undef,
-        
+        VERBOSE => $VERBOSE,
     };
     
     bless ($self, $packagename);
@@ -142,7 +142,8 @@ sub has_commands {
 
 sub run {
     my $self = shift;
-
+    my $VERBOSE = $self->{VERBOSE};
+    
     my $cmds_log_ofh = $self->{cmds_log_ofh};
 
     foreach my $cmd_obj ($self->_get_commands()) {
@@ -158,17 +159,18 @@ sub run {
             print STDERR "-- Skipping CMD: $cmdstr, checkpoint [$checkpoint_file] exists.\n" if $VERBOSE;
         }
         else {
-            print STDERR "* Running CMD: $cmdstr\n" if $VERBOSE;
+            my $datestamp = localtime();
+            print STDERR "* [$datestamp] Running CMD: $cmdstr\n" if $VERBOSE;
             
             my $tmp_stderr = "tmp.$$." . time() . ".stderr";
             if (-e $tmp_stderr) {
                 unlink($tmp_stderr);
             }
 
-            unless ($VERBOSE == 2) {
+            if ($VERBOSE < 2 && $cmdstr !~ / 2>/ ) {
                 $cmdstr .= " 2>$tmp_stderr";
             }
-
+            
             print STDERR $msg if $msg;
             
             my $ret = system($cmdstr);
@@ -177,7 +179,7 @@ sub run {
                 if (-e $tmp_stderr) {
                     my $errmsg = `cat $tmp_stderr`;
                     if ($errmsg =~ /\w/) {
-                        print STDERR "\n\nError encountered::  <!----\n$errmsg\n--->\n\n";
+                        print STDERR "\n\nError encountered::  <!----\nCMD: $cmdstr\n\nErrmsg:\n$errmsg\n--->\n\n";
                     }
                     unlink($tmp_stderr);
                 }

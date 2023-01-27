@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+AA#!/usr/local/bin/perl
 
 package main;
 our $SEE; 
@@ -114,7 +114,7 @@ sub get_longest_orf {
     my $input_sequence = shift;
     
     unless ($input_sequence) {
-		print STDERR "I require a cDNA nucleotide sequence as my only parameter\n";
+	    confess "I require a cDNA nucleotide sequence as my only parameter ";
 		return;
     }
     unless (length ($input_sequence) >= 3) {
@@ -139,7 +139,7 @@ sub capture_all_ORFs {
     my $input_sequence = shift;
 
     unless ($input_sequence) {
-		print STDERR "I require a cDNA nucleotide sequence as my only parameter\n";
+        confess "I require a cDNA nucleotide sequence as my only parameter\n";
 		return;
     }
     unless (length ($input_sequence) >= 3) {
@@ -169,13 +169,13 @@ sub capture_all_ORFs {
     if (@orfs) {
 		## set in order of decreasing length
 		@orfs = reverse sort {$a->{length} <=> $b->{length}} @orfs;
-		my $longest_orf = $orfs[0];
-		my $seq = $longest_orf->{sequence};
-    my $length = length($seq);
-    my $protein = &translate_sequence($seq, 1);
 		
+		my $longest_orf = $orfs[0];
 		my $start = $longest_orf->{start};
 		my $stop = $longest_orf->{stop};
+		my $seq = $longest_orf->{sequence};
+		my $length = length($seq);
+		my $protein = &translate_sequence($seq, 1);
 		$self->{end5} = $start;  ## now coord is seq_based instead of array based.
 		$self->{end3} = $stop;
 		$self->{length} = $length;
@@ -185,44 +185,6 @@ sub capture_all_ORFs {
 	}
 
 	return (@orfs);
-}
-
-sub check_for_fp_5prime_partials {
-  my($self,$min_len,$orfs_ref,$pct_cutoff) = @_;
-  my @orfs = @$orfs_ref;
-  print "IN fp $#orfs\n" if($SEE);
-  $pct_cutoff /= 100;
-  for(my $i = 0; $i <= $#orfs; $i++) {
-    use Data::Dumper;
-
-    next if($orfs[$i]->{type} ne '5prime_partial');
-    my $fl_start = index($orfs[$i]->{protein}, 'M');
-    next if($fl_start == -1);
-
- 
-    my $fl_protein = substr($orfs[$i]->{protein}, $fl_start);
-    print "partial with M\nnew prot: $fl_protein\n" if($SEE);
-    print Dumper($orfs[$i]) if($SEE);
-
-    next if(length($fl_protein) < $min_len);
-    next if(length($fl_protein) < $pct_cutoff*length($orfs[$i]->{protein}));
-    next if($i < $#orfs && length($orfs[$i+1]->{protein}) > length($fl_protein));
- 
-    print "seq start: $orfs[$i]->{start} new start: ".($orfs[$i]->{start} + $fl_start*3)." length: $orfs[$i]->{length}\n" if($SEE);
-    $orfs[$i]->{sequence} = substr($orfs[$i]->{sequence},$fl_start*3);
-    $orfs[$i]->{length} = length($orfs[$i]->{sequence});
-    if($orfs[$i]->{orient} eq '+') {
-      $orfs[$i]->{start} = $orfs[$i]->{start} +$fl_start*3;
-    } else {
-      $orfs[$i]->{start} = $orfs[$i]->{start} -$fl_start*3;
-    }
-
-    $orfs[$i]->{protein} = $fl_protein;
-    $orfs[$i]->{type} = 'complete';
-    
-    print Dumper($orfs[$i]) if($SEE);
-  }
-
 }
 
 sub orfs {
@@ -289,8 +251,8 @@ sub get_orfs {
     foreach my $start_pos (@{$starts_ref}) {
 		my $start_pos_frame = $start_pos % 3;
 		foreach my $stop_pos (@{$stops_ref}) {
-		  # print "Comparing start: $start_pos to stop: $stop_pos, $direction\n";
-		  if ( ($stop_pos > $start_pos)   && #end3 > end5
+            # print "Comparing start: $start_pos to stop: $stop_pos, $direction\n";
+            if ( ($stop_pos > $start_pos)   && #end3 > end5
 				 ( ($stop_pos - $start_pos) % 3 == 0) #must be in-frame
 				 && ($start_pos > $last_delete_pos{$start_pos_frame})) #only count each stop once.
 			{
@@ -307,38 +269,15 @@ sub get_orfs {
 				my $orfSeq =  substr ($seq, $start_pos, ($stop_pos - $start_pos + 3)); #include the stop codon too.
 				my $protein = &translate_sequence($orfSeq, 1);
 				if ($protein =~ /\*.*\*/) {
-				  confess "Fatal Error: Longest_orf: ORF returned which contains intervening stop(s): ($start-$stop, $direction\nProtein:\n$protein\nOf Nucleotide Seq:\n$seq\n";
+                    confess "Fatal Error: Longest_orf: ORF returned which contains intervening stop(s): ($start-$stop, $direction\nProtein:\n$protein\nOf Nucleotide Seq:\n$seq\n";
 				}
-
-        my $got_start = 0;
-        my $got_stop = 0;
-        if ($protein =~ /^M/) {
-            $got_start = 1;
-        } 
-        if ($protein =~ /\*$/) {
-            $got_stop = 1;
-        }
-        
-        my $prot_type = "";
-        if ($got_start && $got_stop) {
-            $prot_type = "complete";
-        } elsif ($got_start) {
-            $prot_type = "3prime_partial";
-        } elsif ($got_stop) {
-            $prot_type = "5prime_partial";
-        } else {
-            $prot_type = "internal";
-        }
-        print "Setting type $prot_type\n" if($SEE);
-
 				my $orf = { sequence => $orfSeq,
 							protein => $protein,
-              type => $prot_type,
 							start=>$start,
 							stop=>$stop,
 							length=>length($orfSeq),
 							orient=>$direction
-							};
+                };
 				push (@orfs, $orf);
 				last;
 			}
@@ -384,29 +323,29 @@ sub identify_putative_starts {
 
 
 sub identify_putative_stops {
-  my ($self, $seq) = @_;
-  my %stops;
-  if ($self->{ALLOW_3PRIME_PARTIALS}) {
-	## count terminal 3 nts as possible ORF terminators.
-	my $seq_length = length ($seq);
-	$stops{$seq_length} = 1;
-	$seq_length--;
-	$stops{$seq_length} = 1;
-	$seq_length--;
-	$stops{$seq_length} = 1;
-  }
-  my @stop_codons = @{$self->{stop_codons}};
-  foreach my $stop_codon (@stop_codons) {
-	$stop_codon = lc $stop_codon;
-	print "Searching for stop codon: ($stop_codon).\n" if $SEE;
-	my $stop_pos = index ($seq, $stop_codon);
-	while ($stop_pos != -1) {
-	  $stops{$stop_pos} = 1;
-	  $stop_pos = index ($seq, $stop_codon, ($stop_pos + 1)); #include the stop codon too.
-	}
-  }
-  my @stops = sort {$a<=>$b} keys %stops;
-  return (@stops);
+    my ($self, $seq) = @_;
+    my %stops;
+    if ($self->{ALLOW_3PRIME_PARTIALS}) {
+        ## count terminal 3 nts as possible ORF terminators.
+        my $seq_length = length ($seq);
+        $stops{$seq_length} = 1;
+        $seq_length--;
+        $stops{$seq_length} = 1;
+        $seq_length--;
+        $stops{$seq_length} = 1;
+    }
+    my @stop_codons = @{$self->{stop_codons}};
+    foreach my $stop_codon (@stop_codons) {
+        $stop_codon = lc $stop_codon;
+        print "Searching for stop codon: ($stop_codon).\n" if $SEE;
+        my $stop_pos = index ($seq, $stop_codon);
+        while ($stop_pos != -1) {
+            $stops{$stop_pos} = 1;
+            $stop_pos = index ($seq, $stop_codon, ($stop_pos + 1)); #include the stop codon too.
+        }
+    }
+    my @stops = sort {$a<=>$b} keys %stops;
+    return (@stops);
 }
 
 
