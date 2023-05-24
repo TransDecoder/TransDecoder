@@ -81,6 +81,27 @@ RUN wget https://github.com/samtools/samtools/releases/download/${SAMTOOLS_VERSI
 
 
 
+# blast
+WORKDIR $SRC
+ENV BLASTPLUS_VERSION 2.12.0
+RUN wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/${BLASTPLUS_VERSION}/ncbi-blast-${BLASTPLUS_VERSION}+-x64-linux.tar.gz && \
+    tar xvf ncbi-blast-${BLASTPLUS_VERSION}+-x64-linux.tar.gz && \
+    cp ncbi-blast-${BLASTPLUS_VERSION}+/bin/* $BIN && \
+    rm -r ncbi-blast-${BLASTPLUS_VERSION}+
+
+
+
+# Hmmer
+
+WORKDIR $SRC
+RUN wget http://eddylab.org/software/hmmer/hmmer.tar.gz && \
+    tar xvf hmmer.tar.gz && \
+    cd hmmer-3.3.2 && \
+    ./configure && \
+    make && make install
+
+
+
 
 
 # Trinotate
