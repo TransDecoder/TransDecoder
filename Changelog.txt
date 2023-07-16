@@ -1,4 +1,8 @@
-## v5.7.0
+## v5.7.1 July 16, 2023
+- Minor updates to better support Docker-based execution.
+- Output directory (via --output_dir | -O) can be set by user, but the working directory name will be fixed within the output directory and based on the name of the target transcriptome.
+
+## v5.7.0 Jan 27, 2023
 - compatible with hmmsearch or hmmscan output
 - cleaner organization of outputs and checkpoints
 - TransDecoder.LongOrfs includes option for --complete_orfs_only (as requested)
