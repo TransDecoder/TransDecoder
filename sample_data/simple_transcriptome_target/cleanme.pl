@@ -36,5 +36,7 @@ foreach my $file (<*>) {
 `rm -rf ./Trinity.fasta.transdecoder_dir/`;
 `rm -rf ./Trinity.fasta.transdecoder_dir.__checkpoints`;
 `rm -rf ./Trinity.fasta.transdecoder_dir.__checkpoints_longorfs`;
+`sudo rm -rf ./transdecoder.docker_outdir`;
+
 
 exit(0);
