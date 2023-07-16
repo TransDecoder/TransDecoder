@@ -7,6 +7,9 @@ test:
 	(cd $$i; $(MAKE) test) || exit $$?; done
 
 
+test_docker:
+	cd simple_transcriptome_target && ./runMe.Docker.sh
+
 clean:
 	@for i in $(DIRS); do \
 	echo "Running example in $$i..."; \
