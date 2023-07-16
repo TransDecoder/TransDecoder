@@ -20,7 +20,7 @@ use Fasta_reader;
 use Longest_orf;
 use Pipeliner;
 use DelimParser;
-
+use Cwd;
 
 #my $VERSION = "__BLEEDING_EDGE__";
 my $VERSION = "5.7.0";
@@ -67,7 +67,7 @@ my $usage = <<__EOUSAGE__;
 #
 #   --single_best_only                     Retain only the single best orf per transcript (prioritized by homology then orf length)
 #
-#   --output_dir | -O  <string>            output directory from the TransDecoder.LongOrfs step (default: basename( -t val ) + ".transdecoder_dir")
+#   --output_dir | -O  <string>            same output directory from the TransDecoder.LongOrfs
 #
 #   --no_refine_starts                     start refinement identifies potential start codons for 5' partial ORFs using a PWM, process on by default.
 #
@@ -151,7 +151,7 @@ my $single_best_flag = 0;
 
 my $NO_REFINE_START_CODONS_FLAG = 0;
 
-my $output_dir;
+my $output_dir = &Pipeliner::ensure_full_path(cwd()); # current working directory by default.
 
 my $show_version_flag;
 
@@ -228,15 +228,12 @@ main: {
         $transcripts_file = $uncompressed_transcripts_file;
     }
     
-    my $workdir = $output_dir;
-    unless ($workdir) {
-        $workdir = basename($transcripts_file) . ".transdecoder_dir"; 
-    }
+    my $workdir = &Pipeliner::ensure_full_path("$output_dir/" . basename($transcripts_file) . ".transdecoder_dir"); 
     
     unless (-d $workdir) {
         die "Error, cannot find directory: $workdir,  be sure to first run TransDecoder.LongOrfs before TransDecoder.Predict\n\n";
     }
-
+    
     my $checkpoints_dir = "$workdir/__checkpoints_TDpredict";
     if (! -d $checkpoints_dir) {
         mkdir($checkpoints_dir);
@@ -327,8 +324,8 @@ main: {
     $pipeliner->add_commands(new Command($select_cmd, "select_best_orfs.$checkpoint_hashcode.ok", "Selecting best orfs"));
                 
     
-    my $final_output_prefix = basename($transcripts_file) . ".transdecoder";
-
+    my $final_output_prefix = &Pipeliner::ensure_full_path("$output_dir/" . basename($transcripts_file) . ".transdecoder");
+    
     my $target_final_file = "$cds_file.best_candidates.gff3";
     
     ## start codon refinement

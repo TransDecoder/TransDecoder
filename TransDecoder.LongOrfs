@@ -18,6 +18,7 @@ use Nuc_translator;
 use Fasta_reader;
 use Longest_orf;
 use Pipeliner;
+use Cwd;
 
 
 #my $VERSION = "__BLEEDING_EDGE__";
@@ -61,7 +62,7 @@ my $usage = <<__EOUSAGE__;
 # 
 #   -S                                     strand-specific (only analyzes top strand)
 #
-#   --output_dir | -O  <string>            path to intended output directory (default:  basename( -t val ) + ".transdecoder_dir")
+#   --output_dir | -O  <string>            path to intended output directory
 #
 #   --version                              show version tag ($VERSION)
 #
@@ -90,7 +91,7 @@ my $gene_trans_map_file;
 my $MPI_DEBUG = 1;
 
 my $show_version_flag;
-my $output_dir;
+my $output_dir =  &Pipeliner::ensure_full_path(cwd());
 my $COMPLETE_ORFS_ONLY = 0;
 
 &GetOptions( 't=s' => \$transcripts_file,
@@ -145,12 +146,10 @@ main: {
     }
 
 
-    my $workdir = $output_dir;
-    unless ($workdir) {
-        $workdir = &Pipeliner::ensure_full_path(basename($transcripts_file) . ".transdecoder_dir");
-    }
+    my $workdir = &Pipeliner::ensure_full_path("$output_dir/" . basename($transcripts_file) . ".transdecoder_dir");
+    
     unless (-d $workdir) {
-        mkdir($workdir) or die "Error, cannot mkdir $workdir.";
+        &process_cmd("mkdir -p $workdir");
     }
     
     my $checkpoints_dir = "$workdir/__checkpoints_longorfs";
@@ -194,15 +193,15 @@ main: {
     my $gff3_file = "$prefix.gff3";
     my $pep_file = "$prefix.pep";
     
-	open (PEP, ">$pep_file") or die $!;
-	open (CDS, ">$cds_file") or die $!; 
-	open (GFF, ">$gff3_file") or die $!;
-	
+    open (PEP, ">$pep_file") or die $!;
+    open (CDS, ">$cds_file") or die $!; 
+    open (GFF, ">$gff3_file") or die $!;
+    
 
     print STDERR "\n\n- extracting ORFs from transcripts.\n";
 	
-	my $model_counter = 0;
-	my $trans_counter = 0;
+    my $model_counter = 0;
+    my $trans_counter = 0;
     
     my $num_total_trans = `grep '>' $transcripts_file | wc -l`;
     chomp $num_total_trans;
@@ -211,34 +210,34 @@ main: {
 
     my %SEEN_PROT_ID;
     
-	my $fasta_reader = new Fasta_reader($transcripts_file);
-	while (my $seq_obj = $fasta_reader->next()) {
-		
+    my $fasta_reader = new Fasta_reader($transcripts_file);
+    while (my $seq_obj = $fasta_reader->next()) {
+	
         $trans_counter++;
         my $percent_done = sprintf("%.2f", $trans_counter/$num_total_trans*100);
         print STDERR "\r[$trans_counter/$num_total_trans] = $percent_done\% done    " if $trans_counter % 100 == 0;
         
         
-		my $acc = $seq_obj->get_accession();
-		my $sequence = $seq_obj->get_sequence();
-		
-		my $longest_orf_finder = new Longest_orf();
+	my $acc = $seq_obj->get_accession();
+	my $sequence = $seq_obj->get_sequence();
+	
+	my $longest_orf_finder = new Longest_orf();
         
         unless ($COMPLETE_ORFS_ONLY) {
             $longest_orf_finder->allow_5prime_partials();
             $longest_orf_finder->allow_3prime_partials();
         }
         
-	    if ($TOP_STRAND_ONLY) {
-			$longest_orf_finder->forward_strand_only();
-		}
+	if ($TOP_STRAND_ONLY) {
+	    $longest_orf_finder->forward_strand_only();
+	}
 		
-		my @orf_structs = $longest_orf_finder->capture_all_ORFs($sequence);
-		
-		@orf_structs = reverse sort {$a->{length}<=>$b->{length}} @orf_structs;
+	my @orf_structs = $longest_orf_finder->capture_all_ORFs($sequence);
+	
+	@orf_structs = reverse sort {$a->{length}<=>$b->{length}} @orf_structs;
         print "checking for fp in $acc \n" if ($SEE);
         
-		
+	
         while (@orf_structs) {
             my $orf = shift @orf_structs;
             
@@ -366,7 +365,7 @@ main: {
             print GFF $gene_obj->to_GFF3_format(source => "transdecoder") . "\n";
             
         }
-	}
+    }
     
     close PEP;
     close CDS;
