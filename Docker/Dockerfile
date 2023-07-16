@@ -106,7 +106,7 @@ RUN wget http://eddylab.org/software/hmmer/hmmer.tar.gz && \
 
 # Trinotate
 WORKDIR $SRC
-ENV TRANSDECODER_CO=2fb395828ec16e299c13ae8293e08169c9ef3841
+ENV TRANSDECODER_CO=d3c0844052ed79f650360be2d6d47a36ed02f593
 
 RUN git clone https://github.com/TransDecoder/TransDecoder.git && \
    cd TransDecoder && \
