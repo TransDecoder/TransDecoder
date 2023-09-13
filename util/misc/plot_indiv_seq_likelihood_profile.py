@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os,sys
 import re
@@ -39,9 +39,9 @@ def main():
         score_vec.sort()
 
     if args.cumsum:
-        plt.plot(range(1,len(score_vec)+1), np.cumsum(score_vec), marker ='o')
+        plt.plot(list(range(1,len(score_vec)+1)), np.cumsum(score_vec), marker ='o')
     else:
-        plt.plot(range(1,len(score_vec)+1), score_vec, marker ='+')
+        plt.plot(list(range(1,len(score_vec)+1)), score_vec, marker ='+')
     
     
     plt.show()
