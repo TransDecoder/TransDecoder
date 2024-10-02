@@ -94,14 +94,11 @@ RUN wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/${BLASTPLUS_VERSION
 # Hmmer
 
 WORKDIR $SRC
-RUN wget http://eddylab.org/software/hmmer/hmmer.tar.gz && \
-    tar xvf hmmer.tar.gz && \
+RUN wget -q http://eddylab.org/software/hmmer/hmmer-3.3.2.tar.gz && \
+    tar xvf hmmer-3.3.2.tar.gz && \
     cd hmmer-3.3.2 && \
     ./configure && \
     make && make install
-
-
-
 
 
 # Trinotate
