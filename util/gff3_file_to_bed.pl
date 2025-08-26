@@ -10,6 +10,8 @@ use Carp;
 use Nuc_translator;
 use File::Basename;
 
+our $SEE = 0;
+
 my $usage = "\n\nusage: $0 gff3_file\n\n";
 
 my $gff3_file = $ARGV[0] or die $usage;
@@ -29,12 +31,10 @@ foreach my $asmbl_id (sort keys %$contig_to_gene_list_href) {
         		
 		my $gene_obj_ref = $gene_obj_indexer_href->{$gene_id};
 		
-		foreach my $gene ($gene_obj_ref, $gene_obj_ref->get_additional_isoforms()) {
+        my $bed = $gene_obj_ref->to_BED_format();
 
-			my $bed = $gene->to_BED_format();
-
-			print $bed;
-		}
+        print $bed;
+		
 	}
 }
 
