@@ -241,7 +241,7 @@ sub index_GFF3_gene_objs {
             push (@$gene_list_aref, $gene_id);
         }
     }
-    print STDERR "\n";
+    #print STDERR "\n";
     return (\%asmbl_id_to_gene_id_list);
 }
 
