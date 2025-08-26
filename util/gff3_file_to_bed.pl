@@ -21,7 +21,7 @@ my $gene_obj_indexer_href = {};
 ## associate gene identifiers with contig id's.
 my $contig_to_gene_list_href = &GFF3_utils2::index_GFF3_gene_objs($gff3_file, $gene_obj_indexer_href);
 
-print "track name=\'" . basename($gff3_file) . "\'\n";
+#print "track name=\'" . basename($gff3_file) . "\'\n";
 
 foreach my $asmbl_id (sort keys %$contig_to_gene_list_href) {
     
