@@ -16,7 +16,7 @@ my $genome = $ARGV[1] or die $usage;
 main: {
 
 
-	print STDERR "-parsing cufflinks output: $cufflinks_gtf\n";
+	print STDERR "-parsing GTF: $cufflinks_gtf\n";
 	my %genome_trans_to_coords;
 	
 	open (my $fh, $cufflinks_gtf) or die "Error, cannot open file $cufflinks_gtf";
