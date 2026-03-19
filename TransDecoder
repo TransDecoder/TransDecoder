@@ -1,0 +1,283 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin;
+use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
+use File::Basename;
+use Cwd;
+
+use lib ("$FindBin::RealBin/PerlLib");
+use Pipeliner;
+
+my $VERSION = "5.7.1";
+
+my $UTIL_DIR  = "$FindBin::RealBin/util";
+my $BIN_DIR   = "$FindBin::RealBin";
+$ENV{PATH} = "$UTIL_DIR/bin:$ENV{PATH}";
+
+my $usage = <<__EOUSAGE__;
+
+##############################################################################################
+#
+#  TransDecoder - full pipeline wrapper
+#
+#  Runs: LongOrfs -> [optional homology search] -> Predict -> [optional genome propagation]
+#
+#  Input (choose one):
+#
+#    -t|--transcripts <string>          Transcripts FASTA file
+#
+#    --genome <string>                  Genome FASTA file  \\  use together to extract
+#    --gtf    <string>                  Annotation GTF file /  cDNA sequences via
+#                                       gtf_genome_to_cdna_fasta.pl, then propagate
+#                                       final ORFs back to genome coordinates.
+#
+#  LongOrfs options:
+#
+#    -m <int>                           Minimum protein length (default: 100)
+#    -S                                 Strand-specific (top strand only)
+#    -G|--genetic_code <string>         Genetic code (default: universal)
+#    --gene_trans_map <string>          Gene-to-transcript map (tab-delimited)
+#    --complete_orfs_only               Only report complete ORFs
+#
+#  Homology search options:
+#
+#    --blast_search_pep <string>        Protein FASTA to search against; triggers
+#                                       homology search (DB built automatically)
+#    --blast_tool <string>              'diamond' or 'blastp' (default: diamond)
+#    --blast_evalue <float>             E-value cutoff (default: 1e-5)
+#    --blast_threads <int>              Threads for homology search (default: 1)
+#
+#  Predict options:
+#
+#    -T <int>                           Top ORFs for Markov model training (default: 500)
+#    --retain_long_orfs_mode <string>   'dynamic' or 'strict' (default: dynamic)
+#    --retain_long_orfs_length <int>    Min length to auto-retain under strict mode
+#    --retain_pfam_hits <string>        Pre-computed Pfam hmmscan domtblout file
+#    --single_best_only                 Retain only single best ORF per transcript
+#    --no_refine_starts                 Skip start codon refinement
+#
+#  Other:
+#
+#    -O|--output_dir <string>           Output directory (default: current directory)
+#    -v|--verbose                       Verbose output
+#    --version                          Show version and exit
+#
+##############################################################################################
+
+__EOUSAGE__
+    ;
+
+
+# ── option variables ──────────────────────────────────────────────────────────
+
+my $transcripts_file;
+my $genome_file;
+my $gtf_file;
+
+# longorfs
+my $min_prot_length    = 100;
+my $strand_specific    = 0;
+my $genetic_code       = 'universal';
+my $gene_trans_map;
+my $complete_orfs_only = 0;
+
+# blast
+my $blast_search_pep;
+my $blast_tool         = 'diamond';
+my $blast_evalue       = 1e-5;
+my $blast_threads      = 1;
+
+# predict
+my $top_orfs_train           = 500;
+my $retain_long_orfs_mode    = 'dynamic';
+my $retain_long_orfs_length  = 1000000;
+my $retain_pfam_hits;
+my $single_best_only         = 0;
+my $no_refine_starts         = 0;
+
+# general
+my $output_dir = &Pipeliner::ensure_full_path(cwd());
+my $verbose    = 0;
+my $help       = 0;
+my $show_version;
+
+# ── parse options ─────────────────────────────────────────────────────────────
+
+&GetOptions(
+    't|transcripts=s'            => \$transcripts_file,
+    'genome=s'                   => \$genome_file,
+    'gtf=s'                      => \$gtf_file,
+
+    'm=i'                        => \$min_prot_length,
+    'S'                          => \$strand_specific,
+    'G|genetic_code=s'           => \$genetic_code,
+    'gene_trans_map=s'           => \$gene_trans_map,
+    'complete_orfs_only'         => \$complete_orfs_only,
+
+    'blast_search_pep=s'         => \$blast_search_pep,
+    'blast_tool=s'               => \$blast_tool,
+    'blast_evalue=f'             => \$blast_evalue,
+    'blast_threads=i'            => \$blast_threads,
+
+    'T=i'                        => \$top_orfs_train,
+    'retain_long_orfs_mode=s'    => \$retain_long_orfs_mode,
+    'retain_long_orfs_length=i'  => \$retain_long_orfs_length,
+    'retain_pfam_hits=s'         => \$retain_pfam_hits,
+    'single_best_only'           => \$single_best_only,
+    'no_refine_starts'           => \$no_refine_starts,
+
+    'O|output_dir=s'             => \$output_dir,
+    'v|verbose'                  => \$verbose,
+    'h|help'                     => \$help,
+    'version'                    => \$show_version,
+) or die $usage;
+
+if ($help)         { print $usage; exit 0; }
+if ($show_version) { print "TransDecoder $VERSION\n"; exit 0; }
+
+# ── validate blast_tool ───────────────────────────────────────────────────────
+
+unless ($blast_tool =~ /^(diamond|blastp)$/) {
+    die "Error: --blast_tool must be 'diamond' or 'blastp' (got: $blast_tool)\n";
+}
+
+# ── validate / resolve genome mode ───────────────────────────────────────────
+
+my $genome_mode = ($genome_file || $gtf_file) ? 1 : 0;
+
+if ($genome_mode) {
+    unless ($genome_file && $gtf_file) {
+        die "Error: --genome and --gtf must be provided together.\n";
+    }
+    unless (-s $genome_file) { die "Error: genome file not found: $genome_file\n"; }
+    unless (-s $gtf_file)    { die "Error: GTF file not found: $gtf_file\n"; }
+    unless ($transcripts_file) {
+        # derive cDNA FASTA name from GTF stem in output_dir
+        my $gtf_base = basename($gtf_file);
+        $gtf_base =~ s/\.gtf$//i;
+        $transcripts_file = "$output_dir/${gtf_base}.cDNA.fasta";
+    }
+} else {
+    unless ($transcripts_file && -s $transcripts_file) {
+        die "Error: provide -t/--transcripts or both --genome and --gtf.\n$usage";
+    }
+}
+
+if ($blast_search_pep && ! -s $blast_search_pep) {
+    die "Error: --blast_search_pep file not found: $blast_search_pep\n";
+}
+if ($retain_pfam_hits && ! -s $retain_pfam_hits) {
+    die "Error: --retain_pfam_hits file not found: $retain_pfam_hits\n";
+}
+
+unless (-d $output_dir) {
+    &process_cmd("mkdir -p $output_dir");
+}
+
+# ── helpers ───────────────────────────────────────────────────────────────────
+
+sub process_cmd {
+    my ($cmd) = @_;
+    print STDERR "CMD: $cmd\n";
+    my $ret = system($cmd);
+    if ($ret) { die "Error, cmd died with ret $ret:\n  $cmd\n"; }
+}
+
+# ── PHASE 0: extract cDNA from genome + GTF ──────────────────────────────────
+
+my $alignment_gff3;   # set here; reused in phase 3
+
+if ($genome_mode) {
+
+    # alignment GFF3 (transcript coords -> genome coords)
+    my $gtf_base = basename($gtf_file);
+    $gtf_base =~ s/\.gtf$//i;
+    $alignment_gff3 = "$output_dir/${gtf_base}.gff3";
+
+    print STDERR "\n-- Converting GTF to alignment GFF3 --\n";
+    &process_cmd("$UTIL_DIR/gtf_to_alignment_gff3.pl $gtf_file > $alignment_gff3");
+
+    # cDNA FASTA
+    print STDERR "\n-- Extracting cDNA sequences --\n";
+    &process_cmd("$UTIL_DIR/gtf_genome_to_cdna_fasta.pl $gtf_file $genome_file > $transcripts_file");
+}
+
+# ── PHASE 1: LongOrfs ────────────────────────────────────────────────────────
+
+print STDERR "\n-- Running TransDecoder.LongOrfs --\n";
+
+my $longorfs_cmd = "$BIN_DIR/TransDecoder.LongOrfs -t $transcripts_file"
+    . " -m $min_prot_length"
+    . " -G $genetic_code"
+    . " -O $output_dir";
+$longorfs_cmd .= " -S"                          if $strand_specific;
+$longorfs_cmd .= " --gene_trans_map $gene_trans_map" if $gene_trans_map;
+$longorfs_cmd .= " --complete_orfs_only"        if $complete_orfs_only;
+
+&process_cmd($longorfs_cmd);
+
+# ── PHASE 1.5: homology search ───────────────────────────────────────────────
+
+my $retain_blastp_hits_file;
+
+if ($blast_search_pep) {
+
+    my $workdir  = "$output_dir/" . basename($transcripts_file) . ".transdecoder_dir";
+    my $pep_file = "$workdir/longest_orfs.pep";
+    my $blast_out = "$workdir/blastp.outfmt6";
+    my $db_path   = "$workdir/blast_db";
+
+    if ($blast_tool eq 'diamond') {
+        print STDERR "\n-- Building Diamond database --\n";
+        &process_cmd("diamond makedb --in $blast_search_pep -d $db_path -p $blast_threads");
+
+        print STDERR "\n-- Running Diamond blastp --\n";
+        &process_cmd("diamond blastp -q $pep_file -d $db_path -k 1 -f 6 -e $blast_evalue -p $blast_threads -o $blast_out");
+
+    } else {
+        print STDERR "\n-- Building BLAST database --\n";
+        &process_cmd("makeblastdb -in $blast_search_pep -dbtype prot -out $db_path");
+
+        print STDERR "\n-- Running blastp --\n";
+        &process_cmd("blastp -query $pep_file -db $db_path -max_target_seqs 1 -outfmt 6 -evalue $blast_evalue -num_threads $blast_threads -out $blast_out");
+    }
+
+    $retain_blastp_hits_file = $blast_out;
+}
+
+# ── PHASE 2: Predict ─────────────────────────────────────────────────────────
+
+print STDERR "\n-- Running TransDecoder.Predict --\n";
+
+my $predict_cmd = "$BIN_DIR/TransDecoder.Predict -t $transcripts_file"
+    . " -T $top_orfs_train"
+    . " --retain_long_orfs_mode $retain_long_orfs_mode"
+    . " --retain_long_orfs_length $retain_long_orfs_length"
+    . " -O $output_dir";
+# Only pass -G when non-default; Predict's default 'Universal' works with all downstream tools
+$predict_cmd .= " -G $genetic_code" if lc($genetic_code) ne 'universal';
+$predict_cmd .= " --retain_blastp_hits $retain_blastp_hits_file" if $retain_blastp_hits_file;
+$predict_cmd .= " --retain_pfam_hits $retain_pfam_hits"          if $retain_pfam_hits;
+$predict_cmd .= " --single_best_only"                            if $single_best_only;
+$predict_cmd .= " --no_refine_starts"                            if $no_refine_starts;
+$predict_cmd .= " -v"                                            if $verbose;
+
+&process_cmd($predict_cmd);
+
+# ── PHASE 3: propagate ORFs to genome coordinates ────────────────────────────
+
+if ($genome_mode) {
+
+    my $td_gff3      = "$output_dir/" . basename($transcripts_file) . ".transdecoder.gff3";
+    my $genome_gff3  = "$output_dir/" . basename($transcripts_file) . ".transdecoder.genome.gff3";
+
+    print STDERR "\n-- Propagating ORFs to genome coordinates --\n";
+    &process_cmd("$UTIL_DIR/cdna_alignment_orf_to_genome_orf.pl $td_gff3 $alignment_gff3 $transcripts_file > $genome_gff3");
+
+    print STDERR "\nGenome-coordinate ORF annotations written to: $genome_gff3\n";
+}
+
+print STDERR "\nTransDecoder finished.\n\n";
+exit 0;
