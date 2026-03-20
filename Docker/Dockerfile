@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -7,13 +7,16 @@ ENV DEBIAN_FRONTEND=noninteractive
 #~~~~
 
 
-RUN apt-get -qq update && apt-get -qq -y install \
+RUN apt-get -qq update && apt-get -qq -y install --no-install-recommends \
     automake \
     build-essential \
     bzip2 \
+    ca-certificates \
+    cpanminus \
     cmake \
     curl \
     default-jre \
+    diamond-aligner \
     fort77 \
     ftp \
     g++ \
@@ -29,10 +32,8 @@ RUN apt-get -qq update && apt-get -qq -y install \
     libjpeg-dev \
     liblzma-dev \
     libncurses-dev \
-    libncurses5-dev \
     libpcre3-dev \
     libpng-dev \
-    libreadline-dev \
     libreadline-dev \
     libssl-dev \
     libtbb-dev \
@@ -41,72 +42,54 @@ RUN apt-get -qq update && apt-get -qq -y install \
     libxt-dev \
     libzmq3-dev \
     make \
+    ncbi-blast+ \
     nano \
     perl \
     pkg-config \
     python3 \
     python3-dev \
-    python3-distutils \
     python3-pip \
     python3-setuptools \
+    r-base \
+    r-bioc-seqlogo \
+    r-cran-caret \
+    r-cran-ggplot2 \
     rsync \
+    samtools \
+    hmmer \
     texlive-latex-base \
     tzdata \
     unzip \
     wget \
     x11-common \
-    zlib1g-dev
+    zlib1g-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 
 
 ## Perl stuff
-RUN curl -L https://cpanmin.us | perl - App::cpanminus
 RUN cpanm install URI::Escape
+
+## R packages not available from Ubuntu packages
+RUN Rscript -e "install.packages('rpart.plot', repos='https://cloud.r-project.org')"
 
 #~~~~~~~~~~~
 # Environmental Variables 
 #~~~~~~~~~~~
-ENV SRC /usr/local/src
-ENV BIN /usr/local/bin
+ENV SRC=/usr/local/src
+ENV BIN=/usr/local/bin
 
 
-# samtools
+# Core bioinformatics tools are installed from Ubuntu packages:
+# samtools, ncbi-blast+, diamond-aligner, and hmmer.
+
+
+# Transdecoder v6.0.0
 WORKDIR $SRC
-ENV SAMTOOLS_VERSION 1.13
-RUN wget https://github.com/samtools/samtools/releases/download/${SAMTOOLS_VERSION}/samtools-${SAMTOOLS_VERSION}.tar.bz2 && \
-    tar xvf samtools-${SAMTOOLS_VERSION}.tar.bz2 && \
-    cd samtools-${SAMTOOLS_VERSION} && \
-    ./configure && make && make install
-
-
-
-# blast
-WORKDIR $SRC
-ENV BLASTPLUS_VERSION 2.12.0
-RUN wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/${BLASTPLUS_VERSION}/ncbi-blast-${BLASTPLUS_VERSION}+-x64-linux.tar.gz && \
-    tar xvf ncbi-blast-${BLASTPLUS_VERSION}+-x64-linux.tar.gz && \
-    cp ncbi-blast-${BLASTPLUS_VERSION}+/bin/* $BIN && \
-    rm -r ncbi-blast-${BLASTPLUS_VERSION}+
-
-
-
-# Hmmer
-
-WORKDIR $SRC
-RUN wget -q http://eddylab.org/software/hmmer/hmmer-3.3.2.tar.gz && \
-    tar xvf hmmer-3.3.2.tar.gz && \
-    cd hmmer-3.3.2 && \
-    ./configure && \
-    make && make install
-
-
-# Trinotate
-WORKDIR $SRC
-ENV TRANSDECODER_CO=817d772325c8a354aec6b94ac58993b994ac7392
+ENV TRANSDECODER_CO=ec18d65529ddacab4cd6c930f8b86406a124b5ea
 
 RUN git clone https://github.com/TransDecoder/TransDecoder.git && \
    cd TransDecoder && \
    git checkout $TRANSDECODER_CO && \
    mv * $BIN
-
-
