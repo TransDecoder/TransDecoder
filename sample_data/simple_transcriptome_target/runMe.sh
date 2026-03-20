@@ -5,9 +5,7 @@ if [ ! -e Trinity.fasta ]; then
     gunzip -c genome_alignments.gmap.gff3.gz > genome_alignments.gmap.gff3
 fi
 
-../../TransDecoder.LongOrfs -t Trinity.fasta $*
-
-../../TransDecoder.Predict -t Trinity.fasta 
+../../TransDecoder -t Trinity.fasta $*
 
 # gmap was used to align the Trinity.fasta transcripts to the genome,
 # using the gmap '-f 3' output formatting parameter, generating file 'genome_alignments.gmap.gff3'

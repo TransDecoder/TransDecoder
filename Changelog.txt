@@ -1,3 +1,11 @@
+## v6.0.0 Mar 20, 2026
+- added `TransDecoder` full-pipeline wrapper as the primary entrypoint for transcript FASTA and genome+GTF workflows
+- phase-specific executables are now provided under `util/TransDecoder.LongOrfs` and `util/TransDecoder.Predict`
+- wrapper now supports automated protein homology searches using NCBI BLAST or DIAMOND via `--blast_search_pep`
+- wrapper now supports integrated Pfam searching via `--pfam-search-db`
+
+
+    
 ## v5.7.1 July 16, 2023
 - Minor updates to better support Docker-based execution.
 - Output directory (via --output_dir | -O) can be set by user, but the working directory name will be fixed within the output directory and based on the name of the target transcriptome.
@@ -131,4 +139,3 @@ More useful logging information is provided to it's clearer as to how many orfs 
 
 -added 'make simple' to build just the essential components involving parafly and cdhit
 -removed the 'cds.' prefix from the pep and cds sequence accessions.
-

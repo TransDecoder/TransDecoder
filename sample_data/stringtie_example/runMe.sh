@@ -12,13 +12,7 @@ export PERL_HASH_SEED=0
 # not including the genome here... too big, but here's how you'd do it.
 #../../util/gtf_genome_to_cdna_fasta.pl stringtie_merged.gtf  genome.fasta > stringtie_merged.transcripts.fasta
 
-## Extract the long ORFs
-../../TransDecoder.LongOrfs -t stringtie_merged.transcripts.fasta -S
-
-
-## Predict likely ORFs
-
-../../TransDecoder.Predict -t stringtie_merged.transcripts.fasta $ARGS
+../../TransDecoder -t stringtie_merged.transcripts.fasta -S $ARGS
 
 
 ## convert to genome coordinates

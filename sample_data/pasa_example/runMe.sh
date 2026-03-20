@@ -20,11 +20,7 @@ fi
 # get the gene-to-transcript relationships
 cut -f2,3 pasa_assemblies_described.txt > pasa.gene_trans_map.txt
 
-../../TransDecoder.LongOrfs -t pasa_assemblies.fasta --gene_trans_map pasa.gene_trans_map.txt -O pasa.transdecoder_workdir
-
-
-
-../../TransDecoder.Predict -t pasa_assemblies.fasta $ARGS -O pasa.transdecoder_workdir
+../../TransDecoder -t pasa_assemblies.fasta --gene_trans_map pasa.gene_trans_map.txt -O pasa.transdecoder_workdir $ARGS
 
 ../../util/cdna_alignment_orf_to_genome_orf.pl  pasa.transdecoder_workdir/pasa_assemblies.fasta.transdecoder.gff3 pasa_assemblies.gff3 pasa_assemblies.fasta  >  pasa_assemblies.fasta.transdecoder.genome.gff3
 
