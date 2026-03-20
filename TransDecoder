@@ -10,7 +10,7 @@ use Cwd;
 use lib ("$FindBin::RealBin/PerlLib");
 use Pipeliner;
 
-my $VERSION = "5.7.1";
+my $VERSION = "6.0.0";
 
 my $UTIL_DIR  = "$FindBin::RealBin/util";
 my $BIN_DIR   = "$FindBin::RealBin";
@@ -54,7 +54,8 @@ my $usage = <<__EOUSAGE__;
 #    -T <int>                           Top ORFs for Markov model training (default: 500)
 #    --retain_long_orfs_mode <string>   'dynamic' or 'strict' (default: dynamic)
 #    --retain_long_orfs_length <int>    Min length to auto-retain under strict mode
-#    --retain_pfam_hits <string>        Pre-computed Pfam hmmscan domtblout file
+#    --pfam-search-db <string>          Pfam HMM database to search with hmmsearch;
+#                                       hmmpress is run automatically if needed
 #    --single_best_only                 Retain only single best ORF per transcript
 #    --no_refine_starts                 Skip start codon refinement
 #
@@ -93,7 +94,7 @@ my $blast_threads      = 1;
 my $top_orfs_train           = 500;
 my $retain_long_orfs_mode    = 'dynamic';
 my $retain_long_orfs_length  = 1000000;
-my $retain_pfam_hits;
+my $pfam_search_db;
 my $single_best_only         = 0;
 my $no_refine_starts         = 0;
 
@@ -124,7 +125,7 @@ my $show_version;
     'T=i'                        => \$top_orfs_train,
     'retain_long_orfs_mode=s'    => \$retain_long_orfs_mode,
     'retain_long_orfs_length=i'  => \$retain_long_orfs_length,
-    'retain_pfam_hits=s'         => \$retain_pfam_hits,
+    'pfam_search_db|pfam-search-db=s' => \$pfam_search_db,
     'single_best_only'           => \$single_best_only,
     'no_refine_starts'           => \$no_refine_starts,
 
@@ -168,8 +169,8 @@ if ($genome_mode) {
 if ($blast_search_pep && ! -s $blast_search_pep) {
     die "Error: --blast_search_pep file not found: $blast_search_pep\n";
 }
-if ($retain_pfam_hits && ! -s $retain_pfam_hits) {
-    die "Error: --retain_pfam_hits file not found: $retain_pfam_hits\n";
+if ($pfam_search_db && ! -s $pfam_search_db) {
+    die "Error: --pfam-search-db file not found: $pfam_search_db\n";
 }
 
 unless (-d $output_dir) {
@@ -183,6 +184,14 @@ sub process_cmd {
     print STDERR "CMD: $cmd\n";
     my $ret = system($cmd);
     if ($ret) { die "Error, cmd died with ret $ret:\n  $cmd\n"; }
+}
+
+sub hmmpress_outputs_exist {
+    my ($pfam_db) = @_;
+    foreach my $ext (qw(.h3f .h3i .h3m .h3p)) {
+        return 0 unless -s "${pfam_db}${ext}";
+    }
+    return 1;
 }
 
 # ── PHASE 0: extract cDNA from genome + GTF ──────────────────────────────────
@@ -208,7 +217,7 @@ if ($genome_mode) {
 
 print STDERR "\n-- Running TransDecoder.LongOrfs --\n";
 
-my $longorfs_cmd = "$BIN_DIR/TransDecoder.LongOrfs -t $transcripts_file"
+my $longorfs_cmd = "$UTIL_DIR/TransDecoder.LongOrfs -t $transcripts_file"
     . " -m $min_prot_length"
     . " -G $genetic_code"
     . " -O $output_dir";
@@ -221,6 +230,7 @@ $longorfs_cmd .= " --complete_orfs_only"        if $complete_orfs_only;
 # ── PHASE 1.5: homology search ───────────────────────────────────────────────
 
 my $retain_blastp_hits_file;
+my $retain_pfam_hits_file;
 
 if ($blast_search_pep) {
 
@@ -247,11 +257,28 @@ if ($blast_search_pep) {
     $retain_blastp_hits_file = $blast_out;
 }
 
+if ($pfam_search_db) {
+
+    my $workdir = "$output_dir/" . basename($transcripts_file) . ".transdecoder_dir";
+    my $pep_file = "$workdir/longest_orfs.pep";
+    my $pfam_out = "$workdir/pfam.domtblout";
+
+    unless (hmmpress_outputs_exist($pfam_search_db)) {
+        print STDERR "\n-- Preparing Pfam database with hmmpress --\n";
+        &process_cmd("hmmpress -f $pfam_search_db");
+    }
+
+    print STDERR "\n-- Running Pfam hmmsearch --\n";
+    &process_cmd("hmmsearch --domtblout $pfam_out $pfam_search_db $pep_file");
+
+    $retain_pfam_hits_file = $pfam_out;
+}
+
 # ── PHASE 2: Predict ─────────────────────────────────────────────────────────
 
 print STDERR "\n-- Running TransDecoder.Predict --\n";
 
-my $predict_cmd = "$BIN_DIR/TransDecoder.Predict -t $transcripts_file"
+my $predict_cmd = "$UTIL_DIR/TransDecoder.Predict -t $transcripts_file"
     . " -T $top_orfs_train"
     . " --retain_long_orfs_mode $retain_long_orfs_mode"
     . " --retain_long_orfs_length $retain_long_orfs_length"
@@ -259,7 +286,7 @@ my $predict_cmd = "$BIN_DIR/TransDecoder.Predict -t $transcripts_file"
 # Only pass -G when non-default; Predict's default 'Universal' works with all downstream tools
 $predict_cmd .= " -G $genetic_code" if lc($genetic_code) ne 'universal';
 $predict_cmd .= " --retain_blastp_hits $retain_blastp_hits_file" if $retain_blastp_hits_file;
-$predict_cmd .= " --retain_pfam_hits $retain_pfam_hits"          if $retain_pfam_hits;
+$predict_cmd .= " --retain_pfam_hits $retain_pfam_hits_file"     if $retain_pfam_hits_file;
 $predict_cmd .= " --single_best_only"                            if $single_best_only;
 $predict_cmd .= " --no_refine_starts"                            if $no_refine_starts;
 $predict_cmd .= " -v"                                            if $verbose;

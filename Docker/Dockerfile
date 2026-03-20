@@ -61,7 +61,6 @@ RUN apt-get -qq update && apt-get -qq -y install \
 
 ## Perl stuff
 RUN curl -L https://cpanmin.us | perl - App::cpanminus
-RUN cpanm install DB_File
 RUN cpanm install URI::Escape
 
 #~~~~~~~~~~~
@@ -109,6 +108,5 @@ RUN git clone https://github.com/TransDecoder/TransDecoder.git && \
    cd TransDecoder && \
    git checkout $TRANSDECODER_CO && \
    mv * $BIN
-
 
 
