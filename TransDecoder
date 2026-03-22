@@ -299,11 +299,16 @@ if ($genome_mode) {
 
     my $td_gff3      = "$output_dir/" . basename($transcripts_file) . ".transdecoder.gff3";
     my $genome_gff3  = "$output_dir/" . basename($transcripts_file) . ".transdecoder.genome.gff3";
+    my $genome_bed   = "$output_dir/" . basename($transcripts_file) . ".transdecoder.genome.bed";
 
     print STDERR "\n-- Propagating ORFs to genome coordinates --\n";
     &process_cmd("$UTIL_DIR/cdna_alignment_orf_to_genome_orf.pl $td_gff3 $alignment_gff3 $transcripts_file > $genome_gff3");
 
+    print STDERR "\n-- Converting genome-coordinate ORFs to BED --\n";
+    &process_cmd("$UTIL_DIR/gff3_file_to_bed.pl $genome_gff3 > $genome_bed");
+
     print STDERR "\nGenome-coordinate ORF annotations written to: $genome_gff3\n";
+    print STDERR "Genome-coordinate ORF BED annotations written to: $genome_bed\n";
 }
 
 print STDERR "\nTransDecoder finished.\n\n";
