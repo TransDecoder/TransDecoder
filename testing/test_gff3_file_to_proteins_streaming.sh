@@ -32,11 +32,10 @@ GFF3
 
 for seq_type in prot CDS cDNA gene; do
     "$repo_dir/util/gff3_file_to_proteins.pl" \
-        --legacy_memory_mode \
         --gff3 "$workdir/test.gff3" \
         --fasta "$workdir/test.fa" \
         --seqType "$seq_type" \
-        > "$workdir/legacy.${seq_type}"
+        > "$workdir/default.${seq_type}"
 
     for batch_size in 1 2 5000; do
         "$repo_dir/util/gff3_file_to_proteins.pl" \
@@ -46,9 +45,24 @@ for seq_type in prot CDS cDNA gene; do
             --seqType "$seq_type" \
             > "$workdir/streaming.${seq_type}.${batch_size}"
 
-        diff -u "$workdir/legacy.${seq_type}" "$workdir/streaming.${seq_type}.${batch_size}"
+        diff -u "$workdir/default.${seq_type}" "$workdir/streaming.${seq_type}.${batch_size}"
     done
 done
+
+if "$repo_dir/util/gff3_file_to_proteins.pl" \
+    --legacy_memory_mode \
+    --gff3 "$workdir/test.gff3" \
+    --fasta "$workdir/test.fa" \
+    > "$workdir/legacy_mode.out" 2> "$workdir/legacy_mode.err"; then
+    echo "Expected removed --legacy_memory_mode option to fail" >&2
+    exit 1
+fi
+
+if ! grep -q "Unknown option: legacy_memory_mode" "$workdir/legacy_mode.err"; then
+    echo "Removed --legacy_memory_mode option was not rejected as expected" >&2
+    cat "$workdir/legacy_mode.err" >&2
+    exit 1
+fi
 
 cat > "$workdir/missing.fa" <<'FASTA'
 >tx1 first transcript

@@ -5,11 +5,10 @@ use warnings;
 use FindBin;
 use lib ("$FindBin::Bin/../PerlLib");
 use Gene_obj;
-use Fasta_reader;
 use GFF3_utils2;
 use Carp;
 use Nuc_translator;
-use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
+use Getopt::Long qw(:config posix_default no_ignore_case bundling);
 
 
 my $usage = <<__EOUSAGE__;
@@ -43,10 +42,6 @@ my $usage = <<__EOUSAGE__;
 #                             supplied, a temporary directory is created and
 #                             cleaned up automatically.  User-supplied tmpdirs
 #                             retain their generated batch subdirectory.
-#
-#  --legacy_memory_mode      use the original all-in-memory execution path
-#                             (loads all FASTA records and indexes the full GFF3)
-#
 ###################################################
 
 
@@ -61,16 +56,13 @@ my $seq_type = 'prot';
 my $genetic_code = '';
 my $batch_size = 5000;
 my $tmpdir = "";
-my $legacy_memory_mode = 0;
-
 &GetOptions ( 'gff3=s' => \$gff3_file,
               'fasta=s' => \$fasta_db,
               'seqType=s' => \$seq_type,
               'genetic_code=s' => \$genetic_code,
               'batch_size=i' => \$batch_size,
               'tmpdir=s' => \$tmpdir,
-              'legacy_memory_mode' => \$legacy_memory_mode,
-    );
+    ) or die $usage;
 
 unless ($gff3_file && $fasta_db) {
     die $usage;
@@ -84,41 +76,9 @@ if ($genetic_code) {
     &Nuc_translator::use_specified_genetic_code($genetic_code);
 }
 
-if ($legacy_memory_mode) {
-    run_legacy_memory_mode($gff3_file, $fasta_db, $seq_type);
-}
-else {
-    run_streaming_mode($gff3_file, $fasta_db, $seq_type, $batch_size, $tmpdir);
-}
+run_streaming_mode($gff3_file, $fasta_db, $seq_type, $batch_size, $tmpdir);
 
 exit(0);
-
-
-sub run_legacy_memory_mode {
-    my ($gff3_file, $fasta_db, $seq_type) = @_;
-
-    ## read genome
-    my $fasta_reader = new Fasta_reader($fasta_db);
-    my %genome = $fasta_reader->retrieve_all_seqs_hash();
-
-
-    my $gene_obj_indexer_href = {};
-
-    ## associate gene identifiers with contig id's.
-    my $contig_to_gene_list_href = &GFF3_utils2::index_GFF3_gene_objs($gff3_file, $gene_obj_indexer_href);
-
-    foreach my $asmbl_id (sort keys %$contig_to_gene_list_href) {
-
-        my $genome_seq = $genome{$asmbl_id} or die "Error, no sequence for $asmbl_id";
-
-        my @gene_ids = @{$contig_to_gene_list_href->{$asmbl_id}};
-
-        foreach my $gene_id (@gene_ids) {
-            my $gene_obj_ref = $gene_obj_indexer_href->{$gene_id};
-            emit_gene_sequences($gene_obj_ref, \$genome_seq, $asmbl_id, $gene_id, $seq_type);
-        }
-    }
-}
 
 
 sub run_streaming_mode {
@@ -326,9 +286,13 @@ sub split_gff3_into_batches {
 
         if (! $out_fh) {
             if (scalar(keys %fh_cache) >= $max_open_fhs) {
-                my $old_batch = shift @fh_order;
-                close $fh_cache{$old_batch};
-                delete $fh_cache{$old_batch};
+                while (@fh_order) {
+                    my $old_batch = shift @fh_order;
+                    next unless exists $fh_cache{$old_batch};
+                    close $fh_cache{$old_batch};
+                    delete $fh_cache{$old_batch};
+                    last;
+                }
             }
 
             my $batch_file = $batch_files[$batch_no];
