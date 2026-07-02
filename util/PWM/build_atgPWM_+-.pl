@@ -6,7 +6,7 @@ use Carp;
 use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
 use FindBin;
 use lib ("$FindBin::Bin/../../PerlLib");
-use Fasta_reader;
+use Fasta_retriever;
 use Nuc_translator;
 use PWM;
 
@@ -66,12 +66,9 @@ my $pwm_length = $pwm_left + 3 + $pwm_right;
 
 main: {
 
-    my $fasta_reader = new Fasta_reader($transcripts_file);
-
-    my %seqs = $fasta_reader->retrieve_all_seqs_hash();
-
     my @starts = &parse_starts($selected_orfs_file);
 
+    my $fasta_retriever = new Fasta_retriever($transcripts_file);
 
 
     my $pwm_plus = new PWM();
@@ -88,7 +85,7 @@ main: {
     foreach my $start_info (@starts) {
         my ($transcript_acc, $start_coord, $orient) = @$start_info;
         
-        my $transcript_seq = uc $seqs{$transcript_acc};
+        my $transcript_seq = uc $fasta_retriever->get_seq($transcript_acc);
 
         if ($orient eq '-') {
             # convert info to (+) strand

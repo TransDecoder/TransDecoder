@@ -105,18 +105,20 @@ main: {
         %pfam_hits = &parse_pfam_hits_file($pfam_hits_file);
     }
 
-    my %cds_scores;
-    if ($cds_scores_file) {
-      %cds_scores = &parse_CDS_scores_file ($cds_scores_file);
-    }
-        
+    my $cds_score_reader = &init_CDS_score_reader($cds_scores_file);
+
     my $gene_obj_indexer_href = {};
-    
-    my $asmbl_id_to_gene_list_href = &GFF3_utils2::index_GFF3_gene_objs($gff3_file, $gene_obj_indexer_href);
-    
-    foreach my $asmbl_id (sort keys %$asmbl_id_to_gene_list_href) {
-        
-        my @gene_ids = @{$asmbl_id_to_gene_list_href->{$asmbl_id}};
+
+    open(my $gff3_fh, $gff3_file) or die "Error, cannot open file: $gff3_file";
+
+    while (1) {
+
+        my ($asmbl_id, $gene_ids_aref) = &GFF3_utils2::next_contig_gene_objs($gff3_fh, $gene_obj_indexer_href);
+        last unless defined $asmbl_id;
+
+        my @gene_ids = @$gene_ids_aref;
+
+        my $cds_scores_href = &get_CDS_scores_for_gene_ids($cds_score_reader, \@gene_ids, $gene_obj_indexer_href);
         
         #print "ASMBL: $asmbl_id, gene_ids: @gene_ids\n";
         my @gene_entries;
@@ -136,7 +138,7 @@ main: {
             }
 
             my $orf_length = $gene_obj_ref->get_CDS_length();
-            my $cds_scores_aref = $cds_scores{$model_id};
+            my $cds_scores_aref = $cds_scores_href->{$model_id};
 
 
             ## apply selection criteria
@@ -165,6 +167,7 @@ main: {
 
         unless (@gene_entries) {
             # skip contig.
+            &clear_gene_objs(\@gene_ids, $gene_obj_indexer_href);
             next;
         }
         
@@ -220,6 +223,7 @@ main: {
             my $model_id = $gene_obj->{Model_feat_name};
 
             my $com_name = $gene_obj->{com_name};
+            $com_name =~ s/\r$// if defined $com_name;
 
             my $adj_comname = $com_name . ",score=" . $gene_entry->{cds_scores}[0];
             
@@ -235,8 +239,13 @@ main: {
             
             print $gene_obj->to_GFF3_format(source => "transdecoder") . "\n";
         }
+
+        &clear_gene_objs(\@gene_ids, $gene_obj_indexer_href);
         
     }
+
+    close $gff3_fh;
+    &close_CDS_score_reader($cds_score_reader);
     
     
     exit(0);
@@ -333,6 +342,195 @@ sub parse_blastp_hits_file {
     return(%blastp_hits);
 }
 
+sub init_CDS_score_reader {
+    my ($cds_scores_file) = @_;
+
+    unless (-e $cds_scores_file) {
+        die "Error, cannot find file $cds_scores_file";
+    }
+
+    open (my $fh, $cds_scores_file) or die "Error, cannot open file $cds_scores_file";
+    my $tabreader = new DelimParser::Reader($fh, "\t");
+
+    return({
+        cds_scores_file => $cds_scores_file,
+        fh => $fh,
+        tabreader => $tabreader,
+        pending_row => undef,
+        full_cds_scores_href => undef,
+        fallback_reason => undef,
+    });
+}
+
+sub close_CDS_score_reader {
+    my ($reader) = @_;
+
+    if ($reader->{fh}) {
+        close $reader->{fh};
+        $reader->{fh} = undef;
+    }
+}
+
+sub get_CDS_scores_for_gene_ids {
+    my ($reader, $gene_ids_aref, $gene_obj_indexer_href) = @_;
+
+    my @model_ids;
+    foreach my $gene_id (@$gene_ids_aref) {
+        my $gene_obj_ref = $gene_obj_indexer_href->{$gene_id}
+            or confess "Error, no gene object indexed for gene_id: $gene_id";
+        push (@model_ids, $gene_obj_ref->{Model_feat_name});
+    }
+
+    return({}) unless @model_ids;
+
+    if ($reader->{full_cds_scores_href}) {
+        return(&get_CDS_scores_from_full_cache($reader, \@model_ids));
+    }
+
+    my ($cds_scores_href, $failure_reason) = &read_CDS_scores_for_contig($reader, \@model_ids);
+
+    if ($failure_reason) {
+        &fallback_to_full_CDS_scores($reader, $failure_reason);
+        return(&get_CDS_scores_from_full_cache($reader, \@model_ids));
+    }
+
+    return($cds_scores_href);
+}
+
+sub read_CDS_scores_for_contig {
+    my ($reader, $model_ids_aref) = @_;
+
+    my %wanted = map { $_ => 1 } @$model_ids_aref;
+    my $wanted_count = scalar keys %wanted;
+    my %cds_scores;
+    my $saw_current_contig_score = 0;
+
+    while (scalar(keys %cds_scores) < $wanted_count) {
+        my $row = &next_CDS_score_row($reader);
+
+        unless ($row) {
+            my @missing_model_ids = grep { ! exists $cds_scores{$_} } keys %wanted;
+            return(undef, "reached end of CDS scores before finding: " . join(", ", @missing_model_ids));
+        }
+
+        my ($acc, $scores_aref) = &parse_CDS_score_row($row);
+
+        if ($wanted{$acc}) {
+            if (exists $cds_scores{$acc}) {
+                return(undef, "found duplicate CDS score row for $acc while streaming");
+            }
+            $cds_scores{$acc} = $scores_aref;
+            $saw_current_contig_score = 1;
+            next;
+        }
+
+        $reader->{pending_row} = $row;
+
+        if ($saw_current_contig_score) {
+            my @missing_model_ids = grep { ! exists $cds_scores{$_} } keys %wanted;
+            return(undef, "encountered CDS score row for $acc before finding scores for: "
+                   . join(", ", @missing_model_ids));
+        }
+        else {
+            return(undef, "next CDS score row $acc does not match the current GFF3 contig");
+        }
+    }
+
+    # Keep one row buffered so the next contig can continue from the exact boundary.
+    my $lookahead_row = &next_CDS_score_row($reader);
+    if ($lookahead_row) {
+        my ($lookahead_acc) = &parse_CDS_score_row($lookahead_row);
+        if ($wanted{$lookahead_acc}) {
+            return(undef, "found extra CDS score row for $lookahead_acc after current contig scores were complete");
+        }
+        $reader->{pending_row} = $lookahead_row;
+    }
+
+    return(\%cds_scores, undef);
+}
+
+sub next_CDS_score_row {
+    my ($reader) = @_;
+
+    if ($reader->{pending_row}) {
+        my $row = $reader->{pending_row};
+        $reader->{pending_row} = undef;
+        return($row);
+    }
+
+    return($reader->{tabreader}->get_row());
+}
+
+sub fallback_to_full_CDS_scores {
+    my ($reader, $reason) = @_;
+
+    $reader->{fallback_reason} = $reason;
+    print STDERR "CDS scores are not in GFF3 stream order ($reason); falling back to full CDS score parsing.\n";
+
+    &close_CDS_score_reader($reader);
+    $reader->{tabreader} = undef;
+    $reader->{pending_row} = undef;
+
+    my %cds_scores = &parse_CDS_scores_file($reader->{cds_scores_file});
+    $reader->{full_cds_scores_href} = \%cds_scores;
+}
+
+sub get_CDS_scores_from_full_cache {
+    my ($reader, $model_ids_aref) = @_;
+
+    my %cds_scores;
+
+    foreach my $model_id (@$model_ids_aref) {
+        my $cds_scores_aref = $reader->{full_cds_scores_href}->{$model_id};
+        unless ($cds_scores_aref) {
+            confess "Error, no CDS scores found for model_id: $model_id";
+        }
+        $cds_scores{$model_id} = $cds_scores_aref;
+    }
+
+    return(\%cds_scores);
+}
+
+sub parse_CDS_score_row {
+    my ($row) = @_;
+
+    foreach my $key (keys %$row) {
+        my $clean_key = $key;
+        $clean_key =~ s/\r$//;
+        if ($clean_key ne $key) {
+            $row->{$clean_key} = delete $row->{$key};
+        }
+    }
+
+    my ($acc, @scores) = ($row->{'#acc'},
+                          $row->{'score_1'}, $row->{'score_2'}, $row->{'score_3'},
+                          $row->{'score_4'}, $row->{'score_5'}, $row->{'score_6'});
+
+    unless (defined $acc) {
+        confess "Error, missing #acc entry for: " . Dumper($row);
+    }
+
+    # make sure we have score vals
+    foreach my $score (@scores) {
+        if (defined $score) {
+            $score =~ s/\r$//;
+        }
+        unless (defined $score) {
+            confess "Error, missing a score entry for: " . Dumper($row);
+        }
+    }
+
+    return($acc, \@scores);
+}
+
+sub clear_gene_objs {
+    my ($gene_ids_aref, $gene_obj_indexer_href) = @_;
+
+    foreach my $gene_id (@$gene_ids_aref) {
+        delete $gene_obj_indexer_href->{$gene_id};
+    }
+}
+
 sub parse_CDS_scores_file {
     my ($cds_scores_file) = @_;
     
@@ -346,18 +544,9 @@ sub parse_CDS_scores_file {
     my $tabreader = new DelimParser::Reader($fh, "\t");
     while (my $row = $tabreader->get_row()) {
         
-        my ($acc, @scores) = ($row->{'#acc'}, 
-                              $row->{'score_1'}, $row->{'score_2'}, $row->{'score_3'},
-                              $row->{'score_4'}, $row->{'score_5'}, $row->{'score_6'});
-
-        # make sure we have score vals
-        foreach my $score (@scores) {
-            unless (defined $score) {
-                confess "Error, missing a score entry for: " . Dumper($row);
-            }
-        }
+        my ($acc, $scores_aref) = &parse_CDS_score_row($row);
                 
-        $cds_scores{$acc} = [@scores];
+        $cds_scores{$acc} = $scores_aref;
     }
     close $fh;
     
