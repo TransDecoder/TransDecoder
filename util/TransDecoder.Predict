@@ -223,6 +223,8 @@ main: {
     unless (-d $workdir) {
         die "Error, cannot find directory: $workdir,  be sure to first run TransDecoder.LongOrfs before TransDecoder.Predict\n\n";
     }
+
+    &ensure_fasta_fai_if_possible($transcripts_file);
     
     my $checkpoints_dir = "$workdir/__checkpoints_TDpredict";
     if (! -d $checkpoints_dir) {
@@ -365,6 +367,58 @@ main: {
     exit(0);
 }
 
+
+####
+sub ensure_fasta_fai_if_possible {
+    my ($fasta_file) = @_;
+
+    my $fai_file = "$fasta_file.fai";
+    if (-s $fai_file) {
+        return;
+    }
+
+    my $samtools = &find_program_on_path("samtools");
+    unless ($samtools) {
+        warn "WARNING: samtools not found on PATH; cannot create FASTA index $fai_file. Continuing without it.\n";
+        return;
+    }
+
+    print STDERR "CMD: $samtools faidx $fasta_file\n";
+    my $ret = system($samtools, "faidx", $fasta_file);
+
+    if ($ret) {
+        my $failure = ($ret == -1) ? "failed to execute: $!" : "exit status " . ($ret >> 8);
+        warn "WARNING: samtools faidx failed for $fasta_file ($failure). Continuing without FASTA index $fai_file.\n";
+    }
+
+    return;
+}
+
+####
+sub find_program_on_path {
+    my ($prog) = @_;
+
+    my @extensions = ("");
+    if ($^O =~ /^(MSWin32|cygwin|msys)$/i) {
+        push(@extensions, split(/;/, $ENV{PATHEXT} || ".COM;.EXE;.BAT;.CMD"));
+    }
+
+    my %seen;
+    @extensions = grep { ! $seen{lc($_)}++ } @extensions;
+
+    foreach my $dir (File::Spec->path()) {
+        next unless defined $dir && length $dir;
+
+        foreach my $extension (@extensions) {
+            my $path = File::Spec->catfile($dir, $prog . $extension);
+            if (-f $path && -x _) {
+                return($path);
+            }
+        }
+    }
+
+    return;
+}
 
 ####
 sub process_cmd {

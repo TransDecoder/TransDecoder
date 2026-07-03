@@ -6,7 +6,7 @@ use FindBin;
 use lib ("$FindBin::Bin/../PerlLib");
 use Gene_obj;
 use GFF3_utils2;
-use Fasta_reader;
+use Fasta_retriever;
 use Nuc_translator;
 use Carp;
 use Data::Dumper;
@@ -108,25 +108,22 @@ main: {
     open(my $ofh_start_scores, ">$start_scores_log_file") or die "Error, cannot write to $start_scores_log_file";
     
     print STDERR "-reading transcripts: $transcripts_file\n" if $DEBUG;
-    my $fasta_reader = new Fasta_reader($transcripts_file);
-
-    my %seqs = $fasta_reader->retrieve_all_seqs_hash();
+    my $fasta_retriever = new Fasta_retriever($transcripts_file);
 
     print STDERR "-parsing orf annotations: $gff3_file\n" if $DEBUG;
     my $gene_obj_indexer_href = {};
 
-    my $asmbl_id_to_gene_list_href = &GFF3_utils2::index_GFF3_gene_objs($gff3_file, $gene_obj_indexer_href);
+    open(my $gff3_fh, $gff3_file) or die "Error, cannot open file: $gff3_file";
 
     my $num_starts_revised = 0;
-    
-    foreach my $transcript_acc (sort keys %$asmbl_id_to_gene_list_href) {
+
+    while (my ($transcript_acc, $gene_ids_aref) = &GFF3_utils2::next_contig_gene_objs($gff3_fh, $gene_obj_indexer_href)) {
+        my @gene_ids = @$gene_ids_aref;
+        unless (@gene_ids) { next; }
 
         print STDERR "-processing: $transcript_acc\n" if $DEBUG;
-        
-        my @gene_ids = @{$asmbl_id_to_gene_list_href->{$transcript_acc}};
-        
 
-        my $transcript_seq = uc $seqs{$transcript_acc};
+        my $transcript_seq = uc $fasta_retriever->get_seq($transcript_acc);
 
         foreach my $gene_id (@gene_ids) {
 
@@ -152,7 +149,10 @@ main: {
             
 
         }
+
+        delete @{$gene_obj_indexer_href}{@gene_ids};
     }
+    close $gff3_fh;
 
     close $ofh_start_scores;
     
