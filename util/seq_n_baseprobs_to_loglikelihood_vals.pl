@@ -7,6 +7,7 @@ use FindBin;
 use lib ("$FindBin::Bin/../PerlLib");
 use Fasta_reader;
 use Nuc_translator;
+use Getopt::Long qw(:config pass_through);
 
 ## hexamer stats
 my %framed_kmers;
@@ -14,7 +15,12 @@ my %framed_kmers;
 my %background_base_probs;
 
 
-my $usage = "usage: $0 targetCDSs base_probs.dat\n\n";
+my $usage = "usage: $0 targetCDSs base_probs.dat [--genetic_code name]\n\n";
+
+my $genetic_code = "Universal";
+&GetOptions('genetic_code|G=s' => \$genetic_code);
+&Nuc_translator::use_specified_genetic_code($genetic_code);
+my %STOP_CODONS = map { $_ => 1 } &Nuc_translator::get_stop_codons();
 
 my $target_CDS = $ARGV[0] or die $usage;
 my $base_probs_dat_file = $ARGV[1] or die $usage;
@@ -111,8 +117,8 @@ sub parse_targetCDSs {
                     ) {
 
                     my $codon = substr($sequence, $i, 3);
-                    # stops: UAA, UAG, UGA
-                    if ($codon =~ /^(TAA|TAG|TGA)$/) {
+                    # stop codons of the genetic code in use
+                    if ($STOP_CODONS{$codon}) {
                         last;
                     }
                 }

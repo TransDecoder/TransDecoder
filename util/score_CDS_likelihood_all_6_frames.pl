@@ -7,9 +7,15 @@ use FindBin;
 use lib ("$FindBin::Bin/../PerlLib");
 use Fasta_reader;
 use Nuc_translator;
+use Getopt::Long qw(:config pass_through);
 use List::Util qw(min);
 
-my $usage = "usage: $0 CDS hexamerScores\n\n";
+my $usage = "usage: $0 CDS hexamerScores [--genetic_code name]\n\n";
+
+my $genetic_code = "Universal";
+&GetOptions('genetic_code|G=s' => \$genetic_code);
+&Nuc_translator::use_specified_genetic_code($genetic_code);
+my %STOP_CODONS = map { $_ => 1 } &Nuc_translator::get_stop_codons();
 
 
 my $MAX_REPEAT_COUNT = 3;
@@ -91,8 +97,8 @@ sub score_CDS_via_Markov {
             ) {
             
             my $codon = substr($sequence, $i, 3);
-            # stops: UAA, UAG, UGA
-            if ($codon =~ /^(TAA|TAG|TGA)$/) {
+            # stop codons of the genetic code in use
+            if ($STOP_CODONS{$codon}) {
                 last;
             }
         }

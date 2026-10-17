@@ -269,13 +269,13 @@ main: {
     }
     
     # score kmers for Markov model
-    $pipeliner->add_commands(new Command("$UTIL_DIR/seq_n_baseprobs_to_loglikelihood_vals.pl $top_cds_file $base_freqs_file > $hexamer_scores_file",
+    $pipeliner->add_commands(new Command("$UTIL_DIR/seq_n_baseprobs_to_loglikelihood_vals.pl $top_cds_file $base_freqs_file $genetic_code > $hexamer_scores_file",
                                          "hexamer_scores.ok") );
     
     # score all cds entries
     my $cds_scores_file = "$cds_file.scores";
     my $cds_scores_checkpoint = "$cds_scores_file.ok";
-    $pipeliner->add_commands(new Command("$UTIL_DIR/score_CDS_likelihood_all_6_frames.pl $cds_file $hexamer_scores_file > $cds_scores_file",
+    $pipeliner->add_commands(new Command("$UTIL_DIR/score_CDS_likelihood_all_6_frames.pl $cds_file $hexamer_scores_file $genetic_code > $cds_scores_file",
                                          "score_cdss.ok"));
 
     $pipeliner->run();
