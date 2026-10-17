@@ -56,7 +56,7 @@ my $usage = <<__EOUSAGE__;
 #
 #
 #   --retain_long_orfs_mode <string>        'dynamic' or 'strict' (default: dynamic)
-#                                        In dynamic mode, sets range according to 1%FDR in random sequence of same GC content.
+#                                        In dynamic mode, sets the length to the 99.9th percentile of ORF lengths in random sequence of the same GC content.
 #
 # 
 #   --retain_long_orfs_length <int>         under 'strict' mode, retain all ORFs found that are equal or longer than these many nucleotides even if no other evidence 
@@ -79,7 +79,7 @@ my $usage = <<__EOUSAGE__;
 #    -T <int>                            Top longest ORFs to train Markov Model (hexamer stats) (default: 500)
 #                                        Note, 10x this value are first selected for removing redundancies,
 #                                        and then this -T value of longest ORFs are selected from the non-redundant set.
-#   --genetic_code | -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotes, Tetrahymena, Candida, Acetabularia, ...)
+#   --genetic_code | -G <string>                            genetic code (default: universal; see PerlDoc; options: Euplotid, Tetrahymena, Candida, Acetabularia, ...)
 #                                              Genetic Codes (derived from: https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi)
 $genetic_code_options
 #

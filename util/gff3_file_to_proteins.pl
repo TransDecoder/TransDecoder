@@ -28,7 +28,7 @@ my $usage = <<__EOUSAGE__;
 #  --seqType <string>        prot|CDS|cDNA|gene,  default=prot
 #
 #  --genetic_code  <string>   universal (default)
-#                             Euplotes, Tetrahymena, Candida
+#                             Euplotid, Tetrahymena, Candida
 #                             Acetabularia, Mitochondrial-Canonical
 #                             Mitochondrial-Vertebrates, Mitochondrial-Arthropods
 #                             Mitochondrial-Echinoderms, Mitochondrial-Molluscs

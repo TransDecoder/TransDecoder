@@ -58,7 +58,7 @@ my $workdir;
             'gff3_file=s' => \$gff3_file,
             'adj_dist=i' => \$adj_dist,
             'atg_pos=i'=> \$atg_pwm_pos,
-            'atg_pct=i' => \$adj_pct,
+            'adj_pct|atg_pct=i' => \$adj_pct,
             'debug' => \$DEBUG,
             'workdir=s' => \$workdir,
     );

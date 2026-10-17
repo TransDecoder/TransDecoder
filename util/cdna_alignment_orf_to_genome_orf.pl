@@ -85,7 +85,8 @@ main: {
                     my $use_gene_id = $transcript_struct->{gene_id};
                     unless ($use_gene_id) {
                         ## extract the orig gene id from the incoming gene obj
-                        my ($isolated_gene_id, @rest) = split(/::/, $gene_id);
+                        # TransDecoder gene ids are "<gene>~~<orf>" ("::" in releases before v5)
+                        my ($isolated_gene_id, @rest) = split(/~~|::/, $gene_id);
                         $use_gene_id = $isolated_gene_id;
                     }
 

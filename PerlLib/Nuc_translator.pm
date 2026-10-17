@@ -36,7 +36,7 @@ my $protein = &translate_sequence($nuc_sequence, $translation_frame);
 
 Methods are provided to translate nucleotide sequences into protein sequences using a specified genetic code.
 
-Available genetic codes include universal, Euplotes, Tetrahymena, Candida, Acetabularia
+Available genetic codes include universal, Euplotid, Tetrahymena, Candida, Acetabularia
 
 For info on these codes, visit:
 
