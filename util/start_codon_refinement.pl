@@ -77,10 +77,10 @@ main: {
     # should be in the output directory
     
     # get transdecoder start train files
-    my $transdecoder_dir = $workdir;
     unless ($workdir) {
         $workdir = basename($transcripts_file) . ".transdecoder_dir";
     }
+    my $transdecoder_dir = $workdir;
     unless (-d $transdecoder_dir) {
         die "Error, cannot locate transdecoder working directory as: $transdecoder_dir";
     }
@@ -102,7 +102,8 @@ main: {
     print STDERR "-best pwm: $pwm_range, with score thresh: $min_threshold\n" if $DEBUG;
     
     my ($pwm_range_left, $pwm_range_right) = split(",", $pwm_range); # extent around the atg
-    my $pwm_range_aref = [$atg_pwm_pos - $pwm_range_left -1, $atg_pwm_pos + 2 + $pwm_range_right -1]; # zero based
+    # zero-based, inclusive; must match the windows scored during training in util/PWM/feature_scoring.+-.pl
+    my $pwm_range_aref = [$atg_pwm_pos - $pwm_range_left, $atg_pwm_pos + 2 + $pwm_range_right];
     
     my $start_scores_log_file = "${transdecoder_dir}/start_refinement.alt_start_scores";
     open(my $ofh_start_scores, ">$start_scores_log_file") or die "Error, cannot write to $start_scores_log_file";
@@ -216,6 +217,9 @@ sub refine_start_codon_position {
     my ($transcript_acc, $gene_id,
         $gene_obj, $pwm_plus_obj, $pwm_minus_obj, 
         $pwm_range_aref, $min_threshold, $transcript_seq, $ofh_start_scores) = @_;
+
+    # training scores (and hence the selected threshold) are normalized by the flank length (window minus the ATG)
+    my $pwm_range_norm = $pwm_range_aref->[1] - $pwm_range_aref->[0] + 1 - 3;
     
     my $revised_start_flag = 0;
     
@@ -275,7 +279,7 @@ sub refine_start_codon_position {
     
     foreach my $alt_start (@alt_starts) {
         my $feature_seq_start = $alt_start - $atg_pwm_pos;
-        if ($feature_seq_start > 0) {
+        if ($feature_seq_start >= 0) {
             my $feature_seq = substr($transcript_seq, $feature_seq_start, $pwm_len);
             unless (length($feature_seq) == $pwm_len) { next; }
             
@@ -284,7 +288,7 @@ sub refine_start_codon_position {
 
             if ($alt_start_score eq "NA") { next; }
      
-            $alt_start_score = sprintf("%.3f", $alt_start_score);
+            $alt_start_score = sprintf("%.3f", $alt_start_score / $pwm_range_norm);
             
             my $short_feature_seq = &translate_sequence(substr($transcript_seq, $alt_start, 15), 1);
                         
