@@ -250,7 +250,7 @@ main: {
         $pipeliner->add_commands(new Command("$UTIL_DIR/get_top_longest_fasta_entries.pl $cds_file $red_num $max_prot_length_for_training > $red_num_cds_longest_file",
                                              "get_longest_orfs.ok"));
         
-        $pipeliner->add_commands(new Command("$UTIL_DIR/exclude_similar_proteins.pl $red_num_cds_longest_file > $red_num_cds_longest_file.nr", "nr.ok"));
+        $pipeliner->add_commands(new Command("$UTIL_DIR/exclude_similar_proteins.pl $red_num_cds_longest_file $genetic_code > $red_num_cds_longest_file.nr", "nr.ok"));
         
         $pipeliner->add_commands(new Command("$UTIL_DIR/get_top_longest_fasta_entries.pl $red_num_cds_longest_file.nr $top_ORFs_train > $top_cds_file",
                                              "top_train_select.ok"));

@@ -7,8 +7,14 @@ use lib ("$FindBin::Bin/../PerlLib");
 use Carp;
 use Nuc_translator;
 use Fasta_reader;
+use Getopt::Long qw(:config pass_through);
 
-my $usage = "\n\nusage: $0 fasta_file [DEBUG]\n\n";
+my $usage = "\n\nusage: $0 fasta_file [DEBUG] [--genetic_code name]\n\n";
+
+# translate with the genetic code in use, so redundancy is judged on the real proteins
+my $genetic_code = "Universal";
+&GetOptions('genetic_code|G=s' => \$genetic_code);
+&Nuc_translator::use_specified_genetic_code($genetic_code);
 
 my $fasta_file = $ARGV[0] or die $usage;
 my $DEBUG = $ARGV[1] || 0;

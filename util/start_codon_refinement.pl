@@ -84,6 +84,15 @@ main: {
     unless (-d $transdecoder_dir) {
         die "Error, cannot locate transdecoder working directory as: $transdecoder_dir";
     }
+
+    if (-e "${transdecoder_dir}/start_refinement.SKIPPED") {
+        # train_start_PWM.pl found too few training features: emit the ORFs unchanged
+        print STDERR "WARNING: start codon refinement was skipped (see ${transdecoder_dir}/start_refinement.SKIPPED)\n";
+        open(my $fh, $gff3_file) or die "Error, cannot open $gff3_file";
+        print while (<$fh>);
+        close $fh;
+        exit(0);
+    }
     
 
     my $pwm_plus = "${transdecoder_dir}/start_refinement.enhanced.+.pwm";

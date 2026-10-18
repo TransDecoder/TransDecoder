@@ -16,6 +16,10 @@ my $help_flag;
 my $pwm_left = 20;
 my $pwm_right = 10;
 
+# Training needs this many start-site features (training ORFs with a complete ATG window).
+# Below it, start refinement is skipped: start_codon_refinement.pl passes the ORFs through.
+my $MIN_TRAINING_FEATURES = 50;
+
 my $usage = <<__EOUSAGE__;
 
 
@@ -79,6 +83,24 @@ main: {
         . " --pwm_left $pwm_left --pwm_right $pwm_right ";
     
     $pipeliner->add_commands(new Command($cmd, "built_init.ok"));
+    $pipeliner->run();
+
+    my $skip_file = "$out_prefix.SKIPPED";
+    unlink($skip_file) if -e $skip_file;
+    my $num_features = 0;
+    open(my $fh, "$out_prefix.+.features") or die "Error, cannot open $out_prefix.+.features";
+    while (<$fh>) { $num_features++ if /\S/; }
+    close $fh;
+    if ($num_features < $MIN_TRAINING_FEATURES) {
+        my $msg = "Only $num_features start-site training features (minimum $MIN_TRAINING_FEATURES); "
+            . "skipping start codon refinement. This happens when training ORFs start at or near the "
+            . "transcript 5' end (e.g. transcripts lacking 5' UTRs).";
+        print STDERR "WARNING: $msg\n";
+        open(my $ofh, ">$skip_file") or die "Error, cannot write $skip_file";
+        print $ofh "$msg\n";
+        close $ofh;
+        exit(0);
+    }
 
     $cmd = "$utildir/feature_scoring.+-.pl "
         . " --features_plus $out_prefix.+.features "
