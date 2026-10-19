@@ -35,7 +35,7 @@ my $usage = <<__EOUSAGE__;
 #
 #  --pfam_hits <string>          pfam hits file
 #
-#  --single_best_orf          retain single longest orf that meets selection criteria
+#  --single_best_orf          retain only the top-priority orf that meets selection criteria
 #
 #  --verbose                  show orf rankings in stderr
 #
@@ -191,17 +191,12 @@ main: {
         }
                 
         if ($SINGLE_BEST_ORF_FLAG) {
-            ## re-sort and take the longest one w/ homology info:
-            @gene_entries = sort {
-                $b->{homology_count} <=> $a->{homology_count}
-                ||
-                $b->{length} <=> $a->{length}
-            } @gene_entries;
-            
+            ## the top orf in the priority order above (homology, coding score, length); ranking by
+            ## length alone favours long antisense ORFs
             @gene_entries = ($gene_entries[0]);
 
             if ($verbose_flag) {
-                print STDERR "- ** selecting best orf, prioritized by homology then length:\n";
+                print STDERR "- ** selecting best orf, prioritized by homology, coding score, then length:\n";
                 my $entry = $gene_entries[0];
                 print STDERR "\t" . join("\t", $entry->{gene_obj}->{Model_feat_name}, 
                                          "homology_count: " . $entry->{homology_count},

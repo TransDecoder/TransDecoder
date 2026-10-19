@@ -56,7 +56,9 @@ my $usage = <<__EOUSAGE__;
 #
 #
 #   --retain_long_orfs_mode <string>        'dynamic' or 'strict' (default: dynamic)
-#                                        In dynamic mode, sets the length to the 99.9th percentile of ORF lengths in random sequence of the same GC content.
+#                                        In dynamic mode, sets the length to the 99.9th percentile of ORF lengths in random sequence of the same GC content
+#                                        (only for genetic codes with stop codons TAA/TAG/TGA, which the table was simulated with;
+#                                         otherwise no ORF is retained on length alone).
 #
 # 
 #   --retain_long_orfs_length <int>         under 'strict' mode, retain all ORFs found that are equal or longer than these many nucleotides even if no other evidence 
@@ -68,13 +70,22 @@ my $usage = <<__EOUSAGE__;
 #   --retain_blastp_hits <string>          blastp output in '-outfmt 6' format.
 #                                        Any ORF with a blast match will be retained in the final output.
 #
-#   --single_best_only                     Retain only the single best orf per transcript (prioritized by homology then orf length)
+#   --retain_multiple_orfs                 Report every non-overlapping ORF passing selection; by default only the single
+#                                        best ORF per transcript is reported (prioritized by homology, coding score, then length)
 #
 #   --output_dir | -O  <string>            same output directory from the TransDecoder.LongOrfs
 #
-#   --no_refine_starts                     start refinement identifies potential start codons for 5' partial ORFs using a PWM, process on by default.
+#   --no_refine_starts                     start refinement decides whether an ORF open at its 5' end is truncated (5' partial)
+#                                        or extends into the 5' UTR, in which case it starts at its first in-frame ATG.
+#                                        On by default.
 #
 ##  Advanced options
+#
+#   --start_contrast_alpha <float>       start refinement: an open 5' end stays 5' partial only if the segment before its
+#                                        first in-frame ATG reaches this fraction of the training ORFs' per-base frame
+#                                        contrast (default: 0.4)
+#
+#   --start_kozak_weight <float>         start refinement: weight of that ATG's Kozak log-odds in the cutoff (default: 0.15)
 #
 #    -T <int>                            Top longest ORFs to train Markov Model (hexamer stats) (default: 500)
 #                                        Note, 10x this value are first selected for removing redundancies,
@@ -150,7 +161,10 @@ my $retain_pfam_hits_file;
 my $retain_blastp_hits_file;
 my $cpu = 1;
 my $MPI_DEBUG = 1;
-my $single_best_flag = 0;
+my $single_best_flag = 0;    # deprecated: single best is the default
+my $retain_multiple_orfs_flag = 0;
+my $start_contrast_alpha = 0.4;
+my $start_kozak_weight = 0.15;
 
 my $NO_REFINE_START_CODONS_FLAG = 0;
 
@@ -176,6 +190,9 @@ my $output_dir = &Pipeliner::ensure_full_path(cwd()); # current working director
              'cpu=i' => \$cpu,
 
              'single_best_only' => \$single_best_flag,
+             'retain_multiple_orfs' => \$retain_multiple_orfs_flag,
+             'start_contrast_alpha=f' => \$start_contrast_alpha,
+             'start_kozak_weight=f' => \$start_kozak_weight,
              
              'genetic_code|G=s' => \$genetic_code,
 
@@ -267,7 +284,15 @@ main: {
     my $base_freqs_file = "$workdir/base_freqs.dat";
 
     if ($RETAIN_LONG_ORFS_MODE eq 'dynamic') {
-        $RETAIN_LONG_ORFS_MIN_LENGTH = &get_dynamic_retain_long_orf_length($base_freqs_file, \@GC_TO_MIN_LONG_ORF_LENGTH);
+        if (&genetic_code_has_standard_stops()) {
+            $RETAIN_LONG_ORFS_MIN_LENGTH = &get_dynamic_retain_long_orf_length($base_freqs_file, \@GC_TO_MIN_LONG_ORF_LENGTH);
+        }
+        else {
+            # the GC table was simulated with TAA/TAG/TGA; with fewer stops random ORFs are much
+            # longer (e.g. TGA-only ciliate code), so no ORF is retained on length alone
+            print STDERR "-genetic code stop codons differ from TAA/TAG/TGA: no length-based ORF retention\n";
+            $RETAIN_LONG_ORFS_MIN_LENGTH = 1000000000;
+        }
     }
     
     # score kmers for Markov model
@@ -308,7 +333,7 @@ main: {
         $select_cmd .= " --blast_hits $retain_blastp_hits_file ";
     }
 
-    if ($single_best_flag) {
+    unless ($retain_multiple_orfs_flag) {
         $select_cmd .= " --single_best_orf ";
     }
     $select_cmd .= " > $cds_file.best_candidates.gff3 ";
@@ -322,11 +347,10 @@ main: {
     
     ## start codon refinement
     unless ($NO_REFINE_START_CODONS_FLAG) {
-        my $cmd = "$UTIL_DIR/train_start_PWM.pl --transcripts $transcripts_file --selected_orfs $top_cds_file --out_prefix $workdir/start_refinement";        
-        $pipeliner->add_commands(new Command($cmd, "train_start_PWM.$checkpoint_hashcode.ok", "Training start codon pattern recognition"));
-        
         my $revised_orf_gff3_file = "$target_final_file.revised_starts.gff3";
-        $cmd = "$UTIL_DIR/start_codon_refinement.pl --transcripts $transcripts_file --gff3_file $target_final_file --workdir $workdir > $revised_orf_gff3_file";
+        my $cmd = "$UTIL_DIR/start_codon_refinement.pl --transcripts $transcripts_file --gff3_file $target_final_file --workdir $workdir "
+            . " --training_orfs $top_cds_file --hexamer_scores $hexamer_scores_file $genetic_code "
+            . " --contrast_alpha $start_contrast_alpha --kozak_weight $start_kozak_weight > $revised_orf_gff3_file";
         $pipeliner->add_commands(new Command($cmd, "revise_starts.$checkpoint_hashcode.ok", "Refining start codon selections."));
                 
         $target_final_file = $revised_orf_gff3_file;
@@ -451,6 +475,17 @@ sub check_program() {
     return @paths;
 }
 
+
+
+####
+sub genetic_code_has_standard_stops {
+    # $genetic_code holds the option string passed to the util scripts
+    my ($code) = $genetic_code =~ /--genetic_code\s+(\S+)/;
+    &Nuc_translator::use_specified_genetic_code($code || "Universal");
+    my $stops = join(",", sort grep { !/U/ } &Nuc_translator::get_stop_codons()); # DNA spellings
+    &Nuc_translator::use_specified_genetic_code("Universal");
+    return($stops eq "TAA,TAG,TGA");
+}
 
 
 ####

@@ -56,7 +56,8 @@ my $usage = <<__EOUSAGE__;
 #    --retain_long_orfs_length <int>    Min length to auto-retain under strict mode
 #    --pfam-search-db <string>          Pfam HMM database to search with hmmsearch;
 #                                       hmmpress is run automatically if needed
-#    --single_best_only                 Retain only single best ORF per transcript
+#    --retain_multiple_orfs             Report all non-overlapping ORFs passing selection
+#                                       (default: the single best ORF per transcript)
 #    --no_refine_starts                 Skip start codon refinement
 #
 #  Other:
@@ -95,7 +96,8 @@ my $top_orfs_train           = 500;
 my $retain_long_orfs_mode    = 'dynamic';
 my $retain_long_orfs_length  = 1000000;
 my $pfam_search_db;
-my $single_best_only         = 0;
+my $single_best_only         = 0;   # deprecated: now the default
+my $retain_multiple_orfs     = 0;
 my $no_refine_starts         = 0;
 
 # general
@@ -127,6 +129,7 @@ my $show_version;
     'retain_long_orfs_length=i'  => \$retain_long_orfs_length,
     'pfam_search_db|pfam-search-db=s' => \$pfam_search_db,
     'single_best_only'           => \$single_best_only,
+    'retain_multiple_orfs'       => \$retain_multiple_orfs,
     'no_refine_starts'           => \$no_refine_starts,
 
     'O|output_dir=s'             => \$output_dir,
@@ -287,7 +290,7 @@ my $predict_cmd = "$UTIL_DIR/TransDecoder.Predict -t $transcripts_file"
 $predict_cmd .= " -G $genetic_code" if lc($genetic_code) ne 'universal';
 $predict_cmd .= " --retain_blastp_hits $retain_blastp_hits_file" if $retain_blastp_hits_file;
 $predict_cmd .= " --retain_pfam_hits $retain_pfam_hits_file"     if $retain_pfam_hits_file;
-$predict_cmd .= " --single_best_only"                            if $single_best_only;
+$predict_cmd .= " --retain_multiple_orfs"                        if $retain_multiple_orfs;
 $predict_cmd .= " --no_refine_starts"                            if $no_refine_starts;
 $predict_cmd .= " -v"                                            if $verbose;
 
