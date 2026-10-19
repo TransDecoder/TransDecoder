@@ -347,9 +347,14 @@ main: {
     
     ## start codon refinement
     unless ($NO_REFINE_START_CODONS_FLAG) {
+        my $cmd = "$UTIL_DIR/train_kozak_model.pl --transcripts $transcripts_file --training_orfs $top_cds_file "
+            . " --out_prefix $workdir/start_refinement";
+        $pipeliner->add_commands(new Command($cmd, "train_kozak_model.$checkpoint_hashcode.ok", "Training start codon (Kozak) context model"));
+
         my $revised_orf_gff3_file = "$target_final_file.revised_starts.gff3";
-        my $cmd = "$UTIL_DIR/start_codon_refinement.pl --transcripts $transcripts_file --gff3_file $target_final_file --workdir $workdir "
+        $cmd = "$UTIL_DIR/start_codon_refinement.pl --transcripts $transcripts_file --gff3_file $target_final_file --workdir $workdir "
             . " --training_orfs $top_cds_file --hexamer_scores $hexamer_scores_file $genetic_code "
+            . " --kozak_model $workdir/start_refinement.kozak.tsv "
             . " --contrast_alpha $start_contrast_alpha --kozak_weight $start_kozak_weight > $revised_orf_gff3_file";
         $pipeliner->add_commands(new Command($cmd, "revise_starts.$checkpoint_hashcode.ok", "Refining start codon selections."));
                 

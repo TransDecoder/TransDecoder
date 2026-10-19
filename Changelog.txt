@@ -3,7 +3,9 @@
   It now starts at its first in-frame ATG unless the segment before that ATG looks coding, judged by the frame contrast
   of the coding Markov score (in frame vs shifted by one and two bases, as in ORF selection) together with the ATG's
   Kozak context (-6..-1, +4..+5), learned from the training ORFs. Options --start_contrast_alpha, --start_kozak_weight.
-  The PWM training step (train_start_PWM.pl) is no longer run.
+  The Kozak model is trained by util/train_kozak_model.pl, which writes start_refinement.kozak.tsv,
+  .kozak.counts.tsv and a sequence logo (.kozak.logo.svg) to the work directory. The PWM training step
+  (train_start_PWM.pl) is no longer run.
 - the single best ORF per transcript is now reported by default, prioritized by homology, coding score, then length
   (previously homology then length, which favored long antisense ORFs). Use --retain_multiple_orfs for all
   non-overlapping ORFs passing selection. --single_best_only is still accepted.

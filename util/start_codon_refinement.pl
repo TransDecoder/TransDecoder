@@ -12,6 +12,7 @@ use Carp;
 use List::Util qw (min max);
 use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
 use File::Basename;
+use Kozak_model;
 
 # An ORF that runs to the 5' end of its transcript (no start codon) is either truncated
 # (5' partial) or extends into the 5' UTR. Two signals decide, and the ORF is trimmed to start
@@ -21,7 +22,8 @@ use File::Basename;
 #    scores shifted by one and two bases (as in ORF selection). Coding sequence scores well
 #    above its shifted frames; UTR does not.
 #  - Kozak context of the ATG: log-odds of the bases at -6..-1 and +4..+5 (A of ATG = +1),
-#    trained on the training ORFs' starts against in-frame ATGs inside them.
+#    trained on the training ORFs' starts against in-frame ATGs inside them
+#    (train_kozak_model.pl; --kozak_model).
 #
 #  trim if  contrast < (contrast_alpha + kozak_weight * kozak_log_odds) * mu * segment_length
 #
@@ -30,9 +32,6 @@ use File::Basename;
 my $contrast_alpha = 0.4;
 my $kozak_weight = 0.15;
 
-my $KOZAK_UPSTREAM = 6;
-my $KOZAK_DOWNSTREAM = 2;
-my $MIN_KOZAK_TRAINING_STARTS = 50;
 my $MARKOV_ORDER = 5;
 
 my $usage = <<__EOUSAGE__;
@@ -48,6 +47,8 @@ my $usage = <<__EOUSAGE__;
 #  --hexamer_scores <string>    Markov model log-likelihood file (hexamer.scores)
 #
 #  optional:
+#
+#  --kozak_model <string>       Kozak log-odds model from train_kozak_model.pl (if absent, frame contrast only)
 #
 #  --workdir <string>           TransDecoder working dir (default: (--transcripts val) + ".transdecoder_dir")
 #
@@ -71,6 +72,7 @@ my $transcripts_file;
 my $gff3_file;
 my $training_orfs_file;
 my $hexamer_scores_file;
+my $kozak_model_file;
 my $genetic_code = "Universal";
 my $DEBUG = 0;
 my $workdir;
@@ -79,6 +81,7 @@ my $workdir;
             'gff3_file=s' => \$gff3_file,
             'training_orfs=s' => \$training_orfs_file,
             'hexamer_scores=s' => \$hexamer_scores_file,
+            'kozak_model=s' => \$kozak_model_file,
             'contrast_alpha=f' => \$contrast_alpha,
             'kozak_weight=f' => \$kozak_weight,
             'genetic_code|G=s' => \$genetic_code,
@@ -121,7 +124,13 @@ main: {
     printf STDERR "-training ORFs: median frame contrast %.4f per base; open 5' ends kept when the upstream segment reaches %.2f of it\n",
         $coding_contrast, $contrast_alpha;
 
-    my $kozak_model = &train_kozak_model($training_orfs_file, \%seqs, "$workdir/start_refinement.kozak.tsv");
+    my $kozak_model;
+    if ($kozak_model_file && -s $kozak_model_file) {
+        $kozak_model = &Kozak_model::read_model($kozak_model_file);
+    }
+    else {
+        print STDERR "-no Kozak model; start refinement uses frame contrast only\n";
+    }
 
     print STDERR "-parsing orf annotations: $gff3_file\n" if $DEBUG;
     my $gene_obj_indexer_href = {};
@@ -190,7 +199,7 @@ sub refine_start_codon_position {
     }
 
     my $contrast = &frame_contrast(substr($orf_seq, 0, $atg));
-    my $kozak_score = ($kozak_model) ? &kozak_score($kozak_model, $transcript_seq, $start_index + $atg) : 0;
+    my $kozak_score = ($kozak_model) ? &Kozak_model::score($kozak_model, $transcript_seq, $start_index + $atg) : 0;
     my $cutoff = $contrast_alpha + $kozak_weight * $kozak_score;
 
     if ($contrast >= $cutoff * $coding_contrast * $atg) {
@@ -307,106 +316,4 @@ sub median_training_contrast {
     @per_base = sort {$a<=>$b} @per_base;
     my $mid = int(scalar(@per_base) / 2);
     return( (scalar(@per_base) % 2) ? $per_base[$mid] : ($per_base[$mid-1] + $per_base[$mid]) / 2 );
-}
-
-
-####
-sub kozak_window {
-    my ($seq, $atg_index) = @_;
-
-    # bases at -6..-1 and +4..+5 around the ATG (undef outside the sequence)
-    my @positions = (($atg_index - $KOZAK_UPSTREAM) .. ($atg_index - 1),
-                     ($atg_index + 3) .. ($atg_index + 2 + $KOZAK_DOWNSTREAM));
-    my @bases;
-    foreach my $j (@positions) {
-        my $base = ($j >= 0 && $j < length($seq)) ? substr($seq, $j, 1) : undef;
-        push (@bases, (defined($base) && $base =~ /^[ACGT]$/) ? $base : undef);
-    }
-    return(@bases);
-}
-
-
-####
-sub train_kozak_model {
-    my ($training_orfs_file, $seqs_href, $model_file) = @_;
-
-    # log-odds of training ORF start contexts vs in-frame ATGs inside the training ORFs
-    my $n = $KOZAK_UPSTREAM + $KOZAK_DOWNSTREAM;
-    my @pos_counts = map { {A=>0, C=>0, G=>0, T=>0} } (1..$n);
-    my @neg_counts = map { {A=>0, C=>0, G=>0, T=>0} } (1..$n);
-    my $num_starts = 0;
-
-    foreach my $orf (&parse_training_orfs($training_orfs_file)) {
-        my ($acc, $lend, $rend, $strand) = @$orf;
-        unless (defined $acc && exists $seqs_href->{$acc}) { next; }
-        my $seq = uc $seqs_href->{$acc};
-        if ($strand eq '-') {
-            $seq = &reverse_complement($seq);
-            ($lend, $rend) = (length($seq) - $rend + 1, length($seq) - $lend + 1);
-        }
-        my ($start, $end) = ($lend - 1, $rend);
-        unless (substr($seq, $start, 3) eq "ATG") { next; }
-        $num_starts++;
-
-        my @sites = ([\@pos_counts, $start]);
-        for (my $i = $start + 3; $i < $end - 3; $i += 3) {
-            if (substr($seq, $i, 3) eq "ATG") {
-                push (@sites, [\@neg_counts, $i]);
-            }
-        }
-        foreach my $site (@sites) {
-            my ($counts_aref, $i) = @$site;
-            my @window = &kozak_window($seq, $i);
-            for my $k (0..$#window) {
-                if (defined $window[$k]) {
-                    $counts_aref->[$k]->{$window[$k]}++;
-                }
-            }
-        }
-    }
-
-    if ($num_starts < $MIN_KOZAK_TRAINING_STARTS) {
-        print STDERR "WARNING: only $num_starts training ORFs start with ATG (minimum $MIN_KOZAK_TRAINING_STARTS); "
-            . "start refinement uses frame contrast only\n";
-        return(undef);
-    }
-
-    my @model;
-    for my $k (0..$n-1) {
-        my $pt = 4; my $nt = 4;
-        foreach my $b (qw(A C G T)) {
-            $pt += $pos_counts[$k]->{$b};
-            $nt += $neg_counts[$k]->{$b};
-        }
-        my %log_odds;
-        foreach my $b (qw(A C G T)) {
-            $log_odds{$b} = log( (($pos_counts[$k]->{$b} + 1) / $pt) / (($neg_counts[$k]->{$b} + 1) / $nt) );
-        }
-        push (@model, \%log_odds);
-    }
-
-    open(my $ofh, ">$model_file") or die "Error, cannot write to $model_file";
-    print $ofh "#position\tA\tC\tG\tT  (log-odds, start vs internal in-frame ATG; $num_starts training starts)\n";
-    my @labels = ((map { "-$_" } reverse(1..$KOZAK_UPSTREAM)), (map { "+$_" } (4..(3 + $KOZAK_DOWNSTREAM))));
-    for my $k (0..$n-1) {
-        print $ofh join("\t", $labels[$k], map { sprintf("%.3f", $model[$k]->{$_}) } qw(A C G T)) . "\n";
-    }
-    close $ofh;
-
-    return(\@model);
-}
-
-
-####
-sub kozak_score {
-    my ($model, $seq, $atg_index) = @_;
-
-    my @window = &kozak_window($seq, $atg_index);
-    my $score = 0;
-    for my $k (0..$#window) {
-        if (defined $window[$k]) {
-            $score += $model->[$k]->{$window[$k]};
-        }
-    }
-    return($score);
 }
