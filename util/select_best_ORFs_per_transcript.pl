@@ -193,8 +193,12 @@ main: {
             
             # orf accepted as preliminary candidate
             
+            my ($orf_lend, $orf_rend) = sort {$a<=>$b} $gene_obj_ref->get_model_span();
             my $struct = { gene_obj => $gene_obj_ref,
                            length => $orf_length, 
+                           lend => $orf_lend,
+                           rend => $orf_rend,
+                           strand => $gene_obj_ref->get_orientation(),
                            homology_count => $homology_count,
                            cds_scores => $cds_scores_aref,
             };
@@ -217,6 +221,13 @@ main: {
             $b->{cds_scores}->[0] <=> $a->{cds_scores}->[0]
             ||
             $b->{length} <=> $a->{length}
+            ||
+            # exact ties (e.g. identical repeated ORFs): leftmost, then plus strand
+            $a->{lend} <=> $b->{lend}
+            ||
+            $a->{rend} <=> $b->{rend}
+            ||
+            $a->{strand} cmp $b->{strand}
             
         } @gene_entries;
 

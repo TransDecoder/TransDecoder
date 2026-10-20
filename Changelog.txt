@@ -1,4 +1,9 @@
 ## (unreleased)
+- Length-based ORF retention (dynamic mode): transcriptome GC is now computed from the G and C counts. It was
+  estimated as 2 x freq(C), which is wrong for strand-specific transcripts, where C and G differ
+  (e.g. A. thaliana: 39.4% instead of 42.2%, giving a 615 nt instead of a 663 nt threshold).
+- ORF selection: exact ties (same homology, score and length, e.g. identical repeated ORFs) are broken by
+  position (leftmost, then plus strand) instead of input order.
 - Output order is now reproducible: GFF3 gene models are indexed in coordinate order instead of Perl's
   per-process random hash order, so repeated runs give byte-identical .pep/.cds/.gff3/.bed files
   (previously the ORFs within a transcript could change order between runs; PERL_HASH_SEED=0 was a workaround).

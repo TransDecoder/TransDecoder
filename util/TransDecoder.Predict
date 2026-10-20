@@ -510,18 +510,22 @@ sub genetic_code_has_standard_stops {
 sub get_dynamic_retain_long_orf_length {
     my ($base_freqs_file, $GC_to_min_orf_length_aref) = @_;
 
-    my $pct_GC = -1;
+    # G+C from the base counts (not 2 x C: on stranded transcripts C and G differ)
+    my $gc_count = 0;
+    my $total_count = 0;
 
     open(my $fh, $base_freqs_file) or confess "Error, cannot open file: $base_freqs_file";
     while (<$fh>) {
         chomp;
         my ($base, $count, $ratio) = split(/\t/);
-        if ($base eq 'C') {
-            $pct_GC = 2 * $ratio * 100;
-            last;
+        $total_count += $count;
+        if ($base eq 'C' || $base eq 'G') {
+            $gc_count += $count;
         }
     }
     close $fh;
+
+    my $pct_GC = ($total_count > 0) ? 100 * $gc_count / $total_count : -1;
 
     print STDERR "PCT_GC: $pct_GC\n";
     
