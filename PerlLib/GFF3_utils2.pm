@@ -137,13 +137,26 @@ sub index_GFF3_gene_objs {
     foreach my $asmbl_id (sort keys %gene_coords) {
         my $genes_href = $gene_coords{$asmbl_id};
         
-		foreach my $gene_id (keys %$genes_href) {
+        ## genes in coordinate order (then by ID), so the output order does not depend on Perl's
+        ## per-process hash order
+        my %gene_lend;
+        foreach my $gene_id (keys %$genes_href) {
+            my @coords;
+            foreach my $transcript_href (values %{$genes_href->{$gene_id}}) {
+                foreach my $feat_coords_href (values %$transcript_href) {
+                    push (@coords, %$feat_coords_href);
+                }
+            }
+            ($gene_lend{$gene_id}) = sort {$a<=>$b} @coords;
+        }
+        
+		foreach my $gene_id (sort {$gene_lend{$a} <=> $gene_lend{$b} || $a cmp $b} keys %$genes_href) {
             #print STDERR "\r-indexing [$gene_id]  ";
             my $transcripts_href = $genes_href->{$gene_id};
             
             my @gene_objs;
             
-            foreach my $transcript_id (keys %$transcripts_href) {
+            foreach my $transcript_id (sort keys %$transcripts_href) {
             
                 my $cds_coords_href = $transcripts_href->{$transcript_id}->{CDS} || {}; # could be a noncoding transcript w/ no CDS
                 my $exon_coords_href = $transcripts_href->{$transcript_id}->{exon};
@@ -164,7 +177,7 @@ sub index_GFF3_gene_objs {
                     my ($cds_lend, $cds_rend) = sort {$a<=>$b} %$cds_coords_href;
                     my @exon_coords;
                     my $orient;
-                    foreach my $exon_end5 (keys %$exon_coords_href) {
+                    foreach my $exon_end5 (sort {$a<=>$b} keys %$exon_coords_href) {
                         my $exon_end3 = $exon_coords_href->{$exon_end5};
                         push (@exon_coords, [$exon_end5, $exon_end3]);
                         if ($exon_end5 < $exon_end3) {

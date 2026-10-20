@@ -1,4 +1,7 @@
 ## (unreleased)
+- Output order is now reproducible: GFF3 gene models are indexed in coordinate order instead of Perl's
+  per-process random hash order, so repeated runs give byte-identical .pep/.cds/.gff3/.bed files
+  (previously the ORFs within a transcript could change order between runs; PERL_HASH_SEED=0 was a workaround).
 - FASTA reader: text before the first '>' header line (e.g. ';' comment lines, as in FAIR Header Reference
   files) is now skipped with a warning. Previously it was read as an extra transcript, named after its first
   word, which gained ORF predictions and changed base_freqs.dat.
