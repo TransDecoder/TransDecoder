@@ -1,4 +1,9 @@
 ## (unreleased)
+- LongOrfs minimum protein length is now 50 aa (-m; previously 100). ORFs under 100 codons are selected by Predict,
+  without homology support, only when their frame contrast (in-frame Markov score minus the better shifted frame)
+  reaches --short_orf_min_contrast (200) bases' worth of the training ORFs' median per-base contrast
+  (--short_orf_length 100). This recovers about half of true 50-99 aa proteins while calls on noncoding RNA and
+  random sequence stay near the 100-aa level. Frame-contrast code shared in PerlLib/Frame_contrast.pm.
 - start refinement rewritten: an ORF open at its 5' end is either truncated (5' partial) or extends into the 5' UTR.
   It now starts at its first in-frame ATG unless the segment before that ATG looks coding, judged by the frame contrast
   of the coding Markov score (in frame vs shifted by one and two bases, as in ORF selection) together with the ATG's

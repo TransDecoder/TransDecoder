@@ -35,7 +35,7 @@ my $usage = <<__EOUSAGE__;
 #
 #  LongOrfs options:
 #
-#    -m <int>                           Minimum protein length (default: 100)
+#    -m <int>                           Minimum protein length (default: 50)
 #    -S                                 Strand-specific (top strand only)
 #    -G|--genetic_code <string>         Genetic code (default: universal)
 #    --gene_trans_map <string>          Gene-to-transcript map (tab-delimited)
@@ -79,7 +79,7 @@ my $genome_file;
 my $gtf_file;
 
 # longorfs
-my $min_prot_length    = 100;
+my $min_prot_length    = 50;
 my $strand_specific    = 0;
 my $genetic_code       = 'universal';
 my $gene_trans_map;

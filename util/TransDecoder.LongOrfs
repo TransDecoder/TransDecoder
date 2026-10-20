@@ -38,7 +38,7 @@ my $genetic_code_options = join("\n", &Nuc_translator::get_genetic_codes());
 
 srand(1234);
 
-my $MIN_PROT_LENGTH = 100;
+my $MIN_PROT_LENGTH = 50;  # ORFs under 100 codons must also pass Predict's short-ORF frame-contrast test
 
 my $usage = <<__EOUSAGE__;
 
@@ -61,7 +61,7 @@ my $usage = <<__EOUSAGE__;
 #
 #   --gene_trans_map <string>              gene-to-transcript identifier mapping file (tab-delimited, gene_id<tab>trans_id<return> ) 
 #
-#   -m <int>                               minimum protein length (default: 100)
+#   -m <int>                               minimum protein length (default: 50)
 # 
 #   -S                                     strand-specific (only analyzes top strand)
 #

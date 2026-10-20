@@ -88,6 +88,12 @@ my $usage = <<__EOUSAGE__;
 #   --start_kozak_weight <float>         start refinement: bases of that per-base contrast one unit of the ATG's Kozak
 #                                        log-odds is worth in the cutoff (default: 25)
 #
+#   --short_orf_length <int>             ORFs with fewer codons need --short_orf_min_contrast (default: 100)
+#
+#   --short_orf_min_contrast <float>     frame contrast (in-frame score minus the better shifted frame) a short ORF needs
+#                                        without homology support, in bases of the training ORFs' median per-base
+#                                        contrast; 0 applies only the usual frame test (default: 200)
+#
 #    -T <int>                            Top longest ORFs to train Markov Model (hexamer stats) (default: 500)
 #                                        Note, 10x this value are first selected for removing redundancies,
 #                                        and then this -T value of longest ORFs are selected from the non-redundant set.
@@ -166,6 +172,8 @@ my $single_best_flag = 0;    # deprecated: single best is the default
 my $retain_multiple_orfs_flag = 0;
 my $start_contrast_alpha = 0.4;
 my $start_kozak_weight = 25;
+my $short_orf_length = 100;
+my $short_orf_min_contrast = 200;
 
 my $NO_REFINE_START_CODONS_FLAG = 0;
 
@@ -194,6 +202,8 @@ my $output_dir = &Pipeliner::ensure_full_path(cwd()); # current working director
              'retain_multiple_orfs' => \$retain_multiple_orfs_flag,
              'start_contrast_alpha=f' => \$start_contrast_alpha,
              'start_kozak_weight=f' => \$start_kozak_weight,
+             'short_orf_length=i' => \$short_orf_length,
+             'short_orf_min_contrast=f' => \$short_orf_min_contrast,
              
              'genetic_code|G=s' => \$genetic_code,
 
@@ -314,7 +324,7 @@ main: {
     
     ## Steps below may be rerun if input parameters are set differently (such as including pfam or blast results in a subsequent run).
 
-    my @checkpoint_inputs = ($transcripts_file);
+    my @checkpoint_inputs = ($transcripts_file, "short_orf:$short_orf_length:$short_orf_min_contrast");
     if ($retain_pfam_hits_file) {
         push (@checkpoint_inputs, $retain_pfam_hits_file);
     }
@@ -325,7 +335,9 @@ main: {
     my $checkpoint_hashcode = Digest::MD5::md5_hex($big_checkpoint_string);
         
     my $select_cmd = "$UTIL_DIR/select_best_ORFs_per_transcript.pl --gff3_file $gff3_file --cds_scores $cds_scores_file "
-        . " --min_length_auto_accept $RETAIN_LONG_ORFS_MIN_LENGTH ";
+        . " --min_length_auto_accept $RETAIN_LONG_ORFS_MIN_LENGTH "
+        . " --training_orfs $top_cds_file --hexamer_scores $hexamer_scores_file $genetic_code "
+        . " --short_orf_length $short_orf_length --short_orf_min_contrast $short_orf_min_contrast ";
 
     if ($retain_pfam_hits_file) {
         $select_cmd .= " --pfam_hits $retain_pfam_hits_file ";

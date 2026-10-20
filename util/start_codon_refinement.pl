@@ -13,6 +13,7 @@ use List::Util qw (min max);
 use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
 use File::Basename;
 use Kozak_model;
+use Frame_contrast;
 
 # An ORF that runs to the 5' end of its transcript (no start codon) is either truncated
 # (5' partial) or extends into the 5' UTR. Two signals decide, and the ORF is trimmed to start
@@ -32,8 +33,6 @@ use Kozak_model;
 
 my $contrast_alpha = 0.4;
 my $kozak_weight = 25;
-
-my $MARKOV_ORDER = 5;
 
 my $usage = <<__EOUSAGE__;
 
@@ -97,9 +96,7 @@ unless ($transcripts_file && $gff3_file && $training_orfs_file && $hexamer_score
 }
 
 &Nuc_translator::use_specified_genetic_code($genetic_code);
-my %STOP_CODONS = map { $_ => 1 } &Nuc_translator::get_stop_codons();
-
-my %MARKOV_SCORES = &parse_kmer_scores($hexamer_scores_file);
+my $FRAME_CONTRAST = new Frame_contrast($hexamer_scores_file, [ &Nuc_translator::get_stop_codons() ]);
 
 
 main: {
@@ -115,7 +112,7 @@ main: {
     my $fasta_reader = new Fasta_reader($transcripts_file);
     my %seqs = $fasta_reader->retrieve_all_seqs_hash();
 
-    my $coding_contrast = &median_training_contrast($training_orfs_file);
+    my $coding_contrast = $FRAME_CONTRAST->median_training_contrast($training_orfs_file);
     unless (defined $coding_contrast) {
         print STDERR "WARNING: no training ORFs for start refinement; ORFs emitted unchanged\n";
         open(my $fh, $gff3_file) or die "Error, cannot open $gff3_file";
@@ -200,7 +197,7 @@ sub refine_start_codon_position {
         return(0);
     }
 
-    my $contrast = &frame_contrast(substr($orf_seq, 0, $atg));
+    my $contrast = $FRAME_CONTRAST->frame_contrast(substr($orf_seq, 0, $atg));
     my $kozak_score = ($kozak_model) ? &Kozak_model::score($kozak_model, $transcript_seq, $start_index + $atg) : 0;
     my $cutoff = $contrast_alpha * $atg + $kozak_weight * $kozak_score;
 
@@ -225,97 +222,3 @@ sub refine_start_codon_position {
 }
 
 
-####
-sub frame_contrast {
-    my ($seq) = @_;
-
-    # in-frame Markov score minus the better of the two shifted-frame scores
-    return(&score_CDS_via_Markov($seq)
-           - max(&score_CDS_via_Markov(substr($seq, 1)), &score_CDS_via_Markov(substr($seq, 2))));
-}
-
-
-####
-sub score_CDS_via_Markov {
-    my ($sequence) = @_;
-
-    # as in score_CDS_likelihood_all_6_frames.pl
-    my $seq_length = length($sequence);
-    if ($seq_length < $MARKOV_ORDER + 1) {
-        return(0);
-    }
-
-    my $score = 0;
-    for (my $i = 0; $i < $seq_length; $i++) {
-        my $frame = $i % 3;
-        my $markov_use = min($i, $MARKOV_ORDER);
-        my $kmer = substr($sequence, $i - $markov_use, $markov_use + 1);
-
-        if ($i == $seq_length - 3 && $frame == 0 && $STOP_CODONS{substr($sequence, $i, 3)}) {
-            last; # terminal stop codon
-        }
-        $score += $MARKOV_SCORES{"${kmer}-${frame}"} || 0;
-    }
-    return($score);
-}
-
-
-####
-sub parse_kmer_scores {
-    my ($kmer_scores_file) = @_;
-
-    my %scores;
-    open (my $fh, $kmer_scores_file) or die "Error, cannot open $kmer_scores_file";
-    while (<$fh>) {
-        chomp;
-        if (/^\#/) { next; }
-        my ($token, $count, $count_kmerminus1, $score) = split (/\t/);
-        $scores{$token} = $score;
-    }
-    close $fh;
-
-    return (%scores);
-}
-
-
-####
-sub parse_training_orfs {
-    my ($training_orfs_file) = @_;
-
-    # returns list of [transcript_acc, lend, rend, strand, cds_seq]
-    my @orfs;
-    my $fasta_reader = new Fasta_reader($training_orfs_file);
-    while (my $seq_obj = $fasta_reader->next()) {
-        my $header = $seq_obj->get_header();
-        my $cds_seq = uc $seq_obj->get_sequence();
-        if ($header =~ /(\S+):(\d+)-(\d+)\(([+-])\)/) {
-            my ($acc, $lend, $rend, $strand) = ($1, $2, $3, $4);
-            ($lend, $rend) = sort {$a<=>$b} ($lend, $rend);
-            push (@orfs, [$acc, $lend, $rend, $strand, $cds_seq]);
-        }
-        else {
-            push (@orfs, [undef, undef, undef, undef, $cds_seq]);
-        }
-    }
-    return(@orfs);
-}
-
-
-####
-sub median_training_contrast {
-    my ($training_orfs_file) = @_;
-
-    my @per_base;
-    foreach my $orf (&parse_training_orfs($training_orfs_file)) {
-        my $cds_seq = $orf->[4];
-        if (length($cds_seq) >= 30) {
-            push (@per_base, &frame_contrast($cds_seq) / length($cds_seq));
-        }
-    }
-    unless (@per_base) {
-        return(undef);
-    }
-    @per_base = sort {$a<=>$b} @per_base;
-    my $mid = int(scalar(@per_base) / 2);
-    return( (scalar(@per_base) % 2) ? $per_base[$mid] : ($per_base[$mid-1] + $per_base[$mid]) / 2 );
-}
