@@ -25,12 +25,13 @@ use Kozak_model;
 #    trained on the training ORFs' starts against in-frame ATGs inside them
 #    (train_kozak_model.pl; --kozak_model).
 #
-#  trim if  contrast < (contrast_alpha + kozak_weight * kozak_log_odds) * mu * segment_length
+#  trim if  contrast < (contrast_alpha * segment_length + kozak_weight * kozak_log_odds) * mu
 #
-# where mu is the median per-base frame contrast of the training ORFs.
+# where mu is the median per-base frame contrast of the training ORFs. The Kozak evidence counts
+# the same whatever the segment's length: one unit of log-odds is worth kozak_weight bases.
 
 my $contrast_alpha = 0.4;
-my $kozak_weight = 0.15;
+my $kozak_weight = 25;
 
 my $MARKOV_ORDER = 5;
 
@@ -55,7 +56,8 @@ my $usage = <<__EOUSAGE__;
 #  --contrast_alpha <float>     fraction of the training ORFs' per-base frame contrast the segment
 #                               before the first ATG must reach to stay 5' partial (default: $contrast_alpha)
 #
-#  --kozak_weight <float>       weight of the ATG's Kozak log-odds in that cutoff (default: $kozak_weight)
+#  --kozak_weight <float>       bases of that per-base contrast one unit of the ATG's Kozak log-odds
+#                               is worth in that cutoff (default: $kozak_weight)
 #
 #  --genetic_code|G <string>    genetic code (default: Universal)
 #
@@ -200,9 +202,9 @@ sub refine_start_codon_position {
 
     my $contrast = &frame_contrast(substr($orf_seq, 0, $atg));
     my $kozak_score = ($kozak_model) ? &Kozak_model::score($kozak_model, $transcript_seq, $start_index + $atg) : 0;
-    my $cutoff = $contrast_alpha + $kozak_weight * $kozak_score;
+    my $cutoff = $contrast_alpha * $atg + $kozak_weight * $kozak_score;
 
-    if ($contrast >= $cutoff * $coding_contrast * $atg) {
+    if ($contrast >= $cutoff * $coding_contrast) {
         return(0); # upstream segment looks coding: 5' partial
     }
 

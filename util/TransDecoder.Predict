@@ -85,7 +85,8 @@ my $usage = <<__EOUSAGE__;
 #                                        first in-frame ATG reaches this fraction of the training ORFs' per-base frame
 #                                        contrast (default: 0.4)
 #
-#   --start_kozak_weight <float>         start refinement: weight of that ATG's Kozak log-odds in the cutoff (default: 0.15)
+#   --start_kozak_weight <float>         start refinement: bases of that per-base contrast one unit of the ATG's Kozak
+#                                        log-odds is worth in the cutoff (default: 25)
 #
 #    -T <int>                            Top longest ORFs to train Markov Model (hexamer stats) (default: 500)
 #                                        Note, 10x this value are first selected for removing redundancies,
@@ -164,7 +165,7 @@ my $MPI_DEBUG = 1;
 my $single_best_flag = 0;    # deprecated: single best is the default
 my $retain_multiple_orfs_flag = 0;
 my $start_contrast_alpha = 0.4;
-my $start_kozak_weight = 0.15;
+my $start_kozak_weight = 25;
 
 my $NO_REFINE_START_CODONS_FLAG = 0;
 

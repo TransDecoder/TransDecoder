@@ -2,7 +2,9 @@
 - start refinement rewritten: an ORF open at its 5' end is either truncated (5' partial) or extends into the 5' UTR.
   It now starts at its first in-frame ATG unless the segment before that ATG looks coding, judged by the frame contrast
   of the coding Markov score (in frame vs shifted by one and two bases, as in ORF selection) together with the ATG's
-  Kozak context (-6..-1, +4..+5), learned from the training ORFs. Options --start_contrast_alpha, --start_kozak_weight.
+  Kozak context (-6..-1, +4..+5), learned from the training ORFs: trimmed when the segment's contrast is below
+  (alpha x length + weight x Kozak log-odds) x the training ORFs' median per-base contrast.
+  Options --start_contrast_alpha (0.4), --start_kozak_weight (25).
   The Kozak model is trained by util/train_kozak_model.pl, which writes start_refinement.kozak.tsv,
   .kozak.counts.tsv and a sequence logo (.kozak.logo.svg) to the work directory. The PWM training step
   (train_start_PWM.pl) is no longer run.
