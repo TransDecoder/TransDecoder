@@ -16,23 +16,23 @@ use Kozak_model;
 use Frame_contrast;
 
 # An ORF that runs to the 5' end of its transcript (no start codon) is either truncated
-# (5' partial) or extends into the 5' UTR. Two signals decide, and the ORF is trimmed to start
-# at its first in-frame ATG unless the segment before that ATG looks coding:
+# (5' partial) or extends into the 5' UTR. Two scores are compared for the segment before its
+# first in-frame ATG, both in bases' worth of typical coding signal (mu, the training ORFs'
+# median per-base frame contrast):
 #
-#  - frame contrast of the segment: its coding Markov score in frame minus the better of the
-#    scores shifted by one and two bases (as in ORF selection). Coding sequence scores well
-#    above its shifted frames; UTR does not.
-#  - Kozak context of the ATG: log-odds of the bases at -6..-1 and +4..+5 (A of ATG = +1),
-#    trained on the training ORFs' starts against in-frame ATGs inside them
-#    (train_kozak_model.pl; --kozak_model).
+#  coding score = frame contrast of the segment / mu
+#                 (coding Markov score in frame minus the better of the scores shifted by one and
+#                 two bases, as in ORF selection: about 1 per base for coding sequence, 0 for UTR)
+#  UTR score    = contrast_alpha * segment_length + kozak_weight * kozak_bits
+#                 (kozak_bits: log2-odds of the bases at -6..-1 and +4..+5 around the ATG, A of
+#                 ATG = +1, trained on the training ORFs' starts against in-frame ATGs inside them;
+#                 train_kozak_model.pl, --kozak_model)
 #
-#  trim if  contrast < (contrast_alpha * segment_length + kozak_weight * kozak_log_odds) * mu
-#
-# where mu is the median per-base frame contrast of the training ORFs. The Kozak evidence counts
-# the same whatever the segment's length: one unit of log-odds is worth kozak_weight bases.
+# The ORF is trimmed to the ATG when the UTR score is higher; otherwise it stays 5' partial.
+# Each bit of Kozak score lets the ATG overrule kozak_weight bases of coding signal.
 
 my $contrast_alpha = 0.4;
-my $kozak_weight = 25;
+my $kozak_weight = 17;
 
 my $usage = <<__EOUSAGE__;
 
@@ -48,15 +48,16 @@ my $usage = <<__EOUSAGE__;
 #
 #  optional:
 #
-#  --kozak_model <string>       Kozak log-odds model from train_kozak_model.pl (if absent, frame contrast only)
+#  --kozak_model <string>       Kozak log2-odds model from train_kozak_model.pl (if absent, coding score only)
 #
 #  --workdir <string>           TransDecoder working dir (default: (--transcripts val) + ".transdecoder_dir")
 #
-#  --contrast_alpha <float>     fraction of the training ORFs' per-base frame contrast the segment
-#                               before the first ATG must reach to stay 5' partial (default: $contrast_alpha)
+#  --contrast_alpha <float>     UTR score per base of the segment before the first ATG: the fraction
+#                               of typical coding signal it may show and still be called UTR
+#                               (default: $contrast_alpha)
 #
-#  --kozak_weight <float>       bases of that per-base contrast one unit of the ATG's Kozak log-odds
-#                               is worth in that cutoff (default: $kozak_weight)
+#  --kozak_weight <float>       UTR score per bit of the ATG's Kozak score, in bases of coding
+#                               signal (default: $kozak_weight)
 #
 #  --genetic_code|G <string>    genetic code (default: Universal)
 #
@@ -120,8 +121,8 @@ main: {
         close $fh;
         exit(0);
     }
-    printf STDERR "-training ORFs: median frame contrast %.4f per base; open 5' ends kept when the upstream segment reaches %.2f of it\n",
-        $coding_contrast, $contrast_alpha;
+    printf STDERR "-training ORFs: median frame contrast %.4f per base; open 5' ends trimmed to the first ATG when %.2f x segment length + %g x Kozak bits exceeds the segment's coding score\n",
+        $coding_contrast, $contrast_alpha, $kozak_weight;
 
     my $kozak_model;
     if ($kozak_model_file && -s $kozak_model_file) {
@@ -197,11 +198,12 @@ sub refine_start_codon_position {
         return(0);
     }
 
-    my $contrast = $FRAME_CONTRAST->frame_contrast(substr($orf_seq, 0, $atg));
+    # both scores in bases' worth of typical coding signal
+    my $coding_score = $FRAME_CONTRAST->frame_contrast(substr($orf_seq, 0, $atg)) / $coding_contrast;
     my $kozak_score = ($kozak_model) ? &Kozak_model::score($kozak_model, $transcript_seq, $start_index + $atg) : 0;
-    my $cutoff = $contrast_alpha * $atg + $kozak_weight * $kozak_score;
+    my $utr_score = $contrast_alpha * $atg + $kozak_weight * $kozak_score;
 
-    if ($contrast >= $cutoff * $coding_contrast) {
+    if ($coding_score >= $utr_score) {
         return(0); # upstream segment looks coding: 5' partial
     }
 
@@ -215,8 +217,8 @@ sub refine_start_codon_position {
     $cds_obj->{end5} = $new_start;
     $gene_obj->refine_gene_object();
 
-    printf STDERR "# refined start codon: %s -> %d (frame contrast %.3f of training, kozak %.2f)\n",
-        $gene_obj->{Model_feat_name}, $new_start, $contrast / ($coding_contrast * $atg), $kozak_score if $DEBUG;
+    printf STDERR "# refined start codon: %s -> %d (coding score %.1f, UTR score %.1f, kozak %.2f bits)\n",
+        $gene_obj->{Model_feat_name}, $new_start, $coding_score, $utr_score, $kozak_score if $DEBUG;
 
     return(1);
 }

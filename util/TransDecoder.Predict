@@ -81,12 +81,13 @@ my $usage = <<__EOUSAGE__;
 #
 ##  Advanced options
 #
-#   --start_contrast_alpha <float>       start refinement: an open 5' end stays 5' partial only if the segment before its
-#                                        first in-frame ATG reaches this fraction of the training ORFs' per-base frame
-#                                        contrast (default: 0.4)
+#   --start_contrast_alpha <float>       start refinement: UTR score per base of the segment before an open ORF's first
+#                                        in-frame ATG, i.e. the fraction of typical coding signal it may show and still
+#                                        be called UTR. Higher trims more open 5' ends (full-length/long-read
+#                                        transcripts); lower keeps more 5' partial (fragmentary assemblies) (default: 0.4)
 #
-#   --start_kozak_weight <float>         start refinement: bases of that per-base contrast one unit of the ATG's Kozak
-#                                        log-odds is worth in the cutoff (default: 25)
+#   --start_kozak_weight <float>         start refinement: bases of coding signal the first ATG may overrule per bit of
+#                                        its Kozak score (log2-odds vs internal ATGs) (default: 17)
 #
 #   --short_orf_length <int>             ORFs with fewer codons need --short_orf_min_contrast (default: 100)
 #
@@ -171,7 +172,7 @@ my $MPI_DEBUG = 1;
 my $single_best_flag = 0;    # deprecated: single best is the default
 my $retain_multiple_orfs_flag = 0;
 my $start_contrast_alpha = 0.4;
-my $start_kozak_weight = 25;
+my $start_kozak_weight = 17;
 my $short_orf_length = 100;
 my $short_orf_min_contrast = 200;
 

@@ -16,12 +16,16 @@
   (--short_orf_length 100). This recovers about half of true 50-99 aa proteins while calls on noncoding RNA and
   random sequence stay near the 100-aa level. Frame-contrast code shared in PerlLib/Frame_contrast.pm.
 - start refinement rewritten: an ORF open at its 5' end is either truncated (5' partial) or extends into the 5' UTR.
-  It now starts at its first in-frame ATG unless the segment before that ATG looks coding, judged by the frame contrast
-  of the coding Markov score (in frame vs shifted by one and two bases, as in ORF selection) together with the ATG's
-  Kozak context (-6..-1, +4..+5), learned from the training ORFs: trimmed when the segment's contrast is below
-  (alpha x length + weight x Kozak log-odds) x the training ORFs' median per-base contrast.
-  Options --start_contrast_alpha (0.4), --start_kozak_weight (25).
-  The Kozak model is trained by util/train_kozak_model.pl, which writes start_refinement.kozak.tsv,
+  For the segment before its first in-frame ATG, two scores are compared, both in bases' worth of typical coding
+  signal (the training ORFs' median per-base frame contrast):
+    coding score = the segment's frame contrast (coding Markov score in frame minus the better of the frames
+                   shifted by one and two bases, as in ORF selection) / that median
+    UTR score    = alpha x segment length + weight x the ATG's Kozak score in bits (log2-odds of -6..-1, +4..+5,
+                   learned from the training ORFs' starts against in-frame ATGs inside them)
+  The ORF is trimmed to the ATG when the UTR score is higher, otherwise it stays 5' partial.
+  Options --start_contrast_alpha (0.4), --start_kozak_weight (17 bases per bit).
+  Step-by-step explanation: docs/start_codon_refinement.md.
+  The Kozak model is trained by util/train_kozak_model.pl, which writes start_refinement.kozak.tsv (bits),
   .kozak.counts.tsv and a sequence logo (.kozak.logo.svg) to the work directory. The PWM training step
   (train_start_PWM.pl) is no longer run.
 - the single best ORF per transcript is now reported by default, prioritized by homology, coding score, then length
