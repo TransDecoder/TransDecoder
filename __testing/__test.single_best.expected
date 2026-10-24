@@ -17,12 +17,11 @@ CUFF.12.1	transdecoder	exon	1	2733	.	+	.	ID=CUFF.12.1.p1.exon1;Parent=CUFF.12.1.
 CUFF.12.1	transdecoder	CDS	228	2249	.	+	0	ID=cds.CUFF.12.1.p1;Parent=CUFF.12.1.p1
 CUFF.12.1	transdecoder	three_prime_UTR	2250	2733	.	+	.	ID=CUFF.12.1.p1.utr3p1;Parent=CUFF.12.1.p1
 
-CUFF.13.1	transdecoder	gene	1	1770	.	+	.	ID=GENE.CUFF.13.1~~CUFF.13.1.p1;Name="ORF type:complete len:130 (+),score=18.26"
-CUFF.13.1	transdecoder	mRNA	1	1770	.	+	.	ID=CUFF.13.1.p1;Parent=GENE.CUFF.13.1~~CUFF.13.1.p1;Name="ORF type:complete len:130 (+),score=18.26"
-CUFF.13.1	transdecoder	five_prime_UTR	1	796	.	+	.	ID=CUFF.13.1.p1.utr5p1;Parent=CUFF.13.1.p1
-CUFF.13.1	transdecoder	exon	1	1770	.	+	.	ID=CUFF.13.1.p1.exon1;Parent=CUFF.13.1.p1
-CUFF.13.1	transdecoder	CDS	797	1186	.	+	0	ID=cds.CUFF.13.1.p1;Parent=CUFF.13.1.p1
-CUFF.13.1	transdecoder	three_prime_UTR	1187	1770	.	+	.	ID=CUFF.13.1.p1.utr3p1;Parent=CUFF.13.1.p1
+CUFF.13.1	transdecoder	gene	1	1770	.	+	.	ID=GENE.CUFF.13.1~~CUFF.13.1.p2;Name="ORF type:3prime_partial len:120 (+),score=34.75"
+CUFF.13.1	transdecoder	mRNA	1	1770	.	+	.	ID=CUFF.13.1.p2;Parent=GENE.CUFF.13.1~~CUFF.13.1.p2;Name="ORF type:3prime_partial len:120 (+),score=34.75"
+CUFF.13.1	transdecoder	five_prime_UTR	1	1413	.	+	.	ID=CUFF.13.1.p2.utr5p1;Parent=CUFF.13.1.p2
+CUFF.13.1	transdecoder	exon	1	1770	.	+	.	ID=CUFF.13.1.p2.exon1;Parent=CUFF.13.1.p2
+CUFF.13.1	transdecoder	CDS	1414	1770	.	+	0	ID=cds.CUFF.13.1.p2;Parent=CUFF.13.1.p2
 
 CUFF.13.2	transdecoder	gene	1	875	.	+	.	ID=GENE.CUFF.13.2~~CUFF.13.2.p1;Name="ORF type:internal len:292 (+),score=76.96"
 CUFF.13.2	transdecoder	mRNA	1	875	.	+	.	ID=CUFF.13.2.p1;Parent=GENE.CUFF.13.2~~CUFF.13.2.p1;Name="ORF type:internal len:292 (+),score=76.96"
@@ -292,12 +291,12 @@ CUFF.50.1	transdecoder	exon	1	5404	.	+	.	ID=CUFF.50.1.p1.exon1;Parent=CUFF.50.1.
 CUFF.50.1	transdecoder	CDS	3999	5267	.	+	0	ID=cds.CUFF.50.1.p1;Parent=CUFF.50.1.p1
 CUFF.50.1	transdecoder	three_prime_UTR	5268	5404	.	+	.	ID=CUFF.50.1.p1.utr3p1;Parent=CUFF.50.1.p1
 
-CUFF.51.1	transdecoder	gene	1	4342	.	+	.	ID=GENE.CUFF.51.1~~CUFF.51.1.p1;Name="ORF type:complete len:372 (+),score=108.67"
-CUFF.51.1	transdecoder	mRNA	1	4342	.	+	.	ID=CUFF.51.1.p1;Parent=GENE.CUFF.51.1~~CUFF.51.1.p1;Name="ORF type:complete len:372 (+),score=108.67"
-CUFF.51.1	transdecoder	five_prime_UTR	1	2631	.	+	.	ID=CUFF.51.1.p1.utr5p1;Parent=CUFF.51.1.p1
-CUFF.51.1	transdecoder	exon	1	4342	.	+	.	ID=CUFF.51.1.p1.exon1;Parent=CUFF.51.1.p1
-CUFF.51.1	transdecoder	CDS	2632	3747	.	+	0	ID=cds.CUFF.51.1.p1;Parent=CUFF.51.1.p1
-CUFF.51.1	transdecoder	three_prime_UTR	3748	4342	.	+	.	ID=CUFF.51.1.p1.utr3p1;Parent=CUFF.51.1.p1
+CUFF.51.1	transdecoder	gene	1	4342	.	+	.	ID=GENE.CUFF.51.1~~CUFF.51.1.p2;Name="ORF type:complete len:347 (+),score=122.42"
+CUFF.51.1	transdecoder	mRNA	1	4342	.	+	.	ID=CUFF.51.1.p2;Parent=GENE.CUFF.51.1~~CUFF.51.1.p2;Name="ORF type:complete len:347 (+),score=122.42"
+CUFF.51.1	transdecoder	five_prime_UTR	1	316	.	+	.	ID=CUFF.51.1.p2.utr5p1;Parent=CUFF.51.1.p2
+CUFF.51.1	transdecoder	exon	1	4342	.	+	.	ID=CUFF.51.1.p2.exon1;Parent=CUFF.51.1.p2
+CUFF.51.1	transdecoder	CDS	317	1357	.	+	0	ID=cds.CUFF.51.1.p2;Parent=CUFF.51.1.p2
+CUFF.51.1	transdecoder	three_prime_UTR	1358	4342	.	+	.	ID=CUFF.51.1.p2.utr3p1;Parent=CUFF.51.1.p2
 
 CUFF.52.1	transdecoder	gene	1	5136	.	+	.	ID=GENE.CUFF.52.1~~CUFF.52.1.p1;Name="ORF type:complete len:393 (+),score=143.50"
 CUFF.52.1	transdecoder	mRNA	1	5136	.	+	.	ID=CUFF.52.1.p1;Parent=GENE.CUFF.52.1~~CUFF.52.1.p1;Name="ORF type:complete len:393 (+),score=143.50"

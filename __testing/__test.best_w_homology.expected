@@ -291,12 +291,12 @@ CUFF.50.1	transdecoder	exon	1	5404	.	+	.	ID=CUFF.50.1.p1.exon1;Parent=CUFF.50.1.
 CUFF.50.1	transdecoder	CDS	3999	5267	.	+	0	ID=cds.CUFF.50.1.p1;Parent=CUFF.50.1.p1
 CUFF.50.1	transdecoder	three_prime_UTR	5268	5404	.	+	.	ID=CUFF.50.1.p1.utr3p1;Parent=CUFF.50.1.p1
 
-CUFF.51.1	transdecoder	gene	1	4342	.	+	.	ID=GENE.CUFF.51.1~~CUFF.51.1.p1;Name="ORF type:complete len:372 (+),score=108.67,YA0C_SCHPO|100.00|0.0,Glyco_transf_8|PF01501.19|1.2e-11,Mannosyl_trans3|PF11051.7|0.00048,Smim3|PF17307.1|0.32,Smim3|PF17307.1|0.085"
-CUFF.51.1	transdecoder	mRNA	1	4342	.	+	.	ID=CUFF.51.1.p1;Parent=GENE.CUFF.51.1~~CUFF.51.1.p1;Name="ORF type:complete len:372 (+),score=108.67,YA0C_SCHPO|100.00|0.0,Glyco_transf_8|PF01501.19|1.2e-11,Mannosyl_trans3|PF11051.7|0.00048,Smim3|PF17307.1|0.32,Smim3|PF17307.1|0.085"
-CUFF.51.1	transdecoder	five_prime_UTR	1	2631	.	+	.	ID=CUFF.51.1.p1.utr5p1;Parent=CUFF.51.1.p1
-CUFF.51.1	transdecoder	exon	1	4342	.	+	.	ID=CUFF.51.1.p1.exon1;Parent=CUFF.51.1.p1
-CUFF.51.1	transdecoder	CDS	2632	3747	.	+	0	ID=cds.CUFF.51.1.p1;Parent=CUFF.51.1.p1
-CUFF.51.1	transdecoder	three_prime_UTR	3748	4342	.	+	.	ID=CUFF.51.1.p1.utr3p1;Parent=CUFF.51.1.p1
+CUFF.51.1	transdecoder	gene	1	4342	.	+	.	ID=GENE.CUFF.51.1~~CUFF.51.1.p2;Name="ORF type:complete len:347 (+),score=122.42,GMH2_SCHPO|100.00|0.0,Glyco_transf_34|PF05637.11|8.1e-87,Nucleotid_trans|PF03407.15|0.00012"
+CUFF.51.1	transdecoder	mRNA	1	4342	.	+	.	ID=CUFF.51.1.p2;Parent=GENE.CUFF.51.1~~CUFF.51.1.p2;Name="ORF type:complete len:347 (+),score=122.42,GMH2_SCHPO|100.00|0.0,Glyco_transf_34|PF05637.11|8.1e-87,Nucleotid_trans|PF03407.15|0.00012"
+CUFF.51.1	transdecoder	five_prime_UTR	1	316	.	+	.	ID=CUFF.51.1.p2.utr5p1;Parent=CUFF.51.1.p2
+CUFF.51.1	transdecoder	exon	1	4342	.	+	.	ID=CUFF.51.1.p2.exon1;Parent=CUFF.51.1.p2
+CUFF.51.1	transdecoder	CDS	317	1357	.	+	0	ID=cds.CUFF.51.1.p2;Parent=CUFF.51.1.p2
+CUFF.51.1	transdecoder	three_prime_UTR	1358	4342	.	+	.	ID=CUFF.51.1.p2.utr3p1;Parent=CUFF.51.1.p2
 
 CUFF.52.1	transdecoder	gene	1	5136	.	+	.	ID=GENE.CUFF.52.1~~CUFF.52.1.p1;Name="ORF type:complete len:393 (+),score=143.50,OYEB_SCHPO|100.00|0.0,Oxidored_FMN|PF00724.19|4.5e-138"
 CUFF.52.1	transdecoder	mRNA	1	5136	.	+	.	ID=CUFF.52.1.p1;Parent=GENE.CUFF.52.1~~CUFF.52.1.p1;Name="ORF type:complete len:393 (+),score=143.50,OYEB_SCHPO|100.00|0.0,Oxidored_FMN|PF00724.19|4.5e-138"
