@@ -38,7 +38,7 @@ my $genetic_code_options = join("\n", &Nuc_translator::get_genetic_codes());
 
 srand(1234);
 
-my $MIN_PROT_LENGTH = 50;  # ORFs under 100 codons must also pass Predict's short-ORF frame-contrast test
+my $MIN_PROT_LENGTH = 50;  # Predict's decoy q-values (stratified by ORF length) set the evidence short ORFs need
 
 my $usage = <<__EOUSAGE__;
 
@@ -149,7 +149,13 @@ main: {
     if (! -d $checkpoints_dir) {
         mkdir($checkpoints_dir);
     }
-    
+
+    # LongOrfs settings, for Predict's decoy ORFs (same ORF finder settings on shuffled transcripts)
+    open (my $params_fh, ">$workdir/longorfs.params.json") or die "Error, cannot write $workdir/longorfs.params.json";
+    printf $params_fh "{\n \"min_protein_length\": %d,\n \"genetic_code\": \"%s\",\n \"strand_specific\": %s,\n \"complete_orfs_only\": %s\n}",
+        $MIN_PROT_LENGTH, $genetic_code, ($TOP_STRAND_ONLY ? "true" : "false"), ($COMPLETE_ORFS_ONLY ? "true" : "false");
+    close $params_fh;
+
     my $pipeliner = new Pipeliner('-verbose' => 2, -checkpoint_dir => $checkpoints_dir);
         
     my %gene_trans_map;

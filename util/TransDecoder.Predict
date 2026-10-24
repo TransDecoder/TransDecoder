@@ -26,6 +26,7 @@ use Fasta_reader;
 use Longest_orf;
 use Pipeliner;
 use DelimParser;
+use Presets;
 use Cwd;
 
 my $RETAIN_LONG_ORFS_MIN_LENGTH = 1000000; # so essentially, off by default
@@ -34,6 +35,14 @@ srand(1234);
 
 my $genetic_code = "Universal";
 my $genetic_code_options = join("\n", &Nuc_translator::get_genetic_codes());
+my $bundled_presets = join(", ", &Presets::bundled_presets()) || "none installed";
+
+# ORF acceptance: target-decoy q-value cutoffs (TransDecoderPaper evidence E20-E22)
+my $DEFAULT_MAX_QVALUE = 0.05;
+my $PRECISE_MAX_QVALUE = 0.01;
+my $SENSITIVE_MAX_QVALUE = 0.2;
+# fewer input transcripts than this: models learned from the input are unreliable (E21); use a preset
+my $SMALL_INPUT_TRANSCRIPTS = 1000;
 
 my $usage = <<__EOUSAGE__;
 
@@ -75,6 +84,19 @@ my $usage = <<__EOUSAGE__;
 #
 #   --output_dir | -O  <string>            same output directory from the TransDecoder.LongOrfs
 #
+#   --max_qvalue <float>                   without homology support, an ORF needs in-frame score > 0, a higher score than
+#                                        the shifted frames, and a target-decoy q-value <= this (default: 0.05).
+#                                        Decoy ORFs come from dinucleotide-shuffled copies of the transcripts.
+#
+#   --precise                              same as --max_qvalue 0.01: fewer calls on noncoding sequence
+#
+#   --sensitive                            same as --max_qvalue 0.2: more short and partial ORFs
+#
+#   --preset <string>                      use a preset's coding model, start model and q-value thresholds instead of
+#                                        learning them from the input; recommended for fewer than ~1,000 transcripts
+#                                        or sets of mostly partial transcripts. A bundled name ($bundled_presets)
+#                                        or a preset directory.
+#
 #   --no_refine_starts                     start refinement decides whether an ORF open at its 5' end is truncated (5' partial)
 #                                        or extends into the 5' UTR, in which case it starts at its first in-frame ATG.
 #                                        On by default.
@@ -89,11 +111,10 @@ my $usage = <<__EOUSAGE__;
 #   --start_kozak_weight <float>         start refinement: bases of coding signal the first ATG may overrule per bit of
 #                                        its Kozak score (log2-odds vs internal ATGs) (default: 17)
 #
-#   --short_orf_length <int>             ORFs with fewer codons need --short_orf_min_contrast (default: 100)
+#   --decoy_shuffles <int>               shuffled copies of each transcript for decoy ORFs; 0 = automatic
+#                                        (~20 Mb of decoy sequence, at most 50) (default: 0)
 #
-#   --short_orf_min_contrast <float>     frame contrast (in-frame score minus the better shifted frame) a short ORF needs
-#                                        without homology support, in bases of the training ORFs' median per-base
-#                                        contrast; 0 applies only the usual frame test (default: 200)
+#   --decoy_seed <int>                   seed of the decoy shuffles (default: 42)
 #
 #    -T <int>                            Top longest ORFs to train Markov Model (hexamer stats) (default: 500)
 #                                        Note, 10x this value are first selected for removing redundancies,
@@ -173,8 +194,12 @@ my $single_best_flag = 0;    # deprecated: single best is the default
 my $retain_multiple_orfs_flag = 0;
 my $start_contrast_alpha = 0.4;
 my $start_kozak_weight = 17;
-my $short_orf_length = 100;
-my $short_orf_min_contrast = 200;
+my $max_qvalue;
+my $precise_flag = 0;
+my $sensitive_flag = 0;
+my $decoy_shuffles = 0;
+my $decoy_seed = 42;
+my $preset_name;
 
 my $NO_REFINE_START_CODONS_FLAG = 0;
 
@@ -203,8 +228,12 @@ my $output_dir = &Pipeliner::ensure_full_path(cwd()); # current working director
              'retain_multiple_orfs' => \$retain_multiple_orfs_flag,
              'start_contrast_alpha=f' => \$start_contrast_alpha,
              'start_kozak_weight=f' => \$start_kozak_weight,
-             'short_orf_length=i' => \$short_orf_length,
-             'short_orf_min_contrast=f' => \$short_orf_min_contrast,
+             'max_qvalue|decoy_q=f' => \$max_qvalue,
+             'precise' => \$precise_flag,
+             'sensitive' => \$sensitive_flag,
+             'decoy_shuffles=i' => \$decoy_shuffles,
+             'decoy_seed=i' => \$decoy_seed,
+             'preset=s' => \$preset_name,
              
              'genetic_code|G=s' => \$genetic_code,
 
@@ -230,6 +259,23 @@ unless ($transcripts_file && -s $transcripts_file) {
     die $usage;
 }
 
+
+if ((defined($max_qvalue) ? 1 : 0) + $precise_flag + $sensitive_flag > 1) {
+    die "Error, use only one of --max_qvalue, --precise and --sensitive\n";
+}
+$max_qvalue = $PRECISE_MAX_QVALUE if $precise_flag;
+$max_qvalue = $SENSITIVE_MAX_QVALUE if $sensitive_flag;
+$max_qvalue = $DEFAULT_MAX_QVALUE unless defined $max_qvalue;
+
+my $preset;
+if ($preset_name) {
+    $preset = new Presets($preset_name);
+    unless (&code_signature($preset->{meta}->{genetic_code}) eq &code_signature($genetic_code)) {
+        die "Error, preset $preset->{meta}->{name} was built with genetic code $preset->{meta}->{genetic_code}, not -G $genetic_code\n";
+    }
+    print STDERR "-preset $preset->{meta}->{name} ($preset->{meta}->{source}; GC $preset->{meta}->{gc_pct}%): coding model, "
+        . "training ORFs, start model and ORF thresholds from the preset\n";
+}
 
 if ($genetic_code) {
     $genetic_code = " --genetic_code $genetic_code";
@@ -270,7 +316,14 @@ main: {
     ## Train a Markov model based on user-provided file or longest candidate CDS sequences, score all candidates, and select the final set.
     
     my $top_cds_file = "$cds_file.top_${top_ORFs_train}_longest";
-    {
+    my $hexamer_scores_file = "$workdir/hexamer.scores";
+    if ($preset) {
+        # the preset's training ORFs and coding model replace those learned from the input
+        &Presets::copy_plain($preset->{training_orfs}, $top_cds_file);
+        &Presets::copy_plain($preset->{hexamer_scores}, $hexamer_scores_file);
+    }
+    else {
+        &warn_if_small_input($transcripts_file);
         
         # to speed things up only check for redundancy up to x the number of entries we want
         my $red_num = $top_ORFs_train * 10;
@@ -291,11 +344,14 @@ main: {
     
         
     # get hexamer scores
-    my $hexamer_scores_file = "$workdir/hexamer.scores";
     my $hexamer_checkpoint = "hexamer_scores_file.ok";
     my $base_freqs_file = "$workdir/base_freqs.dat";
 
-    if ($RETAIN_LONG_ORFS_MODE eq 'dynamic') {
+    if ($RETAIN_LONG_ORFS_MODE eq 'dynamic' && $preset) {
+        $RETAIN_LONG_ORFS_MIN_LENGTH = $preset->auto_accept_nt();
+        print STDERR "-preset long-ORF auto-accept: $RETAIN_LONG_ORFS_MIN_LENGTH nt\n";
+    }
+    elsif ($RETAIN_LONG_ORFS_MODE eq 'dynamic') {
         if (&genetic_code_has_standard_stops()) {
             $RETAIN_LONG_ORFS_MIN_LENGTH = &get_dynamic_retain_long_orf_length($base_freqs_file, \@GC_TO_MIN_LONG_ORF_LENGTH);
         }
@@ -308,8 +364,10 @@ main: {
     }
     
     # score kmers for Markov model
-    $pipeliner->add_commands(new Command("$UTIL_DIR/seq_n_baseprobs_to_loglikelihood_vals.pl $top_cds_file $base_freqs_file $genetic_code > $hexamer_scores_file",
-                                         "hexamer_scores.ok") );
+    unless ($preset) {
+        $pipeliner->add_commands(new Command("$UTIL_DIR/seq_n_baseprobs_to_loglikelihood_vals.pl $top_cds_file $base_freqs_file $genetic_code > $hexamer_scores_file",
+                                             "hexamer_scores.ok") );
+    }
     
     # score all cds entries
     my $cds_scores_file = "$cds_file.scores";
@@ -325,7 +383,8 @@ main: {
     
     ## Steps below may be rerun if input parameters are set differently (such as including pfam or blast results in a subsequent run).
 
-    my @checkpoint_inputs = ($transcripts_file, "short_orf:$short_orf_length:$short_orf_min_contrast");
+    my @checkpoint_inputs = ($transcripts_file, "decoys:$decoy_seed:$decoy_shuffles:$max_qvalue",
+                             "preset:" . ($preset ? $preset->{dir} : ""));
     if ($retain_pfam_hits_file) {
         push (@checkpoint_inputs, $retain_pfam_hits_file);
     }
@@ -335,10 +394,25 @@ main: {
     my $big_checkpoint_string = join("^", @checkpoint_inputs);
     my $checkpoint_hashcode = Digest::MD5::md5_hex($big_checkpoint_string);
         
+    ## target-decoy q-values of the candidate ORFs (with a preset: its thresholds)
+    my $qvalues_file;
+    if ($preset) {
+        $qvalues_file = "$workdir/preset_qvalues.tsv";
+        $pipeliner->add_commands(new Command("$UTIL_DIR/decoy_qvalues.pl --transcripts $transcripts_file --workdir $workdir "
+                                             . " --cds_scores $cds_scores_file --preset $preset->{dir} --max_qvalue $max_qvalue",
+                                             "preset_qvalues.$checkpoint_hashcode.ok", "Applying preset ORF thresholds"));
+    }
+    else {
+        $qvalues_file = "$workdir/decoy_qvalues.tsv";
+        $pipeliner->add_commands(new Command("$UTIL_DIR/decoy_qvalues.pl --transcripts $transcripts_file --workdir $workdir "
+                                             . " --cds_scores $cds_scores_file --hexamer_scores $hexamer_scores_file "
+                                             . " --shuffles $decoy_shuffles --seed $decoy_seed",
+                                             "decoy_qvalues.$decoy_seed.$decoy_shuffles.ok", "Decoy ORFs from shuffled transcripts: q-values"));
+    }
+
     my $select_cmd = "$UTIL_DIR/select_best_ORFs_per_transcript.pl --gff3_file $gff3_file --cds_scores $cds_scores_file "
         . " --min_length_auto_accept $RETAIN_LONG_ORFS_MIN_LENGTH "
-        . " --training_orfs $top_cds_file --hexamer_scores $hexamer_scores_file $genetic_code "
-        . " --short_orf_length $short_orf_length --short_orf_min_contrast $short_orf_min_contrast ";
+        . " --qvalues $qvalues_file --max_qvalue $max_qvalue ";
 
     if ($retain_pfam_hits_file) {
         $select_cmd .= " --pfam_hits $retain_pfam_hits_file ";
@@ -361,14 +435,20 @@ main: {
     
     ## start codon refinement
     unless ($NO_REFINE_START_CODONS_FLAG) {
-        my $cmd = "$UTIL_DIR/train_kozak_model.pl --transcripts $transcripts_file --training_orfs $top_cds_file "
-            . " --out_prefix $workdir/start_refinement";
-        $pipeliner->add_commands(new Command($cmd, "train_kozak_model.$checkpoint_hashcode.ok", "Training start codon (Kozak) context model"));
+        my $kozak_model_file = "$workdir/start_refinement.kozak.tsv";
+        if ($preset) {
+            $kozak_model_file = $preset->{kozak} || "";
+        }
+        else {
+            my $cmd = "$UTIL_DIR/train_kozak_model.pl --transcripts $transcripts_file --training_orfs $top_cds_file "
+                . " --out_prefix $workdir/start_refinement";
+            $pipeliner->add_commands(new Command($cmd, "train_kozak_model.$checkpoint_hashcode.ok", "Training start codon (Kozak) context model"));
+        }
 
         my $revised_orf_gff3_file = "$target_final_file.revised_starts.gff3";
-        $cmd = "$UTIL_DIR/start_codon_refinement.pl --transcripts $transcripts_file --gff3_file $target_final_file --workdir $workdir "
+        my $cmd = "$UTIL_DIR/start_codon_refinement.pl --transcripts $transcripts_file --gff3_file $target_final_file --workdir $workdir "
             . " --training_orfs $top_cds_file --hexamer_scores $hexamer_scores_file $genetic_code "
-            . " --kozak_model $workdir/start_refinement.kozak.tsv "
+            . ($kozak_model_file ? " --kozak_model $kozak_model_file " : "")
             . " --contrast_alpha $start_contrast_alpha --kozak_weight $start_kozak_weight > $revised_orf_gff3_file";
         $pipeliner->add_commands(new Command($cmd, "revise_starts.$checkpoint_hashcode.ok", "Refining start codon selections."));
                 
@@ -495,6 +575,34 @@ sub check_program() {
 }
 
 
+
+####
+sub code_signature {
+    # translation of all 64 codons under a genetic code (to compare codes given by different names)
+    my ($code) = @_;
+    $code = "Universal" if (! $code || lc($code) eq 'universal' || lc($code) eq 'standard');
+    my $codons = join("", map { my $a = $_; map { my $b = $_; map { "$a$b$_" } qw(T C A G) } qw(T C A G) } qw(T C A G));
+    &Nuc_translator::use_specified_genetic_code($code);
+    my $prot = &Nuc_translator::translate_sequence($codons, 1);
+    &Nuc_translator::use_specified_genetic_code("Universal");
+    return($prot);
+}
+
+####
+sub warn_if_small_input {
+    my ($transcripts_file) = @_;
+    my $n = 0;
+    open (my $fh, $transcripts_file) or confess "Error, cannot open $transcripts_file";
+    while (<$fh>) {
+        $n++ if /^>/;
+    }
+    close $fh;
+    if ($n < $SMALL_INPUT_TRANSCRIPTS) {
+        print STDERR "\n-WARNING: only $n input transcripts: coding and start models learned from fewer than "
+            . "$SMALL_INPUT_TRANSCRIPTS transcripts are unreliable, and noncoding sequences then often receive ORF calls. "
+            . "Consider --preset (bundled: $bundled_presets) or a preset built from a related species' transcriptome.\n\n";
+    }
+}
 
 ####
 sub genetic_code_has_standard_stops {

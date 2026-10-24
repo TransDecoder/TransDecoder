@@ -59,6 +59,13 @@ my $usage = <<__EOUSAGE__;
 #    --retain_multiple_orfs             Report all non-overlapping ORFs passing selection
 #                                       (default: the single best ORF per transcript)
 #    --no_refine_starts                 Skip start codon refinement
+#    --max_qvalue <float>               Without homology, keep ORFs with target-decoy q-value <= this
+#                                       (default: 0.05)
+#    --precise                          Same as --max_qvalue 0.01: fewer calls on noncoding sequence
+#    --sensitive                        Same as --max_qvalue 0.2: more short and partial ORFs
+#    --preset <string>                  Coding model, start model and q-value thresholds from a preset
+#                                       (bundled name or directory) instead of the input; recommended
+#                                       below ~1,000 transcripts or for mostly partial transcript sets
 #
 #  Other:
 #
@@ -99,6 +106,10 @@ my $pfam_search_db;
 my $single_best_only         = 0;   # deprecated: now the default
 my $retain_multiple_orfs     = 0;
 my $no_refine_starts         = 0;
+my $max_qvalue;
+my $precise                  = 0;
+my $sensitive                = 0;
+my $preset;
 
 # general
 my $output_dir = &Pipeliner::ensure_full_path(cwd());
@@ -131,6 +142,10 @@ my $show_version;
     'single_best_only'           => \$single_best_only,
     'retain_multiple_orfs'       => \$retain_multiple_orfs,
     'no_refine_starts'           => \$no_refine_starts,
+    'max_qvalue=f'               => \$max_qvalue,
+    'precise'                    => \$precise,
+    'sensitive'                  => \$sensitive,
+    'preset=s'                   => \$preset,
 
     'O|output_dir=s'             => \$output_dir,
     'v|verbose'                  => \$verbose,
@@ -292,6 +307,10 @@ $predict_cmd .= " --retain_blastp_hits $retain_blastp_hits_file" if $retain_blas
 $predict_cmd .= " --retain_pfam_hits $retain_pfam_hits_file"     if $retain_pfam_hits_file;
 $predict_cmd .= " --retain_multiple_orfs"                        if $retain_multiple_orfs;
 $predict_cmd .= " --no_refine_starts"                            if $no_refine_starts;
+$predict_cmd .= " --max_qvalue $max_qvalue"                      if defined $max_qvalue;
+$predict_cmd .= " --precise"                                     if $precise;
+$predict_cmd .= " --sensitive"                                   if $sensitive;
+$predict_cmd .= " --preset $preset"                              if $preset;
 $predict_cmd .= " -v"                                            if $verbose;
 
 &process_cmd($predict_cmd);

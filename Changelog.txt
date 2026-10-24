@@ -10,11 +10,21 @@
 - FASTA reader: text before the first '>' header line (e.g. ';' comment lines, as in FAIR Header Reference
   files) is now skipped with a warning. Previously it was read as an extra transcript, named after its first
   word, which gained ORF predictions and changed base_freqs.dat.
-- LongOrfs minimum protein length is now 50 aa (-m; previously 100). ORFs under 100 codons are selected by Predict,
-  without homology support, only when their frame contrast (in-frame Markov score minus the better shifted frame)
-  reaches --short_orf_min_contrast (200) bases' worth of the training ORFs' median per-base contrast
-  (--short_orf_length 100). This recovers about half of true 50-99 aa proteins while calls on noncoding RNA and
-  random sequence stay near the 100-aa level. Frame-contrast code shared in PerlLib/Frame_contrast.pm.
+- LongOrfs minimum protein length is now 50 aa (-m; previously 100).
+- ORF selection without homology support now uses a target-decoy false discovery rate. Each transcript is
+  shuffled keeping its dinucleotide counts; decoy ORFs are found in the shuffles with the LongOrfs settings
+  (recorded in longorfs.params.json) and scored with the run's Markov model. Within strata of ORF length,
+  transcript length and ORF type (complete/partial), each candidate gets a q-value for its frame contrast
+  (in-frame score minus the better shifted frame); an ORF is kept when its in-frame score > 0, its frame
+  contrast > 0 and q <= --max_qvalue (default 0.05; --precise = 0.01, --sensitive = 0.2). Short ORFs, far
+  more frequent by chance, thus need more coding evidence without a fixed length cutoff, and the rule works
+  for any genetic code. Long-ORF retention by length (dynamic mode) is unchanged. Options --decoy_shuffles
+  (0 = automatic), --decoy_seed (42). Decoys and q-values (util/decoy_qvalues.pl, PerlLib/Decoys.pm) are
+  identical to PyTransDecoder's. Replaces the 100-codon short-ORF contrast test of earlier development.
+- Presets (--preset): for small inputs (fewer than ~1,000 transcripts, warned about) or mostly partial
+  transcript sets, the coding model, start model and q-value thresholds come from a reference transcriptome
+  instead of the input. Bundled presets (PerlLib/presets): mammal, insect, plant, fungus, apicomplexan,
+  ciliate, green_alga; or a directory written by PyTransDecoder build-preset.
 - start refinement rewritten: an ORF open at its 5' end is either truncated (5' partial) or extends into the 5' UTR.
   For the segment before its first in-frame ATG, two scores are compared, both in bases' worth of typical coding
   signal (the training ORFs' median per-base frame contrast):

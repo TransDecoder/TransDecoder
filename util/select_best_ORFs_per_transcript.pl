@@ -10,7 +10,6 @@ use Carp;
 use Data::Dumper;
 use DelimParser;
 use Nuc_translator;
-use Frame_contrast;
 use List::Util qw (max);
 use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
 require "overlapping_nucs.ph";
@@ -39,23 +38,16 @@ my $usage = <<__EOUSAGE__;
 #
 #  --single_best_orf          retain only the top-priority orf that meets selection criteria
 #
-#  Short ORFs (need --training_orfs and --hexamer_scores):
-#
-#  --training_orfs <string>      training ORFs (cds fasta) used for the hexamer model
-#  --hexamer_scores <string>     hexamer (Markov) scores file
-#  --short_orf_length <int>      ORFs with fewer codons need --short_orf_min_contrast (default: 100)
-#  --short_orf_min_contrast <float>  frame contrast (frame_score[0] - max(frame_score[1], frame_score[2]))
-#                                a short ORF needs without homology support, in bases of the training
-#                                ORFs' median per-base frame contrast; 0 disables (default: 200)
-#  --genetic_code|G <string>     genetic code (default: Universal)
+#  --qvalues <string>            target-decoy q-values of the candidate ORFs (util/decoy_qvalues.pl)
+#  --max_qvalue <float>          without homology, an ORF needs q-value <= this (default: 0.05)
 #
 #  --verbose                  show orf rankings in stderr
 #
 #       Initial ORF selection requirement:
 #
-#            blast_hit |  pfam_hit | (frame_score[0] > 0 and frame_score[0] > max(frame_score[1], frame_score[2]) )
-#            and, for ORFs under --short_orf_length codons without homology,
-#            frame_score[0] - max(frame_score[1], frame_score[2]) >= short_orf_min_contrast * median contrast
+#            blast_hit | pfam_hit | length >= min_length_auto_accept
+#            | (frame_score[0] > 0 and frame_score[0] > max(frame_score[1], frame_score[2])
+#               and q-value <= max_qvalue (with --qvalues))
 #
 #       Subsequent ORF prioritization scheme:
 #
@@ -73,11 +65,8 @@ my $blast_hits_file;
 my $pfam_hits_file;
 my $cds_scores_file;
 my $SINGLE_BEST_ORF_FLAG = 0;
-my $training_orfs_file;
-my $hexamer_scores_file;
-my $short_orf_length = 100;
-my $short_orf_min_contrast = 200;
-my $genetic_code = "Universal";
+my $qvalues_file;
+my $max_qvalue = 0.05;
 
 my $MAX_PCT_OVERLAP = 10;
 my $help_flag;
@@ -96,11 +85,8 @@ my $verbose_flag = 0;
              
              'single_best_orf' => \$SINGLE_BEST_ORF_FLAG,
 
-             'training_orfs=s' => \$training_orfs_file,
-             'hexamer_scores=s' => \$hexamer_scores_file,
-             'short_orf_length=i' => \$short_orf_length,
-             'short_orf_min_contrast=f' => \$short_orf_min_contrast,
-             'genetic_code|G=s' => \$genetic_code,
+             'qvalues=s' => \$qvalues_file,
+             'max_qvalue=f' => \$max_qvalue,
 
              'help|h' => \$help_flag,
              'verbose|v' => \$verbose_flag,
@@ -135,20 +121,12 @@ main: {
       %cds_scores = &parse_CDS_scores_file ($cds_scores_file);
     }
 
-    # frame contrast required of short ORFs
-    my $short_orf_nt = 3 * $short_orf_length;
-    my $short_min_contrast = 0;
-    if ($short_orf_min_contrast > 0 && $training_orfs_file && $hexamer_scores_file) {
-        &Nuc_translator::use_specified_genetic_code($genetic_code);
-        my $frame_contrast = new Frame_contrast($hexamer_scores_file, [ &Nuc_translator::get_stop_codons() ]);
-        my $mu = $frame_contrast->median_training_contrast($training_orfs_file);
-        if (defined $mu) {
-            $short_min_contrast = $short_orf_min_contrast * $mu;
-            printf STDERR "-ORFs shorter than %d codons need frame contrast >= %.2f (%g bases x %.4f) without homology support\n",
-                $short_orf_length, $short_min_contrast, $short_orf_min_contrast, $mu;
-        }
+    # target-decoy q-values (ORFs absent from the file: q = 1)
+    my %qvalue;
+    if ($qvalues_file) {
+        %qvalue = &parse_qvalues_file($qvalues_file);
     }
-        
+
     my $gene_obj_indexer_href = {};
     
     my $asmbl_id_to_gene_list_href = &GFF3_utils2::index_GFF3_gene_objs($gff3_file, $gene_obj_indexer_href);
@@ -185,7 +163,7 @@ main: {
                     $orf_length >= $min_length_auto_accept
                     ||
                     ($cds_scores_aref->[0] > 0 && $frame_contrast > 0
-                     && ($orf_length >= $short_orf_nt || $frame_contrast >= $short_min_contrast))
+                     && (! $qvalues_file || ($qvalue{$model_id} // 1) <= $max_qvalue))
                 ) {
                 # doesn't meet selection criteria. skipping it.
                 next;
@@ -378,6 +356,20 @@ sub parse_blastp_hits_file {
     close $fh;
 
     return(%blastp_hits);
+}
+
+sub parse_qvalues_file {
+    my ($qvalues_file) = @_;
+    my %q;
+    open (my $fh, $qvalues_file) or confess "Error, cannot open $qvalues_file";
+    while (<$fh>) {
+        chomp;
+        next if /^\#/;
+        my ($orf_id, $stratum, $contrast, $q) = split(/\t/);
+        $q{$orf_id} = $q;
+    }
+    close $fh;
+    return(%q);
 }
 
 sub parse_CDS_scores_file {

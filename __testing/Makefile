@@ -1,7 +1,10 @@
 
 
 
-all: incl_blast_n_pfam simplest single_best best_with_homology
+all: incl_blast_n_pfam simplest single_best best_with_homology decoys
+
+decoys:
+	./test_decoys.pl
 
 simplest:
 	../util/select_best_ORFs_per_transcript.pl --gff3_file longest_orfs.gff3 --cds_scores longest_orfs.cds.scores > test.simplest
