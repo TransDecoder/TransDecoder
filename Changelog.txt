@@ -1,4 +1,4 @@
-## (unreleased)
+## v7.0.0 Nov 2, 2026
 - Length-based ORF retention (dynamic mode): transcriptome GC is now computed from the G and C counts. It was
   estimated as 2 x freq(C), which is wrong for strand-specific transcripts, where C and G differ
   (e.g. A. thaliana: 39.4% instead of 42.2%, giving a 615 nt instead of a 663 nt threshold).

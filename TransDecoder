@@ -10,7 +10,7 @@ use Cwd;
 use lib ("$FindBin::RealBin/PerlLib");
 use Pipeliner;
 
-my $VERSION = "6.0.0";
+my $VERSION = "7.0.0";
 
 my $UTIL_DIR  = "$FindBin::RealBin/util";
 my $BIN_DIR   = "$FindBin::RealBin";
