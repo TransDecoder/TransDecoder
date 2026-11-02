@@ -9,7 +9,7 @@ use Nuc_translator;
 use Kozak_model;
 use Getopt::Long qw(:config posix_default no_ignore_case bundling pass_through);
 
-# Train the start-codon (Kozak) context model used by start_codon_refinement.pl: log-odds of
+# Train the start-codon (Kozak) context model used by start_codon_refinement.pl: log2-odds (bits) of
 # bases at -6..-1 and +4..+5 around the ATG, training ORF starts vs in-frame ATGs inside the
 # training ORFs.
 
@@ -24,7 +24,7 @@ my $usage = <<__EOUSAGE__;
 #  --training_orfs <string>     training ORF CDS fasta (headers include acc:lend-rend(strand))
 #
 #  --out_prefix <string>        writes:
-#                                 <prefix>.kozak.tsv         log-odds model (read by start_codon_refinement.pl)
+#                                 <prefix>.kozak.tsv         log2-odds model (bits) (read by start_codon_refinement.pl)
 #                                 <prefix>.kozak.counts.tsv  base counts at start and internal ATG sites
 #                                 <prefix>.kozak.logo.svg    sequence logo
 #                               or, with fewer than $MIN_TRAINING_STARTS training ORFs starting with ATG,

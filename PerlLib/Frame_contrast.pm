@@ -2,7 +2,7 @@ package Frame_contrast;
 
 # Frame contrast of a coding Markov model: the in-frame score of a sequence minus the better of
 # its scores shifted by one and two bases (as in ORF selection), and the median per-base contrast
-# of the training ORFs. Used by start codon refinement and by the short-ORF test in ORF selection.
+# of the training ORFs. Used by start codon refinement.
 # Same computation as PyTransDecoder (predict.py: _frame_contrast, _coding_contrast).
 
 use strict;

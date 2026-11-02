@@ -85,9 +85,9 @@ ENV BIN=/usr/local/bin
 # samtools, ncbi-blast+, diamond-aligner, and hmmer.
 
 
-# Transdecoder v6.0.0
+# Transdecoder v7.0.0
 WORKDIR $SRC
-ENV TRANSDECODER_CO=ec18d65529ddacab4cd6c930f8b86406a124b5ea
+ENV TRANSDECODER_CO=TransDecoder-v7.0.0
 
 RUN git clone https://github.com/TransDecoder/TransDecoder.git && \
    cd TransDecoder && \

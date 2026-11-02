@@ -1,0 +1,20 @@
+{
+ "name": "ciliate",
+ "source": "tthermophila benchmark annotation (TransDecoder paper 2026): complete coding transcripts + their fragments",
+ "genetic_code": "Tetrahymena",
+ "gc_pct": 25.85,
+ "auto_accept_nt": null,
+ "strata": "len_tx_type",
+ "q_levels": [
+  0.001,
+  0.002,
+  0.005,
+  0.01,
+  0.02,
+  0.05,
+  0.1,
+  0.2,
+  0.3,
+  0.5
+ ]
+}

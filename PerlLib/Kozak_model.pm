@@ -3,8 +3,8 @@ package Kozak_model;
 # Start-codon (Kozak) context model used by start codon refinement.
 #
 # Positions -6..-1 and +4..+5 around an ATG (A of ATG = +1; the ATG itself is not scored).
-# Log-odds (natural log, +1 pseudocounts) of training ORF start contexts vs in-frame ATGs
-# inside the training ORFs. Same model and file formats as PyTransDecoder (core/kozak.py).
+# Log2-odds (bits, +1 pseudocounts) of training ORF start contexts vs in-frame ATGs inside the
+# training ORFs: +1 bit = twice as start-like as an average internal ATG. Same model and file formats as PyTransDecoder (core/kozak.py).
 
 use strict;
 use warnings;
@@ -70,7 +70,7 @@ sub log_odds_model {
         }
         my %log_odds;
         foreach my $b (@BASES) {
-            $log_odds{$b} = log( (($pos_counts->[$k]->{$b} + 1) / $pt) / (($neg_counts->[$k]->{$b} + 1) / $nt) );
+            $log_odds{$b} = log( (($pos_counts->[$k]->{$b} + 1) / $pt) / (($neg_counts->[$k]->{$b} + 1) / $nt) ) / log(2);
         }
         push (@model, \%log_odds);
     }
@@ -84,7 +84,7 @@ sub write_model {
 
     my @labels = &position_labels();
     open(my $ofh, ">$filename") or confess "Error, cannot write to $filename";
-    print $ofh "#position\tA\tC\tG\tT  (log-odds, start vs internal in-frame ATG; $num_starts training starts)\n";
+    print $ofh "#position\tA\tC\tG\tT  (log2-odds in bits, start vs internal in-frame ATG; $num_starts training starts)\n";
     for my $k (0..$#$model) {
         print $ofh join("\t", $labels[$k], map { sprintf("%.3f", $model->[$k]->{$_}) } @BASES) . "\n";
     }
@@ -171,7 +171,7 @@ sub write_logo_svg {
         $ic_stack[$k] = [ map { [$_, $f{$_} * $ic] } sort { $f{$a} <=> $f{$b} } @BASES ];
         $max_ic = $ic if $ic > $max_ic;
 
-        my %lo = map { $_ => $model->[$k]->{$_} / log(2) } @BASES;
+        my %lo = map { $_ => $model->[$k]->{$_} } @BASES;
         $up_stack[$k] = [ map { [$_, $lo{$_}] } sort { $lo{$a} <=> $lo{$b} } grep { $lo{$_} > 0 } @BASES ];
         $dn_stack[$k] = [ map { [$_, -$lo{$_}] } sort { $lo{$b} <=> $lo{$a} } grep { $lo{$_} < 0 } @BASES ];
         my ($u, $d) = (0, 0);
